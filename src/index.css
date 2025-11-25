@@ -1,0 +1,215 @@
+/* :root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+} */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Horizontal logo scrolling bar
+.logo-marquee {
+  white-space: nowrap;
+}
+
+.logo-marquee-inner {
+  display: inline-flex;
+  gap: 3rem;
+  padding-block: 0.4rem;
+  animation: logo-scroll 25s linear infinite;
+}
+
+.logo-pill {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.7;
+} */
+
+/* Simple infinite scroll */
+/* @keyframes logo-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+} */
+
+/* GLOBAL BLACK BACKGROUND + WHITE GRID */
+/* body {
+  margin: 0;
+  background: black;
+} */
+
+/* Create a grid overlay that sits above the body background */
+/* body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none; 
+  z-index: 0; */
+
+/* background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.12) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+
+  background-size: 22px 22px;
+} */
+
+/* GLOBAL BLACK BACKGROUND */
+body {
+  margin: 0;
+  background: black;
+  color: white;
+}
+
+/* GRID ON MAIN SECTION ONLY */
+.grid-bg {
+  position: relative;
+}
+
+.grid-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.018) 0.15px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.014) 0.15px,
+      transparent 1px
+    );
+
+  background-size: 22px 22px;
+}
+
+/* Light-mode polish for contact section */
+.theme-light .contact-section h2 {
+  /* stronger, slightly warmer heading color */
+  color: #111827; /* slate-900 */
+}
+
+.theme-light .contact-section h2 .text-neutral-700 {
+  color: #475569 !important; /* slate-600 */
+}
+
+.theme-light .contact-section h2 .text-neutral-900 {
+  color: #0f172a !important; /* slate-900 */
+}
+
+.theme-light .contact-section label {
+  color: #6b7280; /* neutral/gray */
+}
+
+.theme-light .contact-section input,
+.theme-light .contact-section textarea {
+  background: #f3f4f6; /* light neutral */
+  color: #0f172a;
+  border: 1px solid #e6e9ee;
+  box-shadow: inset 6px 6px 12px rgba(2,6,23,0.06), inset -6px -6px 12px rgba(255,255,255,0.7);
+  border-radius: 12px;
+}
+
+.theme-light .contact-section textarea {
+  min-height: 160px;
+}
+
+.theme-light .contact-section input::placeholder,
+.theme-light .contact-section textarea::placeholder {
+  color: #9ca3af;
+}
+
+.theme-light .contact-section .mb-8 .text-sm {
+  color: #2563eb; /* keep the blue links visible */
+}
+
+.theme-light .contact-section button[type="submit"] {
+  background: linear-gradient(180deg, #ffffff, #f3f4f6);
+  color: #0f172a;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 8px rgba(2,6,23,0.04);
+}
+
+.theme-light .contact-section .w-2.h-2 {
+  /* status dot — make it a bit darker on light mode */
+  background-color: #10b981;
+}
+
+/* Slight lift on hovered logo in the logo loops (only in light mode) */
+.theme-light .logoloop--scale-hover .logoloop__item:hover img,
+.theme-light .logoloop--scale-hover .logoloop__item:hover .logoloop__node {
+  transform: scale(1.34);
+}

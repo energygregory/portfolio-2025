@@ -1,0 +1,199 @@
+// // export default function App() {
+// //   return (
+// //     <div>
+// //       <h1>Portfolio is live</h1>
+// //     </div>
+// //   );
+// // }
+
+// function App() {
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-black">
+//       <h1 className="text-4xl font-bold text-white">Tailwind is working 🎯</h1>
+//     </div>
+//   );
+// }
+
+// export default App;
+
+// import { Routes, Route, Link } from "react-router-dom";
+// import Home from "./pages/Home.jsx";
+// import Work from "./pages/Work.jsx";
+// import About from "./pages/About.jsx";
+// import Testimonials from "./pages/Testimonials.jsx";
+// import Contact from "./pages/Contact.jsx";
+
+// function App() {
+//   return (
+//     <div className="min-h-screen text-white relative">
+//       <header className="p-4 border-b border-neutral-800 flex justify-center gap-56">
+//         <Link to="/">Home</Link>
+//         <Link to="/work">Work</Link>
+//         <Link to="/about">About</Link>
+//         <Link to="/testimonials">Testimonials</Link>
+//         <Link to="/contact">Contact</Link>
+//       </header>
+
+//       <main className="p-4">
+//         <Routes>
+//           <Route path="/" element={<Home />} />
+//           <Route path="/work" element={<Work />} />
+//           <Route path="/about" element={<About />} />
+//           <Route path="/testimonials" element={<Testimonials />} />
+//           <Route path="/contact" element={<Contact />} />
+//         </Routes>
+//       </main>
+//     </div>
+//   );
+// }
+
+// export default App;
+
+// import { Routes, Route, Link } from "react-router-dom";
+// import Home from "./pages/Home.jsx";
+// import Work from "./pages/Work.jsx";
+// import About from "./pages/About.jsx";
+// import Testimonials from "./pages/Testimonials.jsx";
+// import Contact from "./pages/Contact.jsx";
+
+// function App() {
+//   return (
+//     <div className="min-h-screen text-white relative">
+//       {/* NAVBAR — no grid */}
+//       <header className="p-4 border-b border-neutral-800 flex justify-center gap-56 bg-black relative z-10">
+//         <Link to="/">Home</Link>
+//         <Link to="/work">Work</Link>
+//         <Link to="/about">About</Link>
+//         <Link to="/testimonials">Testimonials</Link>
+//         <Link to="/contact">Contact</Link>
+//       </header>
+
+//       {/* MAIN CONTENT — grid background */}
+//       <main className="p-4 grid-bg relative z-10">
+//         <Routes>
+//           <Route path="/" element={<Home />} />
+//           <Route path="/work" element={<Work />} />
+//           <Route path="/about" element={<About />} />
+//           <Route path="/testimonials" element={<Testimonials />} />
+//           <Route path="/contact" element={<Contact />} />
+//         </Routes>
+//       </main>
+//     </div>
+//   );
+// }
+
+// export default App;
+
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Home from "./pages/Home.jsx";
+import Work from "./pages/Work.jsx";
+import About from "./pages/About.jsx";
+import Testimonials from "./pages/Testimonials.jsx";
+import Contact from "./pages/Contact.jsx";
+import Terzo from "./pages/Terzo.jsx";
+import WilliamRu from "./pages/WilliamRu.jsx";
+import Around from "./pages/Around.jsx";
+import FlyHigh from "./pages/FlyHigh.jsx";
+import LegacyDrip from "./pages/LegacyDrip.jsx";
+
+import LogoLoop from "./components/LogoLoop";
+
+// Use the actual files in public/LOGOS (filenames used as-is).
+const portfolioLogos = [
+  { id: "brand-one", label: "Brand One", src: "/LOGOS/BRAND-ONE.svg", path: "/work" },
+  { id: "brand-two", label: "Brand Two", src: "/LOGOS/BRAND-TWO.svg", path: "/work" },
+  { id: "brand-three", label: "Brand Three", src: "/LOGOS/BRAND-THREE.svg", path: "/work" },
+  { id: "logo-1-white", label: "Logo 1", src: "/LOGOS/Logo 1 in whitw.svg", path: "/terzo" },
+  { id: "william-ru", label: "William Ru", src: "/LOGOS/William Ru.svg", path: "/williamru" },
+];
+
+function App() {
+  const navigate = useNavigate();
+
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem("theme") || "dark";
+    } catch (e) {
+      return "dark";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("theme", theme);
+    } catch (e) {}
+  }, [theme]);
+
+  return (
+    <div
+      className={`min-h-screen relative ${
+        theme === "dark"
+          ? "bg-black text-white theme-dark"
+          : "bg-white text-black theme-light"
+      }`}
+    >
+      {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
+
+      {/* NAV BAR (CENTERED LINKS) */}
+  <header
+    className={`sticky top-0 z-40 p-4 border-b flex justify-center gap-56 ${
+      theme === "dark" ? "border-neutral-800 bg-black" : "border-neutral-300 bg-white"
+    }`}
+  >
+        <Link to="/">Home</Link>
+        <Link to="/work">Work</Link>
+        <Link to="/about">About</Link>
+        <Link to="/testimonials">Testimonials</Link>
+        <Link to="/contact">Contact</Link>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          <button
+            onClick={() => setTheme("light")}
+            aria-label="Light mode"
+            className="p-1 rounded hover:bg-neutral-200/10"
+            title="Light mode"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="M4.93 4.93l1.41 1.41"></path>
+              <path d="M17.66 17.66l1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="M4.93 19.07l1.41-1.41"></path>
+              <path d="M17.66 6.34l1.41-1.41"></path>
+            </svg>
+          </button>
+          <button
+            onClick={() => setTheme("dark")}
+            aria-label="Dark mode"
+            className="p-1 rounded hover:bg-neutral-200/10"
+            title="Dark mode"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main className="p-4">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/work" element={<Work />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/around" element={<Around />} />
+          <Route path="/flyhigh" element={<FlyHigh />} />
+          <Route path="/legacydrip" element={<LegacyDrip />} />
+          <Route path="/terzo" element={<Terzo />} />
+          <Route path="/williamru" element={<WilliamRu />} />
+          <Route path="/testimonials" element={<Testimonials />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+export default App;
