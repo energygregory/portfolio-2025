@@ -135,9 +135,10 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: clamp(24px, 8%, 120px);
+  /* push fades much further toward the center — larger clamp so they intrude */
+  width: clamp(120px, 40%, 50%);
   pointer-events: none;
-  z-index: 10;
+  z-index: 40;
 }
 
 .logoloop--fade::before {
@@ -145,6 +146,7 @@
   background: linear-gradient(
     to right,
     var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 40%,
     rgba(0, 0, 0, 0) 100%
   );
 }
@@ -154,6 +156,7 @@
   background: linear-gradient(
     to left,
     var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 40%,
     rgba(0, 0, 0, 0) 100%
   );
 }
@@ -163,7 +166,8 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: clamp(24px, 8%, 120px);
+  /* increase vertical fade height to push fades inward */
+  height: clamp(120px, 40%, 50%);
 }
 
 .logoloop--vertical.logoloop--fade::before {
@@ -172,6 +176,7 @@
   background: linear-gradient(
     to bottom,
     var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 40%,
     rgba(0, 0, 0, 0) 100%
   );
 }
@@ -182,6 +187,7 @@
   background: linear-gradient(
     to top,
     var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+    var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 40%,
     rgba(0, 0, 0, 0) 100%
   );
 }
@@ -240,4 +246,104 @@
 .logo-bar .logo-img {
   height: 20px !important; /* smaller icon size */
   width: auto !important;
+}
+
+/* Per-row spacing for multi-row logo block */
+/* Layout for stacked rows: use a uniform gap and fixed row height so rows appear even
+   regardless of individual logo artwork sizes. */
+.multi-logoloop__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--multi-logoloop-rowGap, 80px);
+}
+
+.multi-logoloop__row {
+  display: flex;
+  align-items: center; /* vertical center logos inside the row */
+  justify-content: center;
+  min-height: calc(var(--logoloop-logoHeight) * 3.5); /* ensures taller rows for big logos */
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Keep last row same as others so spacing is uniform */
+.multi-logoloop__row--last {
+  /* no special margin; handled by the parent gap */
+}
+
+/* Any row-specific tweaks can be added here. */
+
+/* Slightly reduce the gap between the 1st and 2nd rows by pulling the 2nd row up */
+.multi-logoloop__row--idx-1 {
+  transform: translateY(-12px);
+}
+
+/* MOBILE-ONLY OVERRIDES */
+@media (max-width: 640px) {
+  .multi-logoloop__inner {
+    gap: 12px !important; /* No change needed here */
+  }
+  /* Make En Garde larger on mobile */
+  .multi-logoloop .logoloop__item--en-garde img {
+    height: 40px !important;
+  }
+  .multi-logoloop__row--idx-2 {
+     margin-top: -20px !important; /* Further reduce gap between 2nd and 3rd row */
+  }
+  .multi-logoloop__row {
+    min-height: calc(var(--logoloop-logoHeight) * 1.1) !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+  }
+  .logoloop__item {
+     margin-right: 32px !important; /* Maximum horizontal spacing between logos for mobile */
+  }
+  /* Make Tribe of God (asset-4), Asset 3 (asset-3), and Around (asset-1) logos bigger on mobile */
+  .multi-logoloop .logoloop__item--asset-4 img { /* Tribe of God - higher specificity */
+    height: 40px !important; /* reduced ~30% from 56px */
+  }
+  .multi-logoloop .logoloop__item--asset-3 img, /* Asset 3 */
+  .multi-logoloop .logoloop__item--asset-1 img { /* Around */
+    height: 28px !important; /* reduced ~30% from 40px */
+  }
+  /* Ensure logos in each row are centered relative to each other */
+  .multi-logoloop__row .logoloop__item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  /* Fix uneven spacing for row 1 logos */
+  .multi-logoloop__row--idx-0 .logoloop__item {
+    margin-right: 32px !important;
+  }
+  .logoloop__item img {
+    height: 12px !important;
+  }
+  .logoloop--fade::before {
+    width: clamp(18px, 6%, 40px) !important;
+    /* left-side fade (gradient flows to the right) */
+    background: linear-gradient(
+      to right,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 20%,
+      rgba(0,0,0,0) 100%
+    );
+  }
+
+  .logoloop--fade::after {
+    width: clamp(18px, 6%, 40px) !important;
+    /* right-side fade (gradient flows to the left) - fixed for mobile */
+    background: linear-gradient(
+      to left,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
+      var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 20%,
+      rgba(0,0,0,0) 100%
+    );
+  }
+  .multi-logoloop {
+    --logoloop-mobileSpeed: 0.4s !important;
+  }
+  .nav-logo {
+    height: 18px !important;
+  }
 }

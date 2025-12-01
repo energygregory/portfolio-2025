@@ -84,18 +84,18 @@
 
 // export default App;
 
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Home from "./pages/Home.jsx";
 import Work from "./pages/Work.jsx";
 import About from "./pages/About.jsx";
-import Testimonials from "./pages/Testimonials.jsx";
 import Contact from "./pages/Contact.jsx";
 import Terzo from "./pages/Terzo.jsx";
 import WilliamRu from "./pages/WilliamRu.jsx";
 import Around from "./pages/Around.jsx";
 import FlyHigh from "./pages/FlyHigh.jsx";
 import LegacyDrip from "./pages/LegacyDrip.jsx";
+import PriceList from "./pages/PriceList.jsx";
 
 import LogoLoop from "./components/LogoLoop";
 
@@ -137,46 +137,62 @@ function App() {
 
       {/* NAV BAR (CENTERED LINKS) */}
   <header
-    className={`sticky top-0 z-40 p-4 border-b flex justify-center gap-56 ${
+    className={`sticky top-0 z-40 p-4 border-b flex justify-center items-center sm:gap-56 gap-3 app-header ${
       theme === "dark" ? "border-neutral-800 bg-black" : "border-neutral-300 bg-white"
     }`}
   >
-        <Link to="/">Home</Link>
-        <Link to="/work">Work</Link>
-        <Link to="/about">About</Link>
-        <Link to="/testimonials">Testimonials</Link>
-        <Link to="/contact">Contact</Link>
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          <button
-            onClick={() => setTheme("light")}
-            aria-label="Light mode"
-            className="p-1 rounded hover:bg-neutral-200/10"
-            title="Light mode"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2"></path>
-              <path d="M12 20v2"></path>
-              <path d="M4.93 4.93l1.41 1.41"></path>
-              <path d="M17.66 17.66l1.41 1.41"></path>
-              <path d="M2 12h2"></path>
-              <path d="M20 12h2"></path>
-              <path d="M4.93 19.07l1.41-1.41"></path>
-              <path d="M17.66 6.34l1.41-1.41"></path>
-            </svg>
-          </button>
-          <button
-            onClick={() => setTheme("dark")}
-            aria-label="Dark mode"
-            className="p-1 rounded hover:bg-neutral-200/10"
-            title="Dark mode"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
-              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-            </svg>
-          </button>
-        </div>
-      </header>
+    {/* Top-left clickable logo that always links to home */}
+    <div className="absolute left-4 top-1/2 -translate-y-1/2">
+      <Link to="/" aria-label="Home">
+        <img src="/LOGOS/finalbiglogo.svg" alt="Home" className="nav-logo sm:h-8 h-6 dark:invert" />
+      </Link>
+    </div>
+    {/* Show all nav links on all devices with small gaps on mobile */}
+    <nav className="flex items-center gap-3 sm:gap-6">
+      <NavLink to="/" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
+        Home
+      </NavLink>
+      <NavLink to="/work" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
+        Work
+      </NavLink>
+      <NavLink to="/about" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
+        About
+      </NavLink>
+      <NavLink to="/contact" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
+        Contact
+      </NavLink>
+    </nav>
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+      <button
+        onClick={() => setTheme("light")}
+        aria-label="Light mode"
+        className="p-1 rounded hover:bg-neutral-200/10"
+        title="Light mode"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2"></path>
+          <path d="M12 20v2"></path>
+          <path d="M4.93 4.93l1.41 1.41"></path>
+          <path d="M17.66 17.66l1.41 1.41"></path>
+          <path d="M2 12h2"></path>
+          <path d="M20 12h2"></path>
+          <path d="M4.93 19.07l1.41-1.41"></path>
+          <path d="M17.66 6.34l1.41-1.41"></path>
+        </svg>
+      </button>
+      <button
+        onClick={() => setTheme("dark")}
+        aria-label="Dark mode"
+        className="p-1 rounded hover:bg-neutral-200/10"
+        title="Dark mode"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
 
       <main className="p-4">
         <Routes>
@@ -188,8 +204,8 @@ function App() {
           <Route path="/legacydrip" element={<LegacyDrip />} />
           <Route path="/terzo" element={<Terzo />} />
           <Route path="/williamru" element={<WilliamRu />} />
-          <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/pricelist" element={<PriceList />} />
         </Routes>
       </main>
     </div>

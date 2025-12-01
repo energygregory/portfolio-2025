@@ -31,28 +31,34 @@ export default function Home() {
         />
       </div>
 
-      {/* Spacing/divider */}
-      <div className="w-full h-56"></div>
+      {/* Responsive spacing: show 'Trusted By' and part of the first logo row across devices */}
+      <div className="w-full h-20 sm:h-28 md:h-40 lg:h-56"></div>
 
-      {/* Trusted By Section */}
-      <div className="w-full mb-3 text-center">
-        <h3 className="font-mono text-sm tracking-widest text-neutral-600 dark:text-neutral-400">
-          T R U S T E D &nbsp; B Y
-        </h3>
+      {/* Trusted By Section + logo strip — push down on mobile only */}
+      <div className="w-full mt-24 sm:mt-0">
+        <div className="w-full mb-3 text-center">
+          <h3
+            className="trusted-by text-sm tracking-widest text-neutral-600 dark:text-neutral-400"
+            style={{ fontFamily: "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace" }}
+          >
+            T R U S T E D &nbsp; B Y
+          </h3>
+        </div>
+
+        {/* Slow, multi-row logo section (moved from top bar). 4 stacked rows, drastically reduced speed. */}
+        {/* Make the logo strip span the full viewport width so it starts at the edges */}
+        <section className="w-full mb-12">
+          <MultiRowLogoLoop
+            logos={logos}
+            rows={3}
+            /* reduced speed and increased horizontal gap */
+            speed={16}
+            logoHeight={36}
+            gap={140}
+            rowGap={80}
+          />
+        </section>
       </div>
-
-      {/* Slow, multi-row logo section (moved from top bar). 4 stacked rows, drastically reduced speed. */}
-      {/* Make the logo strip span the full viewport width so it starts at the edges */}
-      <section className="w-full mb-12">
-        <MultiRowLogoLoop
-          logos={logos}
-          rows={4}
-          speed={24}
-          logoHeight={36}
-          gap={80}
-          rowGap={48}
-        />
-      </section>
 
       <div className="flex-1" />
 

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function MultiRowLogoLoop({
   logos,
-  rows = 4,
+  rows = 3,
   speed = 120,
   logoHeight = 36,
   gap = 56,
@@ -27,7 +27,11 @@ export default function MultiRowLogoLoop({
 
   // Render each logo as a clickable link
   const renderLogoItem = (item) => (
-    <Link to={item.path} className="logoloop__link" aria-label={item.label}>
+    <Link
+      to={item.path}
+      className={`logoloop__link logoloop__item--${item.id}`}
+      aria-label={item.label}
+    >
       <img
         src={item.src}
         alt={item.alt || item.label}
@@ -61,8 +65,10 @@ export default function MultiRowLogoLoop({
             const hoverMagnitude = 8;
             const signedHover = direction === "left" ? Math.abs(hoverMagnitude) : -Math.abs(hoverMagnitude);
 
+            const rowClass = (i === rows - 1 ? "multi-logoloop__row multi-logoloop__row--last" : "multi-logoloop__row") + ` multi-logoloop__row--idx-${i}`;
+
             return (
-              <div className="multi-logoloop__row" key={i} style={{ marginBottom: i < rows - 1 ? `${rowGap}px` : 0 }}>
+              <div className={rowClass} key={i}>
                 <LogoLoop
                   logos={rowLogos}
                   speed={speed}
