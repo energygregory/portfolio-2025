@@ -55,12 +55,8 @@ export default function NavigationLoader({ theme = "dark" }) {
         vid.style.objectFit = "contain";
         vid.style.borderRadius = "8px";
         // apply theme-aware filter: in light mode the video should be inverted and boosted
-          // apply a stronger light-mode filter so blacks are truly deep without overlays
-          if (theme === "light") {
-            vid.style.filter = "invert(1) contrast(2.4) brightness(0.28) saturate(1.1)";
-        } else {
-          vid.style.filter = "none";
-        }
+          // Remove inline filters so CSS controls the final look (we set tuned filters in CSS)
+          vid.style.filter = "";
         vid.className = "nav-loader-video-el";
         // speed up playback by 3x; set after metadata to avoid DOMException in some browsers
         vid.addEventListener("loadedmetadata", () => {

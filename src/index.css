@@ -450,9 +450,10 @@ html, body {
 /* Stronger blackness for the inverted animation in light mode */
 .theme-light .about-efecto-video,
 .theme-light .nav-loader-video-el {
-  /* Strong inversion with boosted contrast and reduced brightness to get pure blacks */
-  filter: invert(1) contrast(2.4) brightness(0.28) saturate(1.1);
-  -webkit-filter: invert(1) contrast(2.4) brightness(0.28) saturate(1.1);
+  /* Strong inversion tuned to preserve detail while giving deep blacks on white */
+  /* Higher contrast and moderate brightness to avoid grey wash */
+  filter: invert(1) contrast(4) brightness(1.05) saturate(1.1);
+  -webkit-filter: invert(1) contrast(4) brightness(1.05) saturate(1.1);
 }
 .theme-dark .about-efecto-video,
 .theme-dark .nav-loader-video-el {
@@ -463,6 +464,13 @@ html, body {
 /* Previously-used darken overlays caused grey artifacts; disable them and rely on direct filters above. */
 .video-darken-overlay { display: none !important; }
 .nav-loader-darken-overlay { display: none !important; }
+
+/* About wrapper: provide theme-aware background so inverted animation sits on white in light mode */
+.efecto-wrapper { position: relative; display: block; border-radius: 8px; overflow: hidden; }
+.efecto-wrapper .efecto-bg { position: absolute; inset: 0; z-index: 0; }
+.efecto-wrapper video { position: relative; z-index: 1; display: block; }
+.theme-light .efecto-wrapper .efecto-bg { background: #ffffff; }
+.theme-dark .efecto-wrapper .efecto-bg { background: #000000; }
 
 /* Theme-aware tweak: in light theme use a slightly subtler white sheen */
 .theme-light .folder-caption { color: #111827; }
