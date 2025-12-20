@@ -391,6 +391,26 @@ html, body {
   100% { left: 120%; opacity: 0; }
 }
 
+/* Brands list styling: big monospace items with hover highlight per theme */
+.brand-list-item {
+  cursor: pointer;
+  border-radius: 6px;
+}
+.theme-dark .brand-list-item {
+  color: white;
+}
+.theme-dark .brand-list-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: white;
+}
+.theme-light .brand-list-item {
+  color: #111827;
+}
+.theme-light .brand-list-item:hover {
+  background: rgba(0,0,0,0.06);
+  color: #000000;
+}
+
 /* Strong inversion for the efecto video in light mode only.
    Uses theme wrapper classes (`.theme-light` / `.theme-dark`) used by the site.
    This is pure CSS and adds no extra network or runtime cost. */
