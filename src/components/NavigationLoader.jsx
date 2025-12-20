@@ -40,21 +40,28 @@ export default function NavigationLoader({ theme = "dark" }) {
         targetRef.current = url.pathname + url.search + url.hash;
         setVisible(true);
 
-        // create a small video element that is a duplicate of the main video
+        // create a larger video element duplicate for the loader
         const vid = document.createElement("video");
         vid.src = "/efecto-recording-2025-12-20T12-26-03.webm";
         vid.muted = true;
         vid.playsInline = true;
         vid.preload = "auto";
         vid.autoplay = true;
-        vid.style.width = "33vmin"; // reduce roughly by 3
-        vid.style.maxWidth = "120px";
+        // make it noticeably bigger
+        vid.style.width = "44vmin";
+        vid.style.maxWidth = "420px";
         vid.style.height = "auto";
         vid.style.display = "block";
         vid.style.objectFit = "contain";
-        vid.style.borderRadius = "6px";
+        vid.style.borderRadius = "8px";
         vid.style.filter = theme === "light" ? "invert(1) brightness(1.02) contrast(1.2)" : "none";
         vid.className = "nav-loader-video-el";
+        // speed up playback by 3x; set after metadata to avoid DOMException in some browsers
+        vid.addEventListener("loadedmetadata", () => {
+          try {
+            vid.playbackRate = 3.0;
+          } catch (e) {}
+        });
 
         const container = document.getElementById("nav-loader-video-container");
         if (container) {
@@ -69,10 +76,29 @@ export default function NavigationLoader({ theme = "dark" }) {
           // ignore play errors
         }
 
-        // navigate after max 1s
+        // start fade-out shortly before navigation so user sees a smooth transition
+        const FADE_START_MS = 700; // begin fade after 700ms
+        const FADE_DURATION_MS = 300; // fade duration
+
+        const overlayEl = document.getElementById("nav-loader-overlay");
+        // ensure overlay is opaque initially
+        if (overlayEl) {
+          overlayEl.style.transition = `opacity ${FADE_DURATION_MS}ms ease, transform ${FADE_DURATION_MS}ms ease`;
+          overlayEl.style.opacity = "1";
+          overlayEl.style.transform = "scale(1)";
+        }
+
+        setTimeout(() => {
+          if (overlayEl) {
+            overlayEl.style.opacity = "0";
+            overlayEl.style.transform = "scale(0.98)";
+          }
+        }, FADE_START_MS);
+
+        // navigate after the total (fade start + fade duration) so the fade completes
         setTimeout(() => {
           if (targetRef.current) navigate(targetRef.current);
-        }, 1000);
+        }, FADE_START_MS + FADE_DURATION_MS);
       } catch (err) {
         return;
       }
