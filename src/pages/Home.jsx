@@ -51,11 +51,11 @@ export default function Home() {
           <MultiRowLogoLoop
               logos={logos}
               rows={3}
-              /* moderate speed and tighter vertical spacing between rows */
-              speed={80}
+              /* slower speed and much tighter vertical spacing between rows */
+              speed={40}
               logoHeight={36}
               gap={140}
-              rowGap={8}
+              rowGap={4}
             />
         </section>
       </div>
