@@ -450,8 +450,9 @@ html, body {
 /* Stronger blackness for the inverted animation in light mode */
 .theme-light .about-efecto-video,
 .theme-light .nav-loader-video-el {
-  filter: invert(1) contrast(1.6) brightness(0.6) saturate(0.95);
-  -webkit-filter: invert(1) contrast(1.6) brightness(0.6) saturate(0.95);
+  /* Strong inversion with boosted contrast and reduced brightness to get pure blacks */
+  filter: invert(1) contrast(2.4) brightness(0.28) saturate(1.1);
+  -webkit-filter: invert(1) contrast(2.4) brightness(0.28) saturate(1.1);
 }
 .theme-dark .about-efecto-video,
 .theme-dark .nav-loader-video-el {
@@ -459,22 +460,9 @@ html, body {
   -webkit-filter: none;
 }
 
-/* Darkening overlay used to deepen blacks when animation is inverted in light mode */
-.video-darken-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  background: rgba(0,0,0,0.45);
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-.theme-light .video-darken-overlay { opacity: 1; }
-
-.nav-loader-darken-overlay {
-  mix-blend-mode: multiply;
-  background: rgba(0,0,0,0.45);
-}
+/* Previously-used darken overlays caused grey artifacts; disable them and rely on direct filters above. */
+.video-darken-overlay { display: none !important; }
+.nav-loader-darken-overlay { display: none !important; }
 
 /* Theme-aware tweak: in light theme use a slightly subtler white sheen */
 .theme-light .folder-caption { color: #111827; }

@@ -55,8 +55,9 @@ export default function NavigationLoader({ theme = "dark" }) {
         vid.style.objectFit = "contain";
         vid.style.borderRadius = "8px";
         // apply theme-aware filter: in light mode the video should be inverted and boosted
-        if (theme === "light") {
-          vid.style.filter = "invert(1) contrast(1.6) brightness(0.6) saturate(0.95)";
+          // apply a stronger light-mode filter so blacks are truly deep without overlays
+          if (theme === "light") {
+            vid.style.filter = "invert(1) contrast(2.4) brightness(0.28) saturate(1.1)";
         } else {
           vid.style.filter = "none";
         }
@@ -81,22 +82,8 @@ export default function NavigationLoader({ theme = "dark" }) {
           wrap.style.overflow = 'hidden';
 
           // darkening overlay (for light-mode inverted video)
-          const odiv = document.createElement('div');
-          odiv.className = 'nav-loader-darken-overlay';
-          odiv.style.position = 'absolute';
-          odiv.style.inset = '0';
-          odiv.style.pointerEvents = 'none';
-          odiv.style.transition = 'opacity 200ms ease';
-          if (theme === 'light') {
-            odiv.style.opacity = '1';
-            odiv.style.background = 'rgba(0,0,0,0.45)';
-            odiv.style.mixBlendMode = 'multiply';
-          } else {
-            odiv.style.opacity = '0';
-          }
-
           wrap.appendChild(vid);
-          wrap.appendChild(odiv);
+            container.appendChild(wrap);
           container.appendChild(wrap);
         }
 
