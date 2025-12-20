@@ -43,16 +43,16 @@ export default function Work() {
         <nav className="flex gap-6 mb-6 border-b border-neutral-700 pb-3" ref={dropdownRef}>
           <button
             onClick={() => setActiveCategory('brands')}
-            className={`font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
-              activeCategory === 'brands' ? 'text-white border-b-2 border-white' : 'text-neutral-400 hover:text-neutral-300'
+            className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
+              activeCategory === 'brands' ? 'mini-nav-active' : ''
             }`}
           >
             Brands
           </button>
           <button
             onClick={() => setActiveCategory('type')}
-            className={`font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
-              activeCategory === 'type' ? 'text-white border-b-2 border-white' : 'text-neutral-400 hover:text-neutral-300'
+            className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
+              activeCategory === 'type' ? 'mini-nav-active' : ''
             }`}
           >
             Type of Work

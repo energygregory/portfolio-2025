@@ -54,8 +54,12 @@ export default function NavigationLoader({ theme = "dark" }) {
         vid.style.display = "block";
         vid.style.objectFit = "contain";
         vid.style.borderRadius = "8px";
-        // keep the video as-is (white on black) and show it against a dark background
-        vid.style.filter = "none";
+        // apply theme-aware filter: in light mode the video should be inverted and boosted
+        if (theme === "light") {
+          vid.style.filter = "invert(1) contrast(1.6) brightness(0.6) saturate(0.95)";
+        } else {
+          vid.style.filter = "none";
+        }
         vid.className = "nav-loader-video-el";
         // speed up playback by 3x; set after metadata to avoid DOMException in some browsers
         vid.addEventListener("loadedmetadata", () => {
@@ -139,8 +143,8 @@ export default function NavigationLoader({ theme = "dark" }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        // always use a dark background so the animation retains its intended contrast
-        background: "#000000",
+        // use theme-aware background so inverted animation looks correct in light mode
+        background: theme === "light" ? "#ffffff" : "#000000",
       }}
     >
       <div id="nav-loader-video-container" style={{ display: "flex", alignItems: "center", justifyContent: "center" }} />

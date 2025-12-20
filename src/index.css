@@ -416,15 +416,47 @@ html, body {
   color: #000000;
 }
 
+/* Mini-nav active state (theme-aware) */
+.theme-dark .mini-nav-active {
+  color: #ffffff !important;
+  border-bottom: 2px solid #ffffff !important;
+}
+.theme-light .mini-nav-active {
+  color: #000000 !important;
+  border-bottom: 2px solid #000000 !important;
+}
+
+/* Mini-nav button base styling */
+.mini-nav-btn {
+  color: var(--mini-nav-color, #9ca3af);
+}
+
 /* Ensure the efecto animation displays on a dark background for both themes.
    We intentionally avoid inverting the video itself — keep original contrast. */
 .about-efecto-video { display: block; width: 100%; height: auto; }
 
-/* Make nav and home logos visible in light mode by inverting light SVGs to dark */
+/* Logo color rules: ensure logo is black in light mode, white in dark mode */
 .theme-light .nav-logo,
 .theme-light .home-main-logo {
-  filter: invert(1);
-  -webkit-filter: invert(1);
+  filter: brightness(0) saturate(100%); /* force black */
+  -webkit-filter: brightness(0) saturate(100%);
+}
+.theme-dark .nav-logo,
+.theme-dark .home-main-logo {
+  filter: brightness(0) invert(1); /* force white */
+  -webkit-filter: brightness(0) invert(1);
+}
+
+/* Stronger blackness for the inverted animation in light mode */
+.theme-light .about-efecto-video,
+.theme-light .nav-loader-video-el {
+  filter: invert(1) contrast(1.6) brightness(0.6) saturate(0.95);
+  -webkit-filter: invert(1) contrast(1.6) brightness(0.6) saturate(0.95);
+}
+.theme-dark .about-efecto-video,
+.theme-dark .nav-loader-video-el {
+  filter: none;
+  -webkit-filter: none;
 }
 
 /* Theme-aware tweak: in light theme use a slightly subtler white sheen */
