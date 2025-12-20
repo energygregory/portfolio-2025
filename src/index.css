@@ -416,16 +416,15 @@ html, body {
   color: #000000;
 }
 
-/* Strong inversion for the efecto video in light mode only.
-   Uses theme wrapper classes (`.theme-light` / `.theme-dark`) used by the site.
-   This is pure CSS and adds no extra network or runtime cost. */
-.theme-light .about-efecto-video {
-  filter: invert(1) brightness(1.02) contrast(1.2) saturate(1);
-  -webkit-filter: invert(1) brightness(1.02) contrast(1.2) saturate(1);
-}
-.theme-dark .about-efecto-video {
-  filter: none;
-  -webkit-filter: none;
+/* Ensure the efecto animation displays on a dark background for both themes.
+   We intentionally avoid inverting the video itself — keep original contrast. */
+.about-efecto-video { display: block; width: 100%; height: auto; }
+
+/* Make nav and home logos visible in light mode by inverting light SVGs to dark */
+.theme-light .nav-logo,
+.theme-light .home-main-logo {
+  filter: invert(1);
+  -webkit-filter: invert(1);
 }
 
 /* Theme-aware tweak: in light theme use a slightly subtler white sheen */

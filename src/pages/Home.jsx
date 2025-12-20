@@ -27,7 +27,7 @@ export default function Home() {
         <img 
           src={personallogo} 
           alt="Logo" 
-          className="w-full max-w-[1200px] h-auto dark:invert"
+          className="home-main-logo w-full max-w-[1200px] h-auto"
         />
       </div>
 
