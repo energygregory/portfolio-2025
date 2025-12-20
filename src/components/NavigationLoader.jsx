@@ -59,7 +59,8 @@ export default function NavigationLoader({ theme = "dark" }) {
         // speed up playback by 3x; set after metadata to avoid DOMException in some browsers
         vid.addEventListener("loadedmetadata", () => {
           try {
-            vid.playbackRate = 3.0;
+            // reduce speed by 30% from previous 3x => 2.1x
+            vid.playbackRate = 2.1;
           } catch (e) {}
         });
 
