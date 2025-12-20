@@ -76,29 +76,12 @@ export default function NavigationLoader({ theme = "dark" }) {
           // ignore play errors
         }
 
-        // start fade-out shortly before navigation so user sees a smooth transition
-        const FADE_START_MS = 700; // begin fade after 700ms
-        const FADE_DURATION_MS = 300; // fade duration
-
-        const overlayEl = document.getElementById("nav-loader-overlay");
-        // ensure overlay is opaque initially
-        if (overlayEl) {
-          overlayEl.style.transition = `opacity ${FADE_DURATION_MS}ms ease, transform ${FADE_DURATION_MS}ms ease`;
-          overlayEl.style.opacity = "1";
-          overlayEl.style.transform = "scale(1)";
-        }
-
-        setTimeout(() => {
-          if (overlayEl) {
-            overlayEl.style.opacity = "0";
-            overlayEl.style.transform = "scale(0.98)";
-          }
-        }, FADE_START_MS);
-
-        // navigate after the total (fade start + fade duration) so the fade completes
+        // navigate after a short delay while the overlay remains opaque,
+        // then perform the fade-out after the new route mounts.
+        const NAV_DELAY_MS = 700;
         setTimeout(() => {
           if (targetRef.current) navigate(targetRef.current);
-        }, FADE_START_MS + FADE_DURATION_MS);
+        }, NAV_DELAY_MS);
       } catch (err) {
         return;
       }
@@ -108,14 +91,35 @@ export default function NavigationLoader({ theme = "dark" }) {
     return () => document.removeEventListener("click", onClick, true);
   }, [navigate, theme]);
 
-  // hide overlay after location changed (navigation finished)
+  // After location changes, fade the overlay out and then remove it.
   useEffect(() => {
     if (!navigatingRef.current) return;
+    const FADE_DURATION_MS = 300;
+    const overlayEl = document.getElementById("nav-loader-overlay");
+    if (overlayEl) {
+      overlayEl.style.transition = `opacity ${FADE_DURATION_MS}ms ease, transform ${FADE_DURATION_MS}ms ease`;
+      // start fade-out
+      requestAnimationFrame(() => {
+        overlayEl.style.opacity = "0";
+        overlayEl.style.transform = "scale(0.98)";
+      });
+    }
+
     const t = setTimeout(() => {
       setVisible(false);
       navigatingRef.current = false;
       targetRef.current = null;
-    }, 1200);
+      // clear any injected video
+      const container = document.getElementById("nav-loader-video-container");
+      if (container) container.innerHTML = "";
+      if (overlayEl) {
+        // reset inline styles so next time we show cleanly
+        overlayEl.style.transition = "";
+        overlayEl.style.opacity = "0";
+        overlayEl.style.transform = "";
+      }
+    }, FADE_DURATION_MS + 50);
+
     return () => clearTimeout(t);
   }, [location.pathname]);
 
