@@ -9,7 +9,7 @@ export default function About() {
       <div className="mt-12 w-full flex items-center justify-center">
         <div className="bg-black w-full max-w-4xl" style={{ borderRadius: 8, overflow: 'hidden' }}>
           <video
-            src="/efecto-recording-2025-12-20T12-26-03.webm"
+            src="/animation.webm"
             autoPlay
             loop
             muted

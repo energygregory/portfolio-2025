@@ -3,8 +3,8 @@ import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import logos from "../data/logos";
 
-// place your logo at: public/LOGOS/finalbiglogo.svg (or .png/.jpg)
-import personallogo from "../../public/LOGOS/finalbiglogo.svg";
+// place your logo at: public/LOGOS/newlogo.svg (or .png/.jpg)
+import personallogo from "../../public/LOGOS/newlogo.svg";
 
 // Logos used for the logo-strip — same source as App's list (kept local here for the Home page placement)
 const portfolioLogos = [

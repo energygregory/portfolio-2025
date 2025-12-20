@@ -144,9 +144,9 @@ function App() {
     }`}
   >
     {/* Top-left clickable logo that always links to home */}
-    <div className="absolute left-4 top-1/2 -translate-y-1/2">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2">
       <Link to="/" aria-label="Home">
-        <img src="/LOGOS/finalbiglogo.svg" alt="Home" className="nav-logo sm:h-8 h-6 dark:invert" />
+        <img src="/LOGOS/newlogo.svg" alt="Home" className="nav-logo sm:h-8 h-6 dark:invert" />
       </Link>
     </div>
     {/* Show all nav links on all devices with small gaps on mobile */}

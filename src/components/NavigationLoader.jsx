@@ -42,7 +42,7 @@ export default function NavigationLoader({ theme = "dark" }) {
 
         // create a larger video element duplicate for the loader
         const vid = document.createElement("video");
-        vid.src = "/efecto-recording-2025-12-20T12-26-03.webm";
+        vid.src = "/animation.webm";
         vid.muted = true;
         vid.playsInline = true;
         vid.preload = "auto";
