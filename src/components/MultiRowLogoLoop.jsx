@@ -56,7 +56,10 @@ export default function MultiRowLogoLoop({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="multi-logoloop__inner space-y-0">
+      <div
+        className="multi-logoloop__inner space-y-0"
+        style={{ "--multi-logoloop-rowGap": `${rowGap}px` }}
+      >
         {(() => {
           const buckets = distribute(logos, rows);
           return buckets.map((rowLogos, i) => {
