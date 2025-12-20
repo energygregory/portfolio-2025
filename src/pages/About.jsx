@@ -7,7 +7,8 @@ export default function About() {
       <p className="mt-4 text-neutral-400">Replace this with your real about content.</p>
 
       <div className="mt-12 w-full flex items-center justify-center">
-        <div className="bg-black w-full max-w-4xl" style={{ borderRadius: 8, overflow: 'hidden' }}>
+        <div className="efecto-wrapper w-full max-w-4xl relative" style={{ borderRadius: 8, overflow: 'hidden' }}>
+          <div className="efecto-bg" />
           <video
             src="/animation.webm"
             autoPlay
@@ -16,6 +17,7 @@ export default function About() {
             playsInline
             className="about-efecto-video w-full h-auto block"
           />
+          <div className="video-darken-overlay" aria-hidden="true" />
         </div>
       </div>
     </main>

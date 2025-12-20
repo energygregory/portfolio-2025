@@ -73,7 +73,31 @@ export default function NavigationLoader({ theme = "dark" }) {
         if (container) {
           // clear previous children
           container.innerHTML = "";
-          container.appendChild(vid);
+          // wrapper to hold video + overlay
+          const wrap = document.createElement('div');
+          wrap.style.position = 'relative';
+          wrap.style.display = 'inline-block';
+          wrap.style.borderRadius = '8px';
+          wrap.style.overflow = 'hidden';
+
+          // darkening overlay (for light-mode inverted video)
+          const odiv = document.createElement('div');
+          odiv.className = 'nav-loader-darken-overlay';
+          odiv.style.position = 'absolute';
+          odiv.style.inset = '0';
+          odiv.style.pointerEvents = 'none';
+          odiv.style.transition = 'opacity 200ms ease';
+          if (theme === 'light') {
+            odiv.style.opacity = '1';
+            odiv.style.background = 'rgba(0,0,0,0.45)';
+            odiv.style.mixBlendMode = 'multiply';
+          } else {
+            odiv.style.opacity = '0';
+          }
+
+          wrap.appendChild(vid);
+          wrap.appendChild(odiv);
+          container.appendChild(wrap);
         }
 
         try {

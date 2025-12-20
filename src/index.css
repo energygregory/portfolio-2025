@@ -459,6 +459,23 @@ html, body {
   -webkit-filter: none;
 }
 
+/* Darkening overlay used to deepen blacks when animation is inverted in light mode */
+.video-darken-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background: rgba(0,0,0,0.45);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.theme-light .video-darken-overlay { opacity: 1; }
+
+.nav-loader-darken-overlay {
+  mix-blend-mode: multiply;
+  background: rgba(0,0,0,0.45);
+}
+
 /* Theme-aware tweak: in light theme use a slightly subtler white sheen */
 .theme-light .folder-caption { color: #111827; }
 .theme-light .folder-caption::before {
