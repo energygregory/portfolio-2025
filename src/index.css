@@ -67,6 +67,7 @@ button:focus-visible {
   }
 } */
 
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -395,6 +396,10 @@ html, body {
 .brand-list-item {
   cursor: pointer;
   border-radius: 6px;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-weight: 300;
+  letter-spacing: 0.06em;
 }
 .theme-dark .brand-list-item {
   color: white;

@@ -62,16 +62,22 @@ export default function Work() {
       {activeCategory === 'brands' && (
         <section className="max-w-4xl">
           <ul className="space-y-3">
-            {logos.map((l, i) => (
-              <li key={l.id}>
-                <Link
-                  to={l.path || '/work'}
-                  className="brand-list-item block font-mono text-2xl sm:text-3xl tracking-wide px-3 py-2 transition-colors"
-                >
-                  {l.label}
-                </Link>
-              </li>
-            ))}
+            {(() => {
+              // ensure William Ru appears first
+              const first = logos.filter(l => l.id === 'william-ru');
+              const rest = logos.filter(l => l.id !== 'william-ru');
+              const ordered = [...first, ...rest];
+              return ordered.map((l) => (
+                <li key={l.id}>
+                  <Link
+                    to={l.path || '/work'}
+                    className="brand-list-item block text-2xl sm:text-3xl tracking-wide px-3 py-2 transition-colors"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ));
+            })()}
           </ul>
         </section>
       )}
