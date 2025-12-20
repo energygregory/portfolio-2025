@@ -391,6 +391,18 @@ html, body {
   100% { left: 120%; opacity: 0; }
 }
 
+/* Strong inversion for the efecto video in light mode only.
+   Uses theme wrapper classes (`.theme-light` / `.theme-dark`) used by the site.
+   This is pure CSS and adds no extra network or runtime cost. */
+.theme-light .about-efecto-video {
+  filter: invert(1) brightness(1.02) contrast(1.2) saturate(1);
+  -webkit-filter: invert(1) brightness(1.02) contrast(1.2) saturate(1);
+}
+.theme-dark .about-efecto-video {
+  filter: none;
+  -webkit-filter: none;
+}
+
 /* Theme-aware tweak: in light theme use a slightly subtler white sheen */
 .theme-light .folder-caption { color: #111827; }
 .theme-light .folder-caption::before {
