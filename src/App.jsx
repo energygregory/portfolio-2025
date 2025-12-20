@@ -98,6 +98,7 @@ import LegacyDrip from "./pages/LegacyDrip.jsx";
 import PriceList from "./pages/PriceList.jsx";
 
 import LogoLoop from "./components/LogoLoop";
+import NavigationLoader from "./components/NavigationLoader";
 
 // Use the actual files in public/LOGOS (filenames used as-is).
 const portfolioLogos = [
@@ -133,6 +134,7 @@ function App() {
           : "bg-white text-black theme-light"
       }`}
     >
+      <NavigationLoader theme={theme} />
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       {/* NAV BAR (CENTERED LINKS) */}
