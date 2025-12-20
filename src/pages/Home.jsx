@@ -49,14 +49,14 @@ export default function Home() {
         {/* Make the logo strip span the full viewport width so it starts at the edges */}
         <section className="w-full mb-12">
           <MultiRowLogoLoop
-            logos={logos}
-            rows={3}
-            /* reduced speed and increased horizontal gap */
-            speed={16}
-            logoHeight={36}
-            gap={140}
-            rowGap={80}
-          />
+              logos={logos}
+              rows={3}
+              /* increased speed and reduced vertical spacing between rows */
+              speed={240}
+              logoHeight={36}
+              gap={140}
+              rowGap={24}
+            />
         </section>
       </div>
 
