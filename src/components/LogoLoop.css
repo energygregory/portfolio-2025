@@ -205,7 +205,9 @@
 }
 
 /* Helper class for images rendered by the app */
-.logo-img { display: inline-block; }
+.logo-img {
+  display: inline-block;
+}
 
 /* Make circular logos bigger and center them */
 .logo-img--circular {
@@ -262,7 +264,9 @@
   display: flex;
   align-items: center; /* vertical center logos inside the row */
   justify-content: center;
-  min-height: calc(var(--logoloop-logoHeight) * 3.5); /* ensures taller rows for big logos */
+  min-height: calc(
+    var(--logoloop-logoHeight) * 3.5
+  ); /* ensures taller rows for big logos */
   padding-top: 6px;
   padding-bottom: 6px;
 }
@@ -289,7 +293,7 @@
     height: 40px !important;
   }
   .multi-logoloop__row--idx-2 {
-     margin-top: -20px !important; /* Further reduce gap between 2nd and 3rd row */
+    margin-top: -20px !important; /* Further reduce gap between 2nd and 3rd row */
   }
   .multi-logoloop__row {
     min-height: calc(var(--logoloop-logoHeight) * 1.1) !important;
@@ -297,14 +301,16 @@
     padding-bottom: 1px !important;
   }
   .logoloop__item {
-     margin-right: 32px !important; /* Maximum horizontal spacing between logos for mobile */
+    margin-right: 32px !important; /* Maximum horizontal spacing between logos for mobile */
   }
   /* Make Tribe of God (asset-4), Asset 3 (asset-3), and Around (asset-1) logos bigger on mobile */
-  .multi-logoloop .logoloop__item--asset-4 img { /* Tribe of God - higher specificity */
+  .multi-logoloop .logoloop__item--asset-4 img {
+    /* Tribe of God - higher specificity */
     height: 40px !important; /* reduced ~30% from 56px */
   }
   .multi-logoloop .logoloop__item--asset-3 img, /* Asset 3 */
-  .multi-logoloop .logoloop__item--asset-1 img { /* Around */
+  .multi-logoloop .logoloop__item--asset-1 img {
+    /* Around */
     height: 28px !important; /* reduced ~30% from 40px */
   }
   /* Ensure logos in each row are centered relative to each other */
@@ -327,7 +333,7 @@
       to right,
       var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
       var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 20%,
-      rgba(0,0,0,0) 100%
+      rgba(0, 0, 0, 0) 100%
     );
   }
 
@@ -338,7 +344,7 @@
       to left,
       var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%,
       var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 20%,
-      rgba(0,0,0,0) 100%
+      rgba(0, 0, 0, 0) 100%
     );
   }
   .multi-logoloop {

@@ -84,7 +84,14 @@
 
 // export default App;
 
-import { Routes, Route, Link, NavLink, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Link,
+  NavLink,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 import Home from "./pages/Home.jsx";
 import Work from "./pages/Work.jsx";
@@ -99,19 +106,45 @@ import PriceList from "./pages/PriceList.jsx";
 
 import LogoLoop from "./components/LogoLoop";
 import NavigationLoader from "./components/NavigationLoader";
+import Footer from "./components/Footer";
 
 // Use the actual files in public/LOGOS (filenames used as-is).
 const portfolioLogos = [
-  { id: "brand-one", label: "Brand One", src: "/LOGOS/BRAND-ONE.svg", path: "/work" },
-  { id: "brand-two", label: "Brand Two", src: "/LOGOS/BRAND-TWO.svg", path: "/work" },
-  { id: "brand-three", label: "Brand Three", src: "/LOGOS/BRAND-THREE.svg", path: "/work" },
-  { id: "logo-1-white", label: "Logo 1", src: "/LOGOS/Logo 1 in whitw.svg", path: "/terzo" },
-  { id: "william-ru", label: "William Ru", src: "/LOGOS/William Ru.svg", path: "/williamru" },
+  {
+    id: "brand-one",
+    label: "Brand One",
+    src: "/LOGOS/BRAND-ONE.svg",
+    path: "/work",
+  },
+  {
+    id: "brand-two",
+    label: "Brand Two",
+    src: "/LOGOS/BRAND-TWO.svg",
+    path: "/work",
+  },
+  {
+    id: "brand-three",
+    label: "Brand Three",
+    src: "/LOGOS/BRAND-THREE.svg",
+    path: "/work",
+  },
+  {
+    id: "logo-1-white",
+    label: "Logo 1",
+    src: "/LOGOS/Logo 1 in whitw.svg",
+    path: "/terzo",
+  },
+  {
+    id: "william-ru",
+    label: "William Ru",
+    src: "/LOGOS/William Ru.svg",
+    path: "/williamru",
+  },
 ];
 
 function App() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
 
   // Force default to dark mode, ignoring local storage for the initial state if desired,
   // or just ensure the fallback is "dark".
@@ -137,6 +170,34 @@ function App() {
     } catch (e) {}
   }, [theme]);
 
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    // Tailwind uses the 'dark' class (now configured via darkMode: 'class').
+    root.classList.toggle("dark", theme === "dark");
+    root.classList.toggle("theme-dark", theme === "dark");
+    root.classList.toggle("theme-light", theme === "light");
+
+    // Force html and body backgrounds for mobile overscroll
+    const bgColor = theme === "dark" ? "#000000" : "#ffffff";
+    const textColor = theme === "dark" ? "#ffffff" : "#000000";
+
+    root.style.backgroundColor = bgColor;
+    root.style.color = textColor;
+    document.body.style.backgroundColor = bgColor;
+    document.body.style.color = textColor;
+
+    // Update mobile status bar color
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute("content", bgColor);
+    }
+  }, [theme]);
+
   return (
     <div
       className={`min-h-screen relative ${
@@ -145,71 +206,119 @@ function App() {
           : "bg-white text-black theme-light"
       }`}
     >
-      <NavigationLoader theme={theme} onVisibleChange={setIsLoading} />
+      <NavigationLoader theme={theme} />
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       {/* NAV BAR (CENTERED LINKS) */}
-  <header
-    className={`sticky top-0 z-50 p-4 border-b flex justify-center items-center sm:gap-56 gap-3 app-header ${
-      theme === "dark" ? "border-neutral-800 bg-black" : "border-neutral-300 bg-white"
-    }`}
-  >
-    {/* Top-left clickable logo that always links to home */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2">
-      <Link to="/" aria-label="Home">
-        <img src="/LOGOS/newlogo.svg" alt="Home" className="nav-logo sm:h-8 h-6" />
-      </Link>
-    </div>
-    {/* Show all nav links on all devices with small gaps on mobile */}
-    <nav className="flex items-center gap-3 sm:gap-6">
-      <NavLink to="/" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
-        Home
-      </NavLink>
-      <NavLink to="/work" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
-        Work
-      </NavLink>
-      <NavLink to="/about" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
-        About
-      </NavLink>
-      <NavLink to="/contact" className={({ isActive }) => `nav-link inline mx-1 ${isActive ? 'active' : ''}`}>
-        Contact
-      </NavLink>
-    </nav>
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-      <button
-        onClick={() => setTheme("light")}
-        aria-label="Light mode"
-        className="p-1 rounded hover:bg-neutral-200/10"
-        title="Light mode"
+      <header
+        className={`sticky top-0 z-50 p-4 border-b flex justify-center items-center sm:gap-56 gap-3 app-header ${
+          theme === "dark"
+            ? "border-neutral-800 bg-black"
+            : "border-neutral-300 bg-white"
+        }`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2"></path>
-          <path d="M12 20v2"></path>
-          <path d="M4.93 4.93l1.41 1.41"></path>
-          <path d="M17.66 17.66l1.41 1.41"></path>
-          <path d="M2 12h2"></path>
-          <path d="M20 12h2"></path>
-          <path d="M4.93 19.07l1.41-1.41"></path>
-          <path d="M17.66 6.34l1.41-1.41"></path>
-        </svg>
-      </button>
-      <button
-        onClick={() => setTheme("dark")}
-        aria-label="Dark mode"
-        className="p-1 rounded hover:bg-neutral-200/10"
-        title="Dark mode"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
-          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-        </svg>
-      </button>
-    </div>
-  </header>
+        {/* Top-left clickable logo that always links to home */}
+        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+          <Link to="/" aria-label="Home">
+            <img
+              src="/LOGOS/newlogo.svg"
+              alt="Home"
+              className="nav-logo sm:h-8 h-6"
+            />
+          </Link>
+        </div>
+        {/* Show all nav links on all devices with small gaps on mobile */}
+        <nav className="flex items-center gap-3 sm:gap-6">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `nav-link inline mx-1 ${isActive ? "active" : ""}`
+            }
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/work"
+            className={({ isActive }) =>
+              `nav-link inline mx-1 ${isActive ? "active" : ""}`
+            }
+          >
+            Work
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `nav-link inline mx-1 ${isActive ? "active" : ""}`
+            }
+          >
+            About
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              `nav-link inline mx-1 ${isActive ? "active" : ""}`
+            }
+          >
+            Contact
+          </NavLink>
+        </nav>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          <button
+            onClick={() => setTheme("light")}
+            aria-label="Light mode"
+            className="p-1 rounded hover:bg-neutral-200/10"
+            title="Light mode"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-current"
+            >
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="M4.93 4.93l1.41 1.41"></path>
+              <path d="M17.66 17.66l1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="M4.93 19.07l1.41-1.41"></path>
+              <path d="M17.66 6.34l1.41-1.41"></path>
+            </svg>
+          </button>
+          <button
+            onClick={() => setTheme("dark")}
+            aria-label="Dark mode"
+            className="p-1 rounded hover:bg-neutral-200/10"
+            title="Dark mode"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-current"
+            >
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
 
       <main className="p-4">
         <Routes>
-          <Route path="/" element={<Home isLoading={isLoading} />} />
+          <Route path="/" element={<Home />} />
           <Route path="/work" element={<Work />} />
           <Route path="/about" element={<About />} />
           <Route path="/around" element={<Around />} />
@@ -221,6 +330,7 @@ function App() {
           <Route path="/pricelist" element={<PriceList />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -507,7 +507,8 @@ const useAnimationLoop = (
 
       // Clamp huge frame deltas (common during initial page load / image decode)
       // to avoid visible "jump" / stutter.
-      const deltaTimeRaw = Math.max(0, timestamp - lastTimestampRef.current) / 1000;
+      const deltaTimeRaw =
+        Math.max(0, timestamp - lastTimestampRef.current) / 1000;
       const deltaTime = Math.min(deltaTimeRaw, 1 / 30);
       lastTimestampRef.current = timestamp;
 
@@ -590,8 +591,13 @@ export const LogoLoop = memo(
     const seqWidthRef = useRef(0);
     const seqHeightRef = useRef(0);
 
-    const [copyCount, setCopyCount] = useState(ANIMATION_CONFIG.MIN_COPIES);
+    // Use a stable, slightly larger initial copyCount so the marquee can start
+    // immediately without waiting for image decode/measurement.
+    const [copyCount, setCopyCount] = useState(
+      Math.max(ANIMATION_CONFIG.MIN_COPIES, 6)
+    );
     const [isHovered, setIsHovered] = useState(false);
+    const [imagesReady, setImagesReady] = useState(false);
 
     const effectiveHoverSpeed = useMemo(() => {
       if (hoverSpeed !== undefined) return hoverSpeed;
@@ -636,20 +642,26 @@ export const LogoLoop = memo(
             containerRef.current?.clientHeight ??
             parentHeight ??
             sequenceHeight;
-          const copiesNeeded =
-            Math.ceil(viewport / sequenceHeight) +
-            ANIMATION_CONFIG.COPY_HEADROOM;
-          setCopyCount(Math.max(ANIMATION_CONFIG.MIN_COPIES, copiesNeeded));
+          // Avoid rebuilding the DOM repeatedly while images are still decoding.
+          // We'll compute the exact count once all images have loaded.
+          if (imagesReady) {
+            const copiesNeeded =
+              Math.ceil(viewport / sequenceHeight) +
+              ANIMATION_CONFIG.COPY_HEADROOM;
+            setCopyCount(Math.max(ANIMATION_CONFIG.MIN_COPIES, copiesNeeded));
+          }
         }
       } else if (sequenceWidth > 0) {
         // setSeqWidth(Math.ceil(sequenceWidth)); // Removed state update
         seqWidthRef.current = Math.ceil(sequenceWidth);
-        const copiesNeeded =
-          Math.ceil(containerWidth / sequenceWidth) +
-          ANIMATION_CONFIG.COPY_HEADROOM;
-        setCopyCount(Math.max(ANIMATION_CONFIG.MIN_COPIES, copiesNeeded));
+        if (imagesReady) {
+          const copiesNeeded =
+            Math.ceil(containerWidth / sequenceWidth) +
+            ANIMATION_CONFIG.COPY_HEADROOM;
+          setCopyCount(Math.max(ANIMATION_CONFIG.MIN_COPIES, copiesNeeded));
+        }
       }
-    }, [isVertical]);
+    }, [isVertical, imagesReady]);
 
     useResizeObserver(
       updateDimensions,
@@ -657,12 +669,17 @@ export const LogoLoop = memo(
       [logos, gap, logoHeight, isVertical]
     );
 
-    useImageLoader(seqRef, updateDimensions, [
+    useImageLoader(seqRef, () => setImagesReady(true), [
       logos,
       gap,
       logoHeight,
       isVertical,
     ]);
+
+    useEffect(() => {
+      if (!imagesReady) return;
+      updateDimensions();
+    }, [imagesReady, updateDimensions]);
 
     useAnimationLoop(
       trackRef,

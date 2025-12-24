@@ -40,10 +40,10 @@ export default function MultiRowLogoLoop({
         className={`logo-img ${
           item.id === "asset-4" ? "logo-img--circular" : ""
         } ${
-          item.id === "asset-1" || item.id === "asset-3" ? "logo-img--slightly-larger" : ""
-        } ${
-          item.id === "en-garde" ? "logo-img--large-garde" : ""
-        }`}
+          item.id === "asset-1" || item.id === "asset-3"
+            ? "logo-img--slightly-larger"
+            : ""
+        } ${item.id === "en-garde" ? "logo-img--large-garde" : ""}`}
         draggable={false}
       />
     </Link>
@@ -57,16 +57,25 @@ export default function MultiRowLogoLoop({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="multi-logoloop__inner space-y-0">
+      <div
+        className="multi-logoloop__inner"
+        style={{ display: "flex", flexDirection: "column", gap: `${rowGap}px` }}
+      >
         {(() => {
           const buckets = distribute(logos, rows);
           return buckets.map((rowLogos, i) => {
             const direction = i % 2 === 0 ? "left" : "right";
             // reduced hover magnitude so slowdown is subtle but preserves direction
             const hoverMagnitude = 8;
-            const signedHover = direction === "left" ? Math.abs(hoverMagnitude) : -Math.abs(hoverMagnitude);
+            const signedHover =
+              direction === "left"
+                ? Math.abs(hoverMagnitude)
+                : -Math.abs(hoverMagnitude);
 
-            const rowClass = (i === rows - 1 ? "multi-logoloop__row multi-logoloop__row--last" : "multi-logoloop__row") + ` multi-logoloop__row--idx-${i}`;
+            const rowClass =
+              (i === rows - 1
+                ? "multi-logoloop__row multi-logoloop__row--last"
+                : "multi-logoloop__row") + ` multi-logoloop__row--idx-${i}`;
 
             return (
               <div className={rowClass} key={i}>

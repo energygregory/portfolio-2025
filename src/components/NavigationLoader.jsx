@@ -20,22 +20,26 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
   useEffect(() => {
     const runInitialLoader = async () => {
       setVisible(true);
-      
+
       const vid = videoRef.current;
       if (vid) {
         // Ensure video is ready before playing
         if (vid.readyState >= 1) {
           vid.currentTime = 4;
         } else {
-          vid.addEventListener('loadedmetadata', () => {
-            vid.currentTime = 4;
-          }, { once: true });
+          vid.addEventListener(
+            "loadedmetadata",
+            () => {
+              vid.currentTime = 4;
+            },
+            { once: true }
+          );
         }
-        
+
         try {
           vid.playbackRate = 2.52;
           // Use a small timeout to allow the UI to paint first
-          await new Promise(r => setTimeout(r, 50));
+          await new Promise((r) => setTimeout(r, 50));
           await vid.play();
         } catch (err) {
           console.error("Auto-play failed:", err);
@@ -44,7 +48,7 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
 
       // Wait for animation duration
       const NAV_DELAY_MS = 1400;
-      await new Promise(resolve => setTimeout(resolve, NAV_DELAY_MS));
+      await new Promise((resolve) => setTimeout(resolve, NAV_DELAY_MS));
 
       // Fade out
       const FADE_DURATION_MS = 300;
@@ -60,7 +64,7 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
       setTimeout(() => {
         // Only unpause animations AFTER the overlay is fully hidden
         if (onVisibleChange) onVisibleChange(false);
-        
+
         setVisible(false);
         if (overlayEl) {
           overlayEl.style.transition = "";
@@ -90,13 +94,27 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
     async function onClick(e) {
       if (navigatingRef.current) return;
       // only left click without modifier keys
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (
+        e.defaultPrevented ||
+        e.button !== 0 ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.shiftKey ||
+        e.altKey
+      )
+        return;
 
       const a = findAnchor(e.target);
       if (!a) return;
       const href = a.getAttribute("href");
       const target = a.getAttribute("target");
-      if (!href || href.startsWith("#") || href.startsWith("mailto:") || target === "_blank") return;
+      if (
+        !href ||
+        href.startsWith("#") ||
+        href.startsWith("mailto:") ||
+        target === "_blank"
+      )
+        return;
 
       // allow external links (absolute with different origin)
       try {
@@ -154,18 +172,18 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
     const t = setTimeout(() => {
       // Only unpause animations AFTER the overlay is fully hidden
       if (onVisibleChange) onVisibleChange(false);
-      
+
       setVisible(false);
       navigatingRef.current = false;
       targetRef.current = null;
-      
+
       if (overlayEl) {
         // reset inline styles so next time we show cleanly
         overlayEl.style.transition = "";
         overlayEl.style.opacity = "0";
         overlayEl.style.transform = "";
       }
-      
+
       const vid = videoRef.current;
       if (vid) {
         vid.pause();
@@ -195,8 +213,22 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
         background: theme === "light" ? "#ffffff" : "#000000",
       }}
     >
-      <div id="nav-loader-video-container" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ position: 'relative', display: 'inline-block', borderRadius: '8px', overflow: 'hidden' }}>
+      <div
+        id="nav-loader-video-container"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            display: "inline-block",
+            borderRadius: "8px",
+            overflow: "hidden",
+          }}
+        >
           <video
             ref={videoRef}
             src="/animation.webm"
