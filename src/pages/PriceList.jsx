@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 
 const rateData = {
-  "merch-design": [],
+  "merch-design": [
+    { service: "TRUCKER HAT", price: 700, note: "PER DESIGN" },
+    { service: "SNAPBACK HAT", price: 750, note: "PER DESIGN" },
+    { service: "CROP TOPS", price: 900, note: "PER DESIGN" },
+    { service: "T SHIRTS / HOODIES", price: 1200, note: "PER DESIGN" },
+    { service: "BUTTONED SHIRTS", price: 1350, note: "PER DESIGN" },
+    { service: "JERSEYS / JACKETS", price: 1500, note: "PER DESIGN" },
+    { service: "TRACKSUIT SET", price: 2000, note: "PER DESIGN" },
+    { service: "TECH PACK DESIGN", price: 700, note: "PER DESIGN" },
+  ],
   "graphic-design": [
     { service: "FLYERS / POSTERS", price: 550, note: "PER DESIGN" },
     { service: "LOGO DESIGN", price: 700, note: "PER DESIGN" },

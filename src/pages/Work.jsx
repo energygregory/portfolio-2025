@@ -62,22 +62,23 @@ export default function Work() {
       {activeCategory === 'brands' && (
         <section className="max-w-4xl">
           <ul className="space-y-3">
-            {(() => {
-              // ensure William Ru appears first
-              const first = logos.filter(l => l.id === 'william-ru');
-              const rest = logos.filter(l => l.id !== 'william-ru');
-              const ordered = [...first, ...rest];
-              return ordered.map((l) => (
-                <li key={l.id}>
-                  <Link
-                    to={l.path || '/work'}
-                    className="brand-list-item block text-2xl sm:text-3xl tracking-wide px-3 py-2 transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ));
-            })()}
+            {[
+              { label: 'William Ru', path: '/williamru' },
+              { label: 'Legacy Drip', path: '/legacydrip' },
+              { label: 'Fly High', path: '/flyhigh' },
+              { label: 'Around', path: '/around' },
+              { label: 'Zaama disco', path: '/work' },
+              { label: 'Semanu Studios', path: '/work' },
+            ].map((item, idx) => (
+              <li key={idx}>
+                <Link
+                  to={item.path}
+                  className="brand-list-item block text-2xl sm:text-3xl tracking-wide px-3 py-2 transition-colors"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </section>
       )}

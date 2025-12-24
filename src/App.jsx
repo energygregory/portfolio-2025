@@ -111,10 +111,21 @@ const portfolioLogos = [
 
 function App() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Force default to dark mode, ignoring local storage for the initial state if desired,
+  // or just ensure the fallback is "dark".
+  // The user wants "default mode for the site to be dark mode".
+  // If we want to force it every time the app loads (e.g. on refresh), we can just set it to "dark".
+  // But usually users expect persistence.
+  // However, since the user complained "default mode... wasn't dark mode",
+  // I will initialize it to "dark" directly to ensure the first paint is correct.
+  // If we want persistence, we can read it in an effect, but that causes a flash.
+  // Let's stick to the user's request: "default mode... is dark mode".
   const [theme, setTheme] = useState(() => {
     try {
-      return localStorage.getItem("theme") || "dark";
+      // Changed key to 'theme_v2' to reset preferences and ensure default is dark for everyone
+      return localStorage.getItem("theme_v2") || "dark";
     } catch (e) {
       return "dark";
     }
@@ -122,7 +133,7 @@ function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("theme", theme);
+      localStorage.setItem("theme_v2", theme);
     } catch (e) {}
   }, [theme]);
 
@@ -134,12 +145,12 @@ function App() {
           : "bg-white text-black theme-light"
       }`}
     >
-      <NavigationLoader theme={theme} />
+      <NavigationLoader theme={theme} onVisibleChange={setIsLoading} />
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       {/* NAV BAR (CENTERED LINKS) */}
   <header
-    className={`sticky top-0 z-40 p-4 border-b flex justify-center items-center sm:gap-56 gap-3 app-header ${
+    className={`sticky top-0 z-50 p-4 border-b flex justify-center items-center sm:gap-56 gap-3 app-header ${
       theme === "dark" ? "border-neutral-800 bg-black" : "border-neutral-300 bg-white"
     }`}
   >
@@ -198,7 +209,7 @@ function App() {
 
       <main className="p-4">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home isLoading={isLoading} />} />
           <Route path="/work" element={<Work />} />
           <Route path="/about" element={<About />} />
           <Route path="/around" element={<Around />} />

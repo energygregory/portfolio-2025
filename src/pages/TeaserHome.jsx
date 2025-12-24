@@ -1,40 +1,51 @@
-import React from "react";
-import LogoLoop from "../components/LogoLoop";
+......import React, { useState } from "react";
+import Folder from "../components/Folder";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import logos from "../data/logos";
 
-// place your logo at: public/LOGOS/finalbiglogo.svg (or .png/.jpg)
-const personallogo = "/LOGOS/newlogo.svg";
+export default function TeaserHome() {
+  // Folder state
+  const folders = Array.from({ length: 12 }).map((_, i) => ({
+    id: `folder-${i + 1}`,
+    color: '#9CA3AF'
+  }));
+  const [openFolder, setOpenFolder] = useState(null);
+  const handleToggle = (id) => {
+    setOpenFolder(prev => (prev === id ? null : id));
+  };
 
-// Logos used for the logo-strip — same source as App's list (kept local here for the Home page placement)
-const portfolioLogos = [
-  { id: "around", label: "Around", src: "/LOGOS/Asset 1.svg", path: "/work", logoHeight: 72 },
-  { id: "brand-two", label: "Clapes", src: "/LOGOS/BRAND-TWO.svg", path: "/clapes" },
-  { id: "brand-three", label: "Brand Three", src: "/LOGOS/BRAND-THREE.svg", path: "/work" },
-  { id: "logo-1-white", label: "Logo 1", src: "/LOGOS/Logo 1 in whitw.svg", path: "/terzo" },
-  { id: "william-ru", label: "William Ru", src: "/LOGOS/William Ru.svg", path: "/williamru" },
-  { id: "fly-high", label: "Fly High", src: "/LOGOS/flyhigh.svg", path: "/flyhigh" },
-  { id: "semanu-studios", label: "Semanu Studios", src: "/LOGOS/semanu studios.svg", path: "/work" },
-];
-
-export default function Home({ isLoading }) {
   return (
     <main className="min-h-screen px-6 py-16 flex flex-col">
       {/* Top spacer */}
       <div className="w-full h-32"></div>
 
+      {/* Animation (Folder Grid) replacing the static logo */}
       <div className="w-full mb-6 flex justify-center">
-        <img 
-          src={personallogo} 
-          alt="Logo" 
-          className="home-main-logo w-full max-w-[1200px] h-auto"
-        />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+          {['Merch Design', 'Graphic Design', 'Branding', 'Packaging'].slice(0,4).map((label, idx) => {
+            const id = `type-${idx}`;
+            const color = folders[idx]?.color || '#9CA3AF';
+            return (
+              <div key={id} className="flex flex-col items-center">
+                <div className="w-[140px] h-[140px] flex items-center justify-center">
+                  <Folder
+                    color={color}
+                    size={1}
+                    open={openFolder === id}
+                    onToggle={() => handleToggle(id)}
+                  />
+                </div>
+                <div className="mt-3 text-sm font-mono text-center">{label}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Responsive spacing: show 'Trusted By' and part of the first logo row across devices */}
+      {/* Responsive spacing */}
       <div className="w-full h-20 sm:h-28 md:h-40 lg:h-56"></div>
 
-      {/* Trusted By Section + logo strip — push down on mobile only */}
+      {/* Trusted By Section + logo strip */}
       <div className="w-full mt-24 sm:mt-0">
         <div className="w-full mb-3 text-center">
           <h3
@@ -45,8 +56,6 @@ export default function Home({ isLoading }) {
           </h3>
         </div>
 
-        {/* Slow, multi-row logo section (moved from top bar). 4 stacked rows, drastically reduced speed. */}
-        {/* Make the logo strip span the full viewport width so it starts at the edges */}
         <section className="w-full mb-12">
           <MultiRowLogoLoop
               logos={logos}
@@ -56,7 +65,6 @@ export default function Home({ isLoading }) {
               logoHeight={36}
               gap={140}
               rowGap={4}
-              paused={isLoading}
             />
         </section>
       </div>

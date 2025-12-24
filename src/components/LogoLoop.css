@@ -138,7 +138,8 @@
   /* push fades much further toward the center — larger clamp so they intrude */
   width: clamp(120px, 40%, 50%);
   pointer-events: none;
-  z-index: 40;
+  /* Keep fades below the sticky navbar */
+  z-index: 1;
 }
 
 .logoloop--fade::before {

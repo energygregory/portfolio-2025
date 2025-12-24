@@ -468,11 +468,12 @@ const useImageLoader = (seqRef, onLoad, dependencies) => {
 const useAnimationLoop = (
   trackRef,
   targetVelocity,
-  seqWidth,
-  seqHeight,
+  seqWidthRef,
+  seqHeightRef,
   isHovered,
   hoverSpeed,
-  isVertical
+  isVertical,
+  paused
 ) => {
   const rafRef = useRef(null);
   const lastTimestampRef = useRef(null);
@@ -483,23 +484,31 @@ const useAnimationLoop = (
     const track = trackRef.current;
     if (!track) return;
 
-    const seqSize = isVertical ? seqHeight : seqWidth;
-
-    if (seqSize > 0) {
-      offsetRef.current = ((offsetRef.current % seqSize) + seqSize) % seqSize;
-      const transformValue = isVertical
-        ? `translate3d(0, ${-offsetRef.current}px, 0)`
-        : `translate3d(${-offsetRef.current}px, 0, 0)`;
-      track.style.transform = transformValue;
+    if (paused) {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      lastTimestampRef.current = null;
+      return;
     }
+
+    // Set an initial transform immediately.
+    // Even if we don't yet know seqSize (images still loading), we still move.
+    // Once seqSize becomes available, we wrap seamlessly.
+    track.style.transform = isVertical
+      ? `translate3d(0, ${-offsetRef.current}px, 0)`
+      : `translate3d(${-offsetRef.current}px, 0, 0)`;
 
     const animate = (timestamp) => {
       if (lastTimestampRef.current === null) {
         lastTimestampRef.current = timestamp;
       }
 
-      const deltaTime =
-        Math.max(0, timestamp - lastTimestampRef.current) / 1000;
+      // Clamp huge frame deltas (common during initial page load / image decode)
+      // to avoid visible "jump" / stutter.
+      const deltaTimeRaw = Math.max(0, timestamp - lastTimestampRef.current) / 1000;
+      const deltaTime = Math.min(deltaTimeRaw, 1 / 30);
       lastTimestampRef.current = timestamp;
 
       const target =
@@ -509,16 +518,24 @@ const useAnimationLoop = (
         1 - Math.exp(-deltaTime / ANIMATION_CONFIG.SMOOTH_TAU);
       velocityRef.current += (target - velocityRef.current) * easingFactor;
 
-      if (seqSize > 0) {
-        let nextOffset = offsetRef.current + velocityRef.current * deltaTime;
-        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
-        offsetRef.current = nextOffset;
+      // Advance offset even if we don't yet know seqSize.
+      // This removes the "pause" before the marquee starts.
+      let nextOffset = offsetRef.current + velocityRef.current * deltaTime;
 
-        const transformValue = isVertical
-          ? `translate3d(0, ${-offsetRef.current}px, 0)`
-          : `translate3d(${-offsetRef.current}px, 0, 0)`;
-        track.style.transform = transformValue;
+      // Read dimensions from refs inside the loop
+      const currentSeqWidth = seqWidthRef.current;
+      const currentSeqHeight = seqHeightRef.current;
+      const seqSize = isVertical ? currentSeqHeight : currentSeqWidth;
+
+      if (seqSize > 0) {
+        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
       }
+
+      offsetRef.current = nextOffset;
+
+      track.style.transform = isVertical
+        ? `translate3d(0, ${-offsetRef.current}px, 0)`
+        : `translate3d(${-offsetRef.current}px, 0, 0)`;
 
       rafRef.current = requestAnimationFrame(animate);
     };
@@ -534,12 +551,13 @@ const useAnimationLoop = (
     };
   }, [
     targetVelocity,
-    seqWidth,
-    seqHeight,
+    // Remove seqWidth/seqHeight from dependencies to prevent restart
+    // seqWidthRef and seqHeightRef are stable refs
     isHovered,
     hoverSpeed,
     isVertical,
     trackRef,
+    paused,
   ]);
 };
 
@@ -561,13 +579,17 @@ export const LogoLoop = memo(
     className,
     style,
     externalHover,
+    paused = false,
   }) => {
     const containerRef = useRef(null);
     const trackRef = useRef(null);
     const seqRef = useRef(null);
 
-    const [seqWidth, setSeqWidth] = useState(0);
-    const [seqHeight, setSeqHeight] = useState(0);
+    // Removed state for dimensions to prevent re-renders.
+    // We only use refs for the animation loop.
+    const seqWidthRef = useRef(0);
+    const seqHeightRef = useRef(0);
+
     const [copyCount, setCopyCount] = useState(ANIMATION_CONFIG.MIN_COPIES);
     const [isHovered, setIsHovered] = useState(false);
 
@@ -608,7 +630,8 @@ export const LogoLoop = memo(
         }
 
         if (sequenceHeight > 0) {
-          setSeqHeight(Math.ceil(sequenceHeight));
+          // setSeqHeight(Math.ceil(sequenceHeight)); // Removed state update
+          seqHeightRef.current = Math.ceil(sequenceHeight);
           const viewport =
             containerRef.current?.clientHeight ??
             parentHeight ??
@@ -619,7 +642,8 @@ export const LogoLoop = memo(
           setCopyCount(Math.max(ANIMATION_CONFIG.MIN_COPIES, copiesNeeded));
         }
       } else if (sequenceWidth > 0) {
-        setSeqWidth(Math.ceil(sequenceWidth));
+        // setSeqWidth(Math.ceil(sequenceWidth)); // Removed state update
+        seqWidthRef.current = Math.ceil(sequenceWidth);
         const copiesNeeded =
           Math.ceil(containerWidth / sequenceWidth) +
           ANIMATION_CONFIG.COPY_HEADROOM;
@@ -643,11 +667,12 @@ export const LogoLoop = memo(
     useAnimationLoop(
       trackRef,
       targetVelocity,
-      seqWidth,
-      seqHeight,
+      seqWidthRef,
+      seqHeightRef,
       externalHover !== undefined ? externalHover : isHovered,
       effectiveHoverSpeed,
-      isVertical
+      isVertical,
+      paused
     );
 
     const cssVariables = useMemo(

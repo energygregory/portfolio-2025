@@ -72,6 +72,11 @@ button:focus-visible {
 @tailwind components;
 @tailwind utilities;
 
+body {
+  background-color: black;
+  color: white;
+}
+
 /* Horizontal logo scrolling bar
 .logo-marquee {
   white-space: nowrap;
@@ -454,11 +459,17 @@ html, body {
   /* Higher contrast and moderate brightness to avoid grey wash */
   filter: invert(1) contrast(4) brightness(1.05) saturate(1.1);
   -webkit-filter: invert(1) contrast(4) brightness(1.05) saturate(1.1);
+  background: transparent;
+  outline: none;
+  border: none;
 }
 .theme-dark .about-efecto-video,
 .theme-dark .nav-loader-video-el {
   filter: none;
   -webkit-filter: none;
+  background: transparent;
+  outline: none;
+  border: none;
 }
 
 /* Previously-used darken overlays caused grey artifacts; disable them and rely on direct filters above. */

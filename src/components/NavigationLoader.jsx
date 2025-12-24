@@ -1,12 +1,82 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function NavigationLoader({ theme = "dark" }) {
+export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [visible, setVisible] = useState(false);
   const targetRef = useRef(null);
   const navigatingRef = useRef(false);
+  const videoRef = useRef(null);
+
+  // Sync visible state with parent
+  useEffect(() => {
+    if (onVisibleChange) {
+      onVisibleChange(visible);
+    }
+  }, [visible, onVisibleChange]);
+
+  // Initial load animation
+  useEffect(() => {
+    const runInitialLoader = async () => {
+      setVisible(true);
+      
+      const vid = videoRef.current;
+      if (vid) {
+        // Ensure video is ready before playing
+        if (vid.readyState >= 1) {
+          vid.currentTime = 4;
+        } else {
+          vid.addEventListener('loadedmetadata', () => {
+            vid.currentTime = 4;
+          }, { once: true });
+        }
+        
+        try {
+          vid.playbackRate = 2.52;
+          // Use a small timeout to allow the UI to paint first
+          await new Promise(r => setTimeout(r, 50));
+          await vid.play();
+        } catch (err) {
+          console.error("Auto-play failed:", err);
+        }
+      }
+
+      // Wait for animation duration
+      const NAV_DELAY_MS = 1400;
+      await new Promise(resolve => setTimeout(resolve, NAV_DELAY_MS));
+
+      // Fade out
+      const FADE_DURATION_MS = 300;
+      const overlayEl = document.getElementById("nav-loader-overlay");
+      if (overlayEl) {
+        overlayEl.style.transition = `opacity ${FADE_DURATION_MS}ms ease, transform ${FADE_DURATION_MS}ms ease`;
+        requestAnimationFrame(() => {
+          overlayEl.style.opacity = "0";
+          overlayEl.style.transform = "scale(0.98)";
+        });
+      }
+
+      setTimeout(() => {
+        // Only unpause animations AFTER the overlay is fully hidden
+        if (onVisibleChange) onVisibleChange(false);
+        
+        setVisible(false);
+        if (overlayEl) {
+          overlayEl.style.transition = "";
+          overlayEl.style.opacity = "0";
+          overlayEl.style.transform = "";
+        }
+        // Reset video
+        if (vid) {
+          vid.pause();
+          vid.currentTime = 4;
+        }
+      }, FADE_DURATION_MS + 50);
+    };
+
+    runInitialLoader();
+  }, []);
 
   useEffect(() => {
     function findAnchor(el) {
@@ -40,58 +110,20 @@ export default function NavigationLoader({ theme = "dark" }) {
         targetRef.current = url.pathname + url.search + url.hash;
         setVisible(true);
 
-        // create a larger video element duplicate for the loader
-        const vid = document.createElement("video");
-        vid.src = "/animation.webm";
-        vid.muted = true;
-        vid.playsInline = true;
-        vid.preload = "auto";
-        vid.autoplay = true;
-        // make it noticeably bigger
-        vid.style.width = "44vmin";
-        vid.style.maxWidth = "420px";
-        vid.style.height = "auto";
-        vid.style.display = "block";
-        vid.style.objectFit = "contain";
-        vid.style.borderRadius = "8px";
-        // apply theme-aware filter: in light mode the video should be inverted and boosted
-          // Remove inline filters so CSS controls the final look (we set tuned filters in CSS)
-          vid.style.filter = "";
-        vid.className = "nav-loader-video-el";
-        // speed up playback by 3x; set after metadata to avoid DOMException in some browsers
-        vid.addEventListener("loadedmetadata", () => {
+        const vid = videoRef.current;
+        if (vid) {
           try {
-            // reduce speed by 30% from previous 3x => 2.1x
-            vid.playbackRate = 2.1;
-          } catch (e) {}
-        });
-
-        const container = document.getElementById("nav-loader-video-container");
-        if (container) {
-          // clear previous children
-          container.innerHTML = "";
-          // wrapper to hold video + overlay
-          const wrap = document.createElement('div');
-          wrap.style.position = 'relative';
-          wrap.style.display = 'inline-block';
-          wrap.style.borderRadius = '8px';
-          wrap.style.overflow = 'hidden';
-
-          // darkening overlay (for light-mode inverted video)
-          wrap.appendChild(vid);
-            container.appendChild(wrap);
-          container.appendChild(wrap);
+            // Reset time just in case
+            vid.currentTime = 4;
+            vid.playbackRate = 2.52;
+            await vid.play();
+          } catch (err) {
+            // ignore play errors
+          }
         }
 
-        try {
-          await vid.play();
-        } catch (err) {
-          // ignore play errors
-        }
-
-        // navigate after a short delay while the overlay remains opaque,
-        // then perform the fade-out after the new route mounts.
-        const NAV_DELAY_MS = 700;
+        // navigate after delay - increased to allow video to play more fully
+        const NAV_DELAY_MS = 1400;
         setTimeout(() => {
           if (targetRef.current) navigate(targetRef.current);
         }, NAV_DELAY_MS);
@@ -107,6 +139,7 @@ export default function NavigationLoader({ theme = "dark" }) {
   // After location changes, fade the overlay out and then remove it.
   useEffect(() => {
     if (!navigatingRef.current) return;
+
     const FADE_DURATION_MS = 300;
     const overlayEl = document.getElementById("nav-loader-overlay");
     if (overlayEl) {
@@ -119,17 +152,25 @@ export default function NavigationLoader({ theme = "dark" }) {
     }
 
     const t = setTimeout(() => {
+      // Only unpause animations AFTER the overlay is fully hidden
+      if (onVisibleChange) onVisibleChange(false);
+      
       setVisible(false);
       navigatingRef.current = false;
       targetRef.current = null;
-      // clear any injected video
-      const container = document.getElementById("nav-loader-video-container");
-      if (container) container.innerHTML = "";
+      
       if (overlayEl) {
         // reset inline styles so next time we show cleanly
         overlayEl.style.transition = "";
         overlayEl.style.opacity = "0";
         overlayEl.style.transform = "";
+      }
+      
+      const vid = videoRef.current;
+      if (vid) {
+        vid.pause();
+        // Reset to start frame so it's ready for next time
+        vid.currentTime = 4;
       }
     }, FADE_DURATION_MS + 50);
 
@@ -154,7 +195,27 @@ export default function NavigationLoader({ theme = "dark" }) {
         background: theme === "light" ? "#ffffff" : "#000000",
       }}
     >
-      <div id="nav-loader-video-container" style={{ display: "flex", alignItems: "center", justifyContent: "center" }} />
+      <div id="nav-loader-video-container" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: 'relative', display: 'inline-block', borderRadius: '8px', overflow: 'hidden' }}>
+          <video
+            ref={videoRef}
+            src="/animation.webm"
+            muted
+            playsInline
+            preload="auto"
+            className="nav-loader-video-el"
+            style={{
+              width: "44vmin",
+              maxWidth: "420px",
+              height: "auto",
+              display: "block",
+              objectFit: "contain",
+              borderRadius: "8px",
+              willChange: "transform", // Hint to browser to promote to layer
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

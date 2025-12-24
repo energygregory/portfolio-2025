@@ -11,6 +11,7 @@ export default function MultiRowLogoLoop({
   rowGap = 12,
   fadeOutColor,
   className = "",
+  paused = false,
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -56,10 +57,7 @@ export default function MultiRowLogoLoop({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div
-        className="multi-logoloop__inner space-y-0"
-        style={{ "--multi-logoloop-rowGap": `${rowGap}px` }}
-      >
+      <div className="multi-logoloop__inner space-y-0">
         {(() => {
           const buckets = distribute(logos, rows);
           return buckets.map((rowLogos, i) => {
@@ -84,6 +82,7 @@ export default function MultiRowLogoLoop({
                   fadeOut={false} /* container handles fade */
                   renderItem={renderLogoItem}
                   ariaLabel={`Client logos row ${i + 1}`}
+                  paused={paused}
                 />
               </div>
             );
