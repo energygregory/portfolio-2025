@@ -626,6 +626,14 @@ export const LogoLoop = memo(
       const sequenceWidth = sequenceRect?.width ?? 0;
       const sequenceHeight = sequenceRect?.height ?? 0;
 
+      // If speed is 0, only show one copy
+      if (speed === 0) {
+        setCopyCount(1);
+        seqWidthRef.current = Math.ceil(sequenceWidth);
+        seqHeightRef.current = Math.ceil(sequenceHeight);
+        return;
+      }
+
       if (isVertical) {
         const parentHeight =
           containerRef.current?.parentElement?.clientHeight ?? 0;
@@ -661,7 +669,7 @@ export const LogoLoop = memo(
           setCopyCount(Math.max(ANIMATION_CONFIG.MIN_COPIES, copiesNeeded));
         }
       }
-    }, [isVertical, imagesReady]);
+    }, [isVertical, imagesReady, speed]);
 
     useResizeObserver(
       updateDimensions,

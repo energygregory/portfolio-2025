@@ -15,9 +15,7 @@ export default function MultiRowLogoLoop({
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Distribute logos across rows without repeating across rows.
-  // Uses round-robin assignment so when you add logos later they will be
-  // placed sensibly across rows.
+  // Distribute logos across rows - split evenly, no duplicates between rows
   const distribute = (items, rowsCount) => {
     const buckets = Array.from({ length: rowsCount }, () => []);
     items.forEach((item, idx) => {
@@ -59,7 +57,7 @@ export default function MultiRowLogoLoop({
     >
       <div
         className="multi-logoloop__inner"
-        style={{ display: "flex", flexDirection: "column", gap: `${rowGap}px` }}
+        style={{ display: "flex", flexDirection: "column", gap: `${rowGap}px`, alignItems: "center" }}
       >
         {(() => {
           const buckets = distribute(logos, rows);

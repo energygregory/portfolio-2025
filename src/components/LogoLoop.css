@@ -9,7 +9,7 @@
 /* Container used when multiple LogoLoop rows are stacked. Clip fades to this box. */
 .multi-logoloop {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Ensure fades follow the app theme explicitly (avoid race on inline styles) */
@@ -55,6 +55,7 @@
 .logoloop__list {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .logoloop--vertical .logoloop__list {
@@ -140,6 +141,14 @@
   pointer-events: none;
   /* Keep fades below the sticky navbar */
   z-index: 1;
+}
+
+/* Remove fades from no-fade variant */
+.no-fade.logoloop--fade::before,
+.no-fade.logoloop--fade::after,
+.no-fade .logoloop--fade::before,
+.no-fade .logoloop--fade::after {
+  display: none;
 }
 
 .logoloop--fade::before {

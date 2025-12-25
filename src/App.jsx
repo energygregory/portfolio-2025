@@ -92,7 +92,7 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Home from "./pages/Home.jsx";
 import Work from "./pages/Work.jsx";
 import About from "./pages/About.jsx";
@@ -145,6 +145,10 @@ const portfolioLogos = [
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Track if navigating from Work page to brand page
+  const [slideTransition, setSlideTransition] = useState(false);
+  const prevPathRef = useRef(location.pathname);
 
   // Force default to dark mode, ignoring local storage for the initial state if desired,
   // or just ensure the fallback is "dark".
@@ -173,6 +177,19 @@ function App() {
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Check if navigating from Work to brand page
+    const brandPages = ['/williamru', '/legacydrip', '/flyhigh', '/around', '/terzo'];
+    const isFromWorkToBrand = prevPathRef.current === '/work' && brandPages.includes(location.pathname);
+    
+    setSlideTransition(isFromWorkToBrand);
+    prevPathRef.current = location.pathname;
+    
+    // Reset slide transition after animation completes
+    if (isFromWorkToBrand) {
+      const timer = setTimeout(() => setSlideTransition(false), 500);
+      return () => clearTimeout(timer);
+    }
   }, [location.pathname]);
 
   useEffect(() => {
@@ -316,8 +333,8 @@ function App() {
         </div>
       </header>
 
-      <main className="p-4">
-        <Routes>
+      <main className={`p-4 ${slideTransition ? 'page-transition' : ''}`}>
+        <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/work" element={<Work />} />
           <Route path="/about" element={<About />} />

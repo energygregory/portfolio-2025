@@ -124,6 +124,17 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
         if (url.pathname === window.location.pathname) return;
 
         e.preventDefault();
+        
+        // Check if navigating to a brand page from Work page
+        const brandPages = ['/williamru', '/legacydrip', '/flyhigh', '/around', '/terzo'];
+        const isBrandNavigation = location.pathname === '/work' && brandPages.includes(url.pathname);
+        
+        if (isBrandNavigation) {
+          // Skip loader for brand pages, navigate immediately
+          navigate(url.pathname + url.search + url.hash);
+          return;
+        }
+        
         navigatingRef.current = true;
         targetRef.current = url.pathname + url.search + url.hash;
         setVisible(true);

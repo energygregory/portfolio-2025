@@ -100,7 +100,9 @@ export default function Home() {
 
         {/* Slow, multi-row logo section (moved from top bar). 4 stacked rows, drastically reduced speed. */}
         {/* Make the logo strip span the full viewport width so it starts at the edges */}
-        <section className="w-full mb-12">
+        
+        {/* Original - HIDDEN */}
+        <section className="w-full mb-12 hidden">
           <MultiRowLogoLoop
             logos={logos}
             rows={3}
@@ -111,12 +113,27 @@ export default function Home() {
             rowGap={logoRowGap}
           />
         </section>
+
+        {/* Duplicate - No Animation - 2 rows with distributed logos */}
+        <section className="w-full mb-12 pointer-events-none overflow-visible">
+          <div className="max-w-5xl mx-auto">
+            <MultiRowLogoLoop
+              logos={logos}
+              rows={3}
+              speed={0}
+              logoHeight={28}
+              gap={80}
+              rowGap={logoRowGap}
+              className="no-fade"
+            />
+          </div>
+        </section>
       </div>
 
       <div className="flex-1" />
 
-      {/* Contact Section */}
-      <section className="w-full max-w-6xl mx-auto mb-16 contact-section mt-12">
+      {/* Contact Section - HIDDEN */}
+      <section className="hidden w-full max-w-6xl mx-auto mb-16 contact-section mt-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Left: Heading */}
           <div>

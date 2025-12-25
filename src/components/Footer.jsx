@@ -107,13 +107,13 @@ export default function Footer() {
       <div className={`absolute inset-0 ${isDark ? "bg-black/70" : ""}`} />
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
         {/* Mobile Accordion Layout */}
         <div className="lg:hidden">
           <div className="flex gap-4 mb-4">
             {/* Logo - Small, on the side */}
             <div className="flex-shrink-0 pt-2">
-              <AnimatedLogo className="w-28" />
+              <AnimatedLogo className="w-48" />
             </div>
 
             {/* Collapsible Sections */}
@@ -395,16 +395,16 @@ export default function Footer() {
 
           {/* Open For Collabs Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-1">COMMISSIONS OPEN</h3>
-            <p className="text-xs mb-4">and open for collabs</p>
-            <form onSubmit={handleSubscribe} className="space-y-3">
+            <h3 className="text-base font-semibold mb-0.5">COMMISSIONS OPEN</h3>
+            <p className="text-[10px] mb-3">and open for collabs</p>
+            <form onSubmit={handleSubscribe} className="space-y-2">
               <input
                 type="text"
                 placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={isSubmitting}
-                className={`w-full px-4 py-2 rounded focus:outline-none focus:ring-2 placeholder:opacity-50 disabled:opacity-50 ${
+                className={`w-full px-3 py-1.5 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 disabled:opacity-50 ${
                   isDark
                     ? "bg-white text-black focus:ring-gray-400"
                     : "bg-white text-black focus:ring-gray-400"
@@ -416,7 +416,7 @@ export default function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting}
-                className={`w-full px-4 py-2 rounded focus:outline-none focus:ring-2 placeholder:opacity-50 disabled:opacity-50 ${
+                className={`w-full px-3 py-1.5 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 disabled:opacity-50 ${
                   isDark
                     ? "bg-white text-black focus:ring-gray-400"
                     : "bg-white text-black focus:ring-gray-400"
@@ -426,9 +426,9 @@ export default function Footer() {
                 placeholder="Message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                rows="3"
+                rows="2"
                 disabled={isSubmitting}
-                className={`w-full px-4 py-2 rounded focus:outline-none focus:ring-2 resize-none placeholder:opacity-50 disabled:opacity-50 ${
+                className={`w-full px-3 py-1.5 text-sm rounded focus:outline-none focus:ring-2 resize-none placeholder:opacity-50 disabled:opacity-50 ${
                   isDark
                     ? "bg-white text-black focus:ring-gray-400"
                     : "bg-white text-black focus:ring-gray-400"
@@ -437,7 +437,7 @@ export default function Footer() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full px-4 py-2 bg-transparent border rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full px-3 py-1.5 text-sm bg-transparent border rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   isDark
                     ? "border-white text-white hover:bg-white hover:text-black"
                     : "border-black text-black hover:bg-black hover:text-white"
@@ -461,7 +461,7 @@ export default function Footer() {
 
           {/* Resources Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Resources</h3>
+            <h3 className="text-base font-semibold mb-3">Resources</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
@@ -533,7 +533,7 @@ export default function Footer() {
 
           {/* Legal Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+            <h3 className="text-base font-semibold mb-3">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
