@@ -93,18 +93,18 @@ export default function Footer() {
       {/* Dither Background */}
       <div className="absolute inset-0">
         <Dither
-          waveColor={isDark ? [0.3, 0.3, 0.3] : [0.9, 0.9, 0.9]}
+          waveColor={isDark ? [0.3, 0.3, 0.3] : [1.0, 1.0, 1.0]}
           disableAnimation={false}
           enableMouseInteraction={true}
           mouseRadius={0.3}
-          colorNum={4}
+          colorNum={isDark ? 4 : 2}
           waveAmplitude={0.3}
           waveFrequency={3}
           waveSpeed={0.05}
-          bias={isDark ? 0.2 : 0}
+          bias={isDark ? 0.2 : -0.3}
         />
       </div>
-      <div className={`absolute inset-0 ${isDark ? "bg-black/70" : ""}`} />
+      <div className={`absolute inset-0 ${isDark ? "bg-black/70" : "bg-white/70"}`} />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
