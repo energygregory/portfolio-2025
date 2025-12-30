@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
-import AnimatedLogo from "../components/AnimatedLogo";
+import MetallicPaint, { parseLogoImage } from "../components/MetallicPaint";
 import logos from "../data/logos";
 
-// place your logo at: public/LOGOS/finalbiglogo.svg (or .png/.jpg)
-const personallogo = "/LOGOS/newlogo.svg";
+// Logo for metallic paint effect - should be black fill with padding
+const logoPath = "/LOGOS/newlogo.svg";
 
 // Logos used for the logo-strip — same source as App's list (kept local here for the Home page placement)
 const portfolioLogos = [
@@ -56,6 +56,7 @@ const portfolioLogos = [
 
 export default function Home() {
   const [isPhone, setIsPhone] = useState(false);
+  const [imageData, setImageData] = useState(null);
 
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 640px)");
@@ -69,6 +70,22 @@ export default function Home() {
     };
   }, []);
 
+  // Load logo for metallic paint effect
+  useEffect(() => {
+    async function loadLogoImage() {
+      try {
+        const response = await fetch(logoPath);
+        const blob = await response.blob();
+        const file = new File([blob], "logo.svg", { type: blob.type });
+        const parsedData = await parseLogoImage(file);
+        setImageData(parsedData?.imageData ?? null);
+      } catch (err) {
+        console.error("Error loading logo image:", err);
+      }
+    }
+    loadLogoImage();
+  }, []);
+
   const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
   const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
   const logoGap = useMemo(() => (isPhone ? 40 : 80), [isPhone]);
@@ -80,7 +97,19 @@ export default function Home() {
       <div className="w-full h-32"></div>
 
       <div className="w-full mb-6 flex justify-center">
-        <AnimatedLogo className="home-main-logo w-full max-w-[1200px] h-auto" />
+        <div className="w-full max-w-[800px] aspect-square">
+          <MetallicPaint
+            imageData={imageData}
+            params={{
+              patternScale: 3.3,
+              refraction: 0.01,
+              edge: 1,
+              patternBlur: 0.005,
+              liquid: 0.03,
+              speed: 0.85
+            }}
+          />
+        </div>
       </div>
 
       {/* Responsive spacing: show 'Trusted By' and part of the first logo row across devices */}
