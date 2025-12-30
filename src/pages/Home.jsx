@@ -71,9 +71,11 @@ export default function Home() {
 
   const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
   const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
+  const logoGap = useMemo(() => (isPhone ? 40 : 80), [isPhone]);
+  const logoHeight = useMemo(() => (isPhone ? 22 : 28), [isPhone]);
 
   return (
-    <main className="min-h-screen px-6 py-16 flex flex-col">
+    <main className="min-h-screen px-6 py-16 flex flex-col overflow-x-hidden">
       {/* Top spacer */}
       <div className="w-full h-32"></div>
 
@@ -115,14 +117,14 @@ export default function Home() {
         </section>
 
         {/* Duplicate - No Animation - 2 rows with distributed logos */}
-        <section className="w-full mb-12 pointer-events-none overflow-visible">
-          <div className="max-w-5xl mx-auto">
+        <section className="w-full mb-12 pointer-events-none flex justify-center overflow-hidden">
+          <div className="w-full max-w-6xl px-4">
             <MultiRowLogoLoop
               logos={logos}
               rows={3}
               speed={0}
-              logoHeight={28}
-              gap={80}
+              logoHeight={logoHeight}
+              gap={logoGap}
               rowGap={logoRowGap}
               className="no-fade"
             />

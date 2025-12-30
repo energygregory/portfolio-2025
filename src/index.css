@@ -520,7 +520,7 @@ body {
 
 /* Stronger blackness for the inverted animation in light mode */
 .theme-light .about-efecto-video,
-.theme-light .nav-loader-video-el {
+.theme-light #nav-loader-logo-container svg {
   /* Strong inversion tuned to preserve detail while giving deep blacks on white */
   /* Higher contrast and moderate brightness to avoid grey wash */
   filter: invert(1) contrast(4) brightness(1.05) saturate(1.1);
@@ -530,7 +530,7 @@ body {
   border: none;
 }
 .theme-dark .about-efecto-video,
-.theme-dark .nav-loader-video-el {
+.theme-dark #nav-loader-logo-container svg {
   filter: none;
   -webkit-filter: none;
   background: transparent;
@@ -601,4 +601,19 @@ body {
     rgba(255, 255, 255, 0.36) 50%,
     rgba(255, 255, 255, 0) 100%
   );
+}
+
+/* Thicken animated logo in footer only in light mode */
+.theme-light footer #animated-logo .cls-1 {
+  stroke-width: 6px !important;
+}
+
+/* Make all footer text black and bolder in light mode */
+.theme-light footer,
+.theme-light footer *,
+.theme-light footer button,
+.theme-light footer input,
+.theme-light footer textarea {
+  color: #000000 !important;
+  font-weight: 800 !important;
 }

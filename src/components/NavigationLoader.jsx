@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import AnimatedLogo from "./AnimatedLogo";
 
 export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
   const navigate = useNavigate();
@@ -7,7 +8,6 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
   const [visible, setVisible] = useState(false);
   const targetRef = useRef(null);
   const navigatingRef = useRef(false);
-  const videoRef = useRef(null);
 
   // Sync visible state with parent
   useEffect(() => {
@@ -16,37 +16,11 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
     }
   }, [visible, onVisibleChange]);
 
-  // Initial load animation
+  // Initial load animation: show overlay with animated logo, then fade
   useEffect(() => {
     const runInitialLoader = async () => {
       setVisible(true);
 
-      const vid = videoRef.current;
-      if (vid) {
-        // Ensure video is ready before playing
-        if (vid.readyState >= 1) {
-          vid.currentTime = 4;
-        } else {
-          vid.addEventListener(
-            "loadedmetadata",
-            () => {
-              vid.currentTime = 4;
-            },
-            { once: true }
-          );
-        }
-
-        try {
-          vid.playbackRate = 2.52;
-          // Use a small timeout to allow the UI to paint first
-          await new Promise((r) => setTimeout(r, 50));
-          await vid.play();
-        } catch (err) {
-          console.error("Auto-play failed:", err);
-        }
-      }
-
-      // Wait for animation duration
       const NAV_DELAY_MS = 1400;
       await new Promise((resolve) => setTimeout(resolve, NAV_DELAY_MS));
 
@@ -62,7 +36,6 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
       }
 
       setTimeout(() => {
-        // Only unpause animations AFTER the overlay is fully hidden
         if (onVisibleChange) onVisibleChange(false);
 
         setVisible(false);
@@ -70,11 +43,6 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
           overlayEl.style.transition = "";
           overlayEl.style.opacity = "0";
           overlayEl.style.transform = "";
-        }
-        // Reset video
-        if (vid) {
-          vid.pause();
-          vid.currentTime = 4;
         }
       }, FADE_DURATION_MS + 50);
     };
@@ -124,34 +92,11 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
         if (url.pathname === window.location.pathname) return;
 
         e.preventDefault();
-        
-        // Check if navigating to a brand page from Work page
-        const brandPages = ['/williamru', '/legacydrip', '/flyhigh', '/around', '/terzo'];
-        const isBrandNavigation = location.pathname === '/work' && brandPages.includes(url.pathname);
-        
-        if (isBrandNavigation) {
-          // Skip loader for brand pages, navigate immediately
-          navigate(url.pathname + url.search + url.hash);
-          return;
-        }
-        
         navigatingRef.current = true;
         targetRef.current = url.pathname + url.search + url.hash;
         setVisible(true);
 
-        const vid = videoRef.current;
-        if (vid) {
-          try {
-            // Reset time just in case
-            vid.currentTime = 4;
-            vid.playbackRate = 2.52;
-            await vid.play();
-          } catch (err) {
-            // ignore play errors
-          }
-        }
-
-        // navigate after delay - increased to allow video to play more fully
+        // navigate after delay so the logo animation is visible
         const NAV_DELAY_MS = 1400;
         setTimeout(() => {
           if (targetRef.current) navigate(targetRef.current);
@@ -173,7 +118,6 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
     const overlayEl = document.getElementById("nav-loader-overlay");
     if (overlayEl) {
       overlayEl.style.transition = `opacity ${FADE_DURATION_MS}ms ease, transform ${FADE_DURATION_MS}ms ease`;
-      // start fade-out
       requestAnimationFrame(() => {
         overlayEl.style.opacity = "0";
         overlayEl.style.transform = "scale(0.98)";
@@ -181,7 +125,6 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
     }
 
     const t = setTimeout(() => {
-      // Only unpause animations AFTER the overlay is fully hidden
       if (onVisibleChange) onVisibleChange(false);
 
       setVisible(false);
@@ -189,17 +132,9 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
       targetRef.current = null;
 
       if (overlayEl) {
-        // reset inline styles so next time we show cleanly
         overlayEl.style.transition = "";
         overlayEl.style.opacity = "0";
         overlayEl.style.transform = "";
-      }
-
-      const vid = videoRef.current;
-      if (vid) {
-        vid.pause();
-        // Reset to start frame so it's ready for next time
-        vid.currentTime = 4;
       }
     }, FADE_DURATION_MS + 50);
 
@@ -220,12 +155,12 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        // use theme-aware background so inverted animation looks correct in light mode
-        background: theme === "light" ? "#ffffff" : "#000000",
+        background: theme === "dark" ? "#000000" : "#ffffff",
+        color: theme === "dark" ? "#ffffff" : "#000000",
       }}
     >
       <div
-        id="nav-loader-video-container"
+        id="nav-loader-logo-container"
         style={{
           display: "flex",
           alignItems: "center",
@@ -236,27 +171,11 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
           style={{
             position: "relative",
             display: "inline-block",
-            borderRadius: "8px",
-            overflow: "hidden",
+            width: "44vmin",
+            maxWidth: "420px",
           }}
         >
-          <video
-            ref={videoRef}
-            src="/animation.webm"
-            muted
-            playsInline
-            preload="auto"
-            className="nav-loader-video-el"
-            style={{
-              width: "44vmin",
-              maxWidth: "420px",
-              height: "auto",
-              display: "block",
-              objectFit: "contain",
-              borderRadius: "8px",
-              willChange: "transform", // Hint to browser to promote to layer
-            }}
-          />
+          <AnimatedLogo />
         </div>
       </div>
     </div>

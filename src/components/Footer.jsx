@@ -9,10 +9,87 @@ export default function Footer() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isDark, setIsDark] = useState(true);
-  const [showPolicyModal, setShowPolicyModal] = useState(false);
+  const [activeModal, setActiveModal] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("");
+
+  const MODAL_CONTENT = {
+    policy: {
+      title: "POLICY/WORKING TERMS",
+      content: (
+        <>
+          <p>
+            1. PAYMENT TERMS: A 50% non-refundable deposit is required to
+            commence work. The remaining balance is due upon project completion
+            before final file delivery.
+          </p>
+          <p>
+            2. REVISIONS: Three rounds of revisions are included in the quoted
+            price. Additional revisions will be charged at an hourly rate.
+          </p>
+          <p>
+            3. TIMELINE: Project timelines are estimates. Delays in client
+            feedback may affect delivery dates.
+          </p>
+          <p>
+            4. OWNERSHIP: Final designs become client property upon full
+            payment. I retain the right to display the work in my portfolio.
+          </p>
+        </>
+      ),
+    },
+    privacy: {
+      title: "PRIVACY POLICY",
+      content: (
+        <>
+          <p>
+            1. DATA COLLECTION: We collect personal information you provide
+            directly to us, such as when you fill out a contact form.
+          </p>
+          <p>
+            2. USE OF INFORMATION: We use the information we collect to
+            communicate with you, provide services, and improve our website.
+          </p>
+          <p>
+            3. DATA PROTECTION: We implement reasonable security measures to
+            protect your personal information.
+          </p>
+        </>
+      ),
+    },
+    terms: {
+      title: "TERMS OF USE",
+      content: (
+        <>
+          <p>
+            1. ACCEPTANCE: By accessing this website, you agree to be bound by
+            these Terms of Use.
+          </p>
+          <p>
+            2. INTELLECTUAL PROPERTY: All content on this site is the property
+            of Greg and protected by copyright laws.
+          </p>
+          <p>
+            3. LIMITATION OF LIABILITY: We are not liable for any damages
+            arising from the use of this website.
+          </p>
+        </>
+      ),
+    },
+    legal: {
+      title: "LEGAL",
+      content: (
+        <>
+          <p>This website is operated by Greg. All rights reserved.</p>
+          <p>
+            For legal inquiries, please contact us directly through the contact
+            form.
+          </p>
+        </>
+      ),
+    },
+  };
 
   useEffect(() => {
     const checkTheme = () => {
@@ -85,7 +162,7 @@ export default function Footer() {
       style={{
         fontFamily:
           "'PT Mono', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-        fontWeight: 800,
+        fontWeight: isDark ? 800 : 950,
         textTransform: "uppercase",
         letterSpacing: "0.06em",
       }}
@@ -101,23 +178,23 @@ export default function Footer() {
           waveAmplitude={0.3}
           waveFrequency={3}
           waveSpeed={0.05}
-          bias={isDark ? 0.2 : -0.3}
+          bias={isDark ? 0.2 : -0.4}
         />
       </div>
-      <div className={`absolute inset-0 ${isDark ? "bg-black/70" : "bg-white/70"}`} />
+      <div className={`absolute inset-0 ${isDark ? "bg-black/70" : "bg-white/90"}`} />
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-4 relative z-10">
         {/* Mobile Accordion Layout */}
         <div className="lg:hidden">
-          <div className="flex gap-4 mb-4">
-            {/* Logo - Small, on the side */}
-            <div className="flex-shrink-0 pt-2">
+          <div className="flex flex-col items-center gap-6 mb-8">
+            {/* Logo - Centered */}
+            <div>
               <AnimatedLogo className="w-48" />
             </div>
 
             {/* Collapsible Sections */}
-            <div className="flex-1 space-y-4">
+            <div className="w-full space-y-4">
               {/* Commissions - Collapsible */}
               <div
                 className={`border rounded-lg overflow-hidden ${
@@ -244,7 +321,7 @@ export default function Footer() {
                       </li>
                       <li>
                         <button
-                          onClick={() => setShowPolicyModal(true)}
+                          onClick={() => setActiveModal("policy")}
                           className={`text-left ${
                             isDark
                               ? "text-gray-300 hover:text-white transition-colors"
@@ -327,40 +404,40 @@ export default function Footer() {
                   >
                     <ul className="space-y-1.5 text-xs">
                       <li>
-                        <Link
-                          to="/privacy"
-                          className={
+                        <button
+                          onClick={() => setActiveModal("privacy")}
+                          className={`text-left ${
                             isDark
                               ? "text-gray-300 hover:text-white transition-colors"
                               : "text-gray-600 hover:text-black transition-colors"
-                          }
+                          }`}
                         >
-                          Privacy Policy
-                        </Link>
+                          PRIVACY POLICY
+                        </button>
                       </li>
                       <li>
-                        <Link
-                          to="/terms"
-                          className={
+                        <button
+                          onClick={() => setActiveModal("terms")}
+                          className={`text-left ${
                             isDark
                               ? "text-gray-300 hover:text-white transition-colors"
                               : "text-gray-600 hover:text-black transition-colors"
-                          }
+                          }`}
                         >
-                          Terms of Use
-                        </Link>
+                          TERMS OF USE
+                        </button>
                       </li>
                       <li>
-                        <Link
-                          to="/legal"
-                          className={
+                        <button
+                          onClick={() => setActiveModal("legal")}
+                          className={`text-left ${
                             isDark
                               ? "text-gray-300 hover:text-white transition-colors"
                               : "text-gray-600 hover:text-black transition-colors"
-                          }
+                          }`}
                         >
-                          Legal
-                        </Link>
+                          LEGAL
+                        </button>
                       </li>
                     </ul>
                   </div>
@@ -371,7 +448,7 @@ export default function Footer() {
 
           {/* Mobile Bottom Bar */}
           <div
-            className={`border-t pt-4 mt-4 ${
+            className={`border-t pt-2 mt-2 ${
               isDark ? "border-gray-600" : "border-gray-400"
             }`}
           >
@@ -387,57 +464,59 @@ export default function Footer() {
         </div>
 
         {/* Desktop Grid Layout */}
-        <div className="hidden lg:grid grid-cols-4 gap-8 mb-8">
+        <div className="hidden lg:grid grid-cols-4 gap-16 mb-4">
           {/* Logo Section */}
           <div className="flex items-start">
-            <AnimatedLogo className="w-80" />
+            <AnimatedLogo className="w-48" />
           </div>
 
           {/* Open For Collabs Section */}
           <div>
-            <h3 className="text-base font-semibold mb-0.5">COMMISSIONS OPEN</h3>
-            <p className="text-[10px] mb-3">and open for collabs</p>
-            <form onSubmit={handleSubscribe} className="space-y-2">
-              <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={isSubmitting}
-                className={`w-full px-3 py-1.5 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 disabled:opacity-50 ${
-                  isDark
-                    ? "bg-white text-black focus:ring-gray-400"
-                    : "bg-white text-black focus:ring-gray-400"
-                }`}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSubmitting}
-                className={`w-full px-3 py-1.5 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 disabled:opacity-50 ${
-                  isDark
-                    ? "bg-white text-black focus:ring-gray-400"
-                    : "bg-white text-black focus:ring-gray-400"
-                }`}
-              />
+            <h3 className="text-base font-semibold mb-0">COMMISSIONS OPEN</h3>
+            <p className="text-[10px] mb-1">and open for collabs</p>
+            <form onSubmit={handleSubscribe} className="space-y-0.5">
+              <div className="flex gap-1">
+                <input
+                  type="text"
+                  placeholder="NAME"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={isSubmitting}
+                  className={`w-1/2 px-2 py-0.5 text-xs rounded-none border focus:outline-none transition-colors placeholder:opacity-50 disabled:opacity-50 ${
+                    isDark
+                      ? "bg-transparent border-white/40 text-white placeholder:text-gray-400 focus:border-white focus:bg-white/5"
+                      : "bg-transparent border-black/40 text-black placeholder:text-gray-500 focus:border-black focus:bg-black/5"
+                  }`}
+                />
+                <input
+                  type="email"
+                  placeholder="EMAIL"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  className={`w-1/2 px-2 py-0.5 text-xs rounded-none border focus:outline-none transition-colors placeholder:opacity-50 disabled:opacity-50 ${
+                    isDark
+                      ? "bg-transparent border-white/40 text-white placeholder:text-gray-400 focus:border-white focus:bg-white/5"
+                      : "bg-transparent border-black/40 text-black placeholder:text-gray-500 focus:border-black focus:bg-black/5"
+                  }`}
+                />
+              </div>
               <textarea
-                placeholder="Message"
+                placeholder="MESSAGE"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                rows="2"
+                rows="1"
                 disabled={isSubmitting}
-                className={`w-full px-3 py-1.5 text-sm rounded focus:outline-none focus:ring-2 resize-none placeholder:opacity-50 disabled:opacity-50 ${
+                className={`w-full px-2 py-0.5 text-xs rounded-none border focus:outline-none resize-none transition-colors placeholder:opacity-50 disabled:opacity-50 ${
                   isDark
-                    ? "bg-white text-black focus:ring-gray-400"
-                    : "bg-white text-black focus:ring-gray-400"
+                    ? "bg-transparent border-white/40 text-white placeholder:text-gray-400 focus:border-white focus:bg-white/5"
+                    : "bg-transparent border-black/40 text-black placeholder:text-gray-500 focus:border-black focus:bg-black/5"
                 }`}
               />
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full px-3 py-1.5 text-sm bg-transparent border rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full px-2 py-0.5 text-xs bg-transparent border rounded-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   isDark
                     ? "border-white text-white hover:bg-white hover:text-black"
                     : "border-black text-black hover:bg-black hover:text-white"
@@ -477,7 +556,7 @@ export default function Footer() {
               </li>
               <li>
                 <button
-                  onClick={() => setShowPolicyModal(true)}
+                  onClick={() => setActiveModal("policy")}
                   className={`text-left ${
                     isDark
                       ? "text-gray-300 hover:text-white transition-colors"
@@ -536,40 +615,40 @@ export default function Footer() {
             <h3 className="text-base font-semibold mb-3">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  to="/privacy"
-                  className={
+                <button
+                  onClick={() => setActiveModal("privacy")}
+                  className={`text-left ${
                     isDark
                       ? "text-gray-300 hover:text-white transition-colors"
                       : "text-gray-600 hover:text-black transition-colors"
-                  }
+                  }`}
                 >
-                  Privacy Policy
-                </Link>
+                  PRIVACY POLICY
+                </button>
               </li>
               <li>
-                <Link
-                  to="/terms"
-                  className={
+                <button
+                  onClick={() => setActiveModal("terms")}
+                  className={`text-left ${
                     isDark
                       ? "text-gray-300 hover:text-white transition-colors"
                       : "text-gray-600 hover:text-black transition-colors"
-                  }
+                  }`}
                 >
-                  Terms of Use
-                </Link>
+                  TERMS OF USE
+                </button>
               </li>
               <li>
-                <Link
-                  to="/legal"
-                  className={
+                <button
+                  onClick={() => setActiveModal("legal")}
+                  className={`text-left ${
                     isDark
                       ? "text-gray-300 hover:text-white transition-colors"
                       : "text-gray-600 hover:text-black transition-colors"
-                  }
+                  }`}
                 >
-                  Legal
-                </Link>
+                  LEGAL
+                </button>
               </li>
             </ul>
           </div>
@@ -577,7 +656,7 @@ export default function Footer() {
 
         {/* Desktop Bottom Bar */}
         <div
-          className={`hidden lg:block border-t pt-6 ${
+          className={`hidden lg:block border-t pt-4 ${
             isDark ? "border-gray-600" : "border-gray-400"
           }`}
         >
@@ -593,10 +672,10 @@ export default function Footer() {
       </div>
 
       {/* Policy Modal */}
-      {showPolicyModal && (
+      {activeModal && MODAL_CONTENT[activeModal] && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setShowPolicyModal(false)}
+          onClick={() => setActiveModal(null)}
         >
           <div
             className={`relative max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto rounded-lg p-8 ${
@@ -605,29 +684,17 @@ export default function Footer() {
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              onClick={() => setShowPolicyModal(false)}
+              onClick={() => setActiveModal(null)}
               className="absolute top-4 right-4 text-2xl font-bold hover:opacity-70"
               aria-label="Close"
             >
               ×
             </button>
-            <h2 className="text-2xl font-bold mb-4">POLICY/WORKING TERMS</h2>
-            <div className="space-y-4 text-sm leading-relaxed">
-              <p>
-                This is our policy document. Lorem ipsum dolor sit amet,
-                consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
-                labore et dolore magna aliqua.
-              </p>
-              <p>
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-                dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                fugiat nulla pariatur.
-              </p>
-              <p>
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                qui officia deserunt mollit anim id est laborum.
-              </p>
+            <h2 className="text-2xl font-bold mb-4 font-mono">
+              {MODAL_CONTENT[activeModal].title}
+            </h2>
+            <div className="space-y-4 text-sm leading-relaxed font-mono uppercase">
+              {MODAL_CONTENT[activeModal].content}
             </div>
           </div>
         </div>

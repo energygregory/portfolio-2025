@@ -6,8 +6,8 @@ export default function About() {
       <div className="max-w-7xl mx-auto">
         {/* About Me Section */}
         <div className="mb-16">
-          <h1 className="text-5xl font-bold mb-12 uppercase tracking-wider">
-            about me:
+          <h1 className="text-5xl font-bold mb-12 tracking-wider">
+            who is greg?
           </h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">

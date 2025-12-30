@@ -12,7 +12,6 @@ export default function Work() {
   }));
 
   const [openFolder, setOpenFolder] = useState(null);
-  const [hoveredBrand, setHoveredBrand] = useState(null);
 
   // use a mini-nav like PriceList: 'Brands' | 'Skill Set'
   const [activeCategory, setActiveCategory] = useState('brands');
@@ -36,8 +35,8 @@ export default function Work() {
   };
 
   return (
-    <main className="min-h-screen px-6 py-16">
-      <h1 className="text-3xl font-semibold mb-6">Work</h1>
+    <main className="px-6 py-16">
+      <h1 className="text-3xl font-mono mb-6">what is my work made of?</h1>
 
       {/* Mini nav (same visual style as PriceList) */}
       <div className="w-full mb-6">
@@ -61,21 +60,17 @@ export default function Work() {
         </nav>
       </div>
       {activeCategory === 'brands' && (
-        <section className="flex gap-8 items-start">
-          <ul className="space-y-4 flex-1">
+        <section className="max-w-4xl">
+          <ul className="space-y-4">
             {[
-              { label: 'William Ru', path: '/williamru', image: '/Images/William Ru/png2.png' },
-              { label: 'Legacy Drip', path: '/legacydrip', image: '/realistic/mockup.png' },
-              { label: 'Fly High', path: '/flyhigh', image: '/realistic/grey beanie.png' },
-              { label: 'Around', path: '/around', image: '/realistic/t shirt 1.png' },
-              { label: 'Zaama disco', path: '/work', image: '/box.png' },
-              { label: 'Semanu Studios', path: '/work', image: '/box2.png' },
+              { label: 'William Ru', path: '/williamru' },
+              { label: 'Legacy Drip', path: '/legacydrip' },
+              { label: 'Fly High', path: '/flyhigh' },
+              { label: 'Around', path: '/around' },
+              { label: 'Zaama disco', path: '/work' },
+              { label: 'Semanu Studios', path: '/work' },
             ].map((item, idx) => (
-              <li 
-                key={idx}
-                onMouseEnter={() => setHoveredBrand(item)}
-                onMouseLeave={() => setHoveredBrand(null)}
-              >
+              <li key={idx}>
                 <Link
                   to={item.path}
                   className="brand-list-item block text-4xl sm:text-5xl tracking-wide px-3 py-3 transition-colors"
@@ -85,21 +80,6 @@ export default function Work() {
               </li>
             ))}
           </ul>
-          
-          {/* Preview Panel */}
-          <div className="hidden lg:block w-96 sticky top-24" style={{ height: 'calc(100vh - 6rem - 100px)' }}>
-            <div className={`w-full h-full transition-all duration-500 ease-out flex items-center justify-center ${
-              hoveredBrand ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-            }`}>
-              {hoveredBrand && (
-                <img 
-                  src={hoveredBrand.image} 
-                  alt={hoveredBrand.label}
-                  className="w-full h-full object-contain"
-                />
-              )}
-            </div>
-          </div>
         </section>
       )}
 

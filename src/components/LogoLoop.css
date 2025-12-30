@@ -9,7 +9,7 @@
 /* Container used when multiple LogoLoop rows are stacked. Clip fades to this box. */
 .multi-logoloop {
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 /* Ensure fades follow the app theme explicitly (avoid race on inline styles) */
@@ -46,6 +46,11 @@
   z-index: 0;
 }
 
+/* When parent has justify-content: center, allow track to shrink */
+.logoloop[style*="justify-content: center"] .logoloop__track {
+  width: auto;
+}
+
 .logoloop--vertical .logoloop__track {
   flex-direction: column;
   height: max-content;
@@ -55,7 +60,6 @@
 .logoloop__list {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .logoloop--vertical .logoloop__list {
@@ -143,14 +147,6 @@
   z-index: 1;
 }
 
-/* Remove fades from no-fade variant */
-.no-fade.logoloop--fade::before,
-.no-fade.logoloop--fade::after,
-.no-fade .logoloop--fade::before,
-.no-fade .logoloop--fade::after {
-  display: none;
-}
-
 .logoloop--fade::before {
   left: 0;
   background: linear-gradient(
@@ -189,6 +185,13 @@
     var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 40%,
     rgba(0, 0, 0, 0) 100%
   );
+}
+
+/* Helper to disable fades when container requests it (e.g. home page logos) */
+.no-fade.logoloop--fade::before,
+.no-fade.logoloop--fade::after {
+  display: none !important;
+  background: none !important;
 }
 
 .logoloop--vertical.logoloop--fade::after {

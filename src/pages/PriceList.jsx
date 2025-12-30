@@ -33,6 +33,28 @@ export default function PriceList() {
   const [activeCategory, setActiveCategory] = useState("graphic-design");
   const [currencyKey, setCurrencyKey] = useState("GHS");
   const [detectedCurrencyKey, setDetectedCurrencyKey] = useState("GHS");
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
+  const [isDark, setIsDark] = useState(true);
+
+  // Detect theme
+  useEffect(() => {
+    const checkTheme = () => {
+      const theme = document.documentElement.classList.contains("theme-light")
+        ? "light"
+        : "dark";
+      setIsDark(theme === "dark");
+    };
+
+    checkTheme();
+
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Detect visitor's currency on mount
   useEffect(() => {
@@ -76,27 +98,26 @@ export default function PriceList() {
   return (
     <main className="min-h-screen px-6 py-16">
       <div className="max-w-4xl">
-        <h1 className="text-3xl font-semibold mb-4">0021.STUDIO</h1>
-        <p className="text-lg italic text-neutral-400 mb-12">Rate Card</p>
+        <h1 className="text-3xl font-mono mb-12">how much do i charge for my services?</h1>
 
         {/* Mini nav for service categories */}
-        <nav className="flex gap-4 mb-10 border-b border-neutral-700 pb-4">
+        <nav className="flex gap-6 mb-6 border-b border-neutral-700 pb-3">
           <button
             onClick={() => setActiveCategory("merch-design")}
-            className={`font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
+            className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
               activeCategory === "merch-design"
-                ? "text-white border-b-2 border-white"
-                : "text-neutral-400 hover:text-neutral-300"
+                ? "mini-nav-active"
+                : ""
             }`}
           >
             Merch Design
           </button>
           <button
             onClick={() => setActiveCategory("graphic-design")}
-            className={`font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
+            className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
               activeCategory === "graphic-design"
-                ? "text-white border-b-2 border-white"
-                : "text-neutral-400 hover:text-neutral-300"
+                ? "mini-nav-active"
+                : ""
             }`}
           >
             Graphic Design
@@ -104,23 +125,28 @@ export default function PriceList() {
         </nav>
 
         {/* Currency selector */}
-        <div className="mb-10 flex items-center gap-4">
-          <label htmlFor="currency-select" className="font-mono text-sm text-neutral-400">
-            Currency:
-          </label>
-          <select
-            id="currency-select"
-            value={currencyKey}
-            onChange={(e) => setCurrencyKey(e.target.value)}
-            className="font-mono px-3 py-2 bg-neutral-900 border border-neutral-700 text-white rounded hover:border-neutral-500 focus:outline-none focus:border-neutral-400"
-          >
-            <option value={detectedCurrencyKey}>
-              {detectedCurrencyKey} {exchangeRates[detectedCurrencyKey]?.flag}
-            </option>
-            <option value="USD">USD 🇺🇸</option>
-            <option value="GBP">GBP 🇬🇧</option>
-            <option value="EUR">EUR 🇪🇺</option>
-          </select>
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-3">
+            <label htmlFor="currency-select" className="font-mono text-sm text-neutral-400">
+              Currency:
+            </label>
+            <select
+              id="currency-select"
+              value={currencyKey}
+              onChange={(e) => setCurrencyKey(e.target.value)}
+              className="font-mono px-3 py-2 bg-neutral-900 border border-neutral-700 text-white rounded hover:border-neutral-500 focus:outline-none focus:border-neutral-400"
+            >
+              <option value={detectedCurrencyKey}>
+                {detectedCurrencyKey} {exchangeRates[detectedCurrencyKey]?.flag}
+              </option>
+              <option value="USD">USD 🇺🇸</option>
+              <option value="GBP">GBP 🇬🇧</option>
+              <option value="EUR">EUR 🇪🇺</option>
+            </select>
+          </div>
+          <p className="font-mono text-sm text-neutral-400">
+            Read my <button onClick={() => setShowPolicyModal(true)} className="underline hover:text-white transition-colors">policy</button> here
+          </p>
         </div>
 
         {/* Rate cards in monospace */}
@@ -150,6 +176,47 @@ export default function PriceList() {
           </a>
         </div>
       </div>
+
+      {/* Policy Modal */}
+      {showPolicyModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowPolicyModal(false)}
+        >
+          <div
+            className={`relative max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto rounded-lg p-8 ${
+              isDark ? "bg-[#1a1a1a] text-white" : "bg-white text-black"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowPolicyModal(false)}
+              className="absolute top-4 right-4 text-2xl font-bold hover:opacity-70"
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-bold mb-4 font-mono">POLICY/WORKING TERMS</h2>
+            <div className="space-y-4 text-sm leading-relaxed font-mono uppercase">
+              <p>
+                This is our policy document. Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+                labore et dolore magna aliqua.
+              </p>
+              <p>
+                Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                dolor in reprehenderit in voluptate velit esse cillum dolore eu
+                fugiat nulla pariatur.
+              </p>
+              <p>
+                Excepteur sint occaecat cupidatat non proident, sunt in culpa
+                qui officia deserunt mollit anim id est laborum.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -138,7 +138,9 @@ class RetroEffectImpl extends Effect {
   constructor() {
     const uniforms = new Map([
       ["colorNum", new THREE.Uniform(4.0)],
-      ["pixelSize", new THREE.Uniform(2.0)],      ["bias", new THREE.Uniform(0.2)],    ]);
+      ["pixelSize", new THREE.Uniform(2.0)],
+      ["bias", new THREE.Uniform(0.2)],
+    ]);
     super("RetroEffect", ditherFragmentShader, { uniforms });
     this.uniforms = uniforms;
   }
@@ -166,7 +168,9 @@ const WrappedRetro = wrapEffect(RetroEffectImpl);
 
 const RetroEffect = forwardRef((props, ref) => {
   const { colorNum, pixelSize, bias } = props;
-  return <WrappedRetro ref={ref} colorNum={colorNum} pixelSize={pixelSize} bias={bias} />;
+  return (
+    <WrappedRetro ref={ref} colorNum={colorNum} pixelSize={pixelSize} bias={bias} />
+  );
 });
 RetroEffect.displayName = "RetroEffect";
 
@@ -180,7 +184,7 @@ function DitheredWaves({
   disableAnimation,
   enableMouseInteraction,
   mouseRadius,
-  bias = 0.2,
+  bias,
 }) {
   const mesh = useRef(null);
   const mouseRef = useRef(new THREE.Vector2());
@@ -303,8 +307,6 @@ export default function Dither({
         enableMouseInteraction={enableMouseInteraction}
         mouseRadius={mouseRadius}
         bias={bias}
-      />
-        mouseRadius={mouseRadius}
       />
     </Canvas>
   );

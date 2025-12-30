@@ -76,7 +76,7 @@ export default function MultiRowLogoLoop({
                 : "multi-logoloop__row") + ` multi-logoloop__row--idx-${i}`;
 
             return (
-              <div className={rowClass} key={i}>
+              <div className={rowClass} key={i} style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                 <LogoLoop
                   logos={rowLogos}
                   speed={speed}

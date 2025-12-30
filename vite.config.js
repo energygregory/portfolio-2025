@@ -18,6 +18,7 @@ export default defineConfig({
       "b4906d848688.ngrok-free.app",
       "542750dba6de.ngrok-free.app",
       "446af1b24303.ngrok-free.app",
+      "8a88da4d903a.ngrok-free.app",
     ],
   },
 });

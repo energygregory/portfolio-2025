@@ -819,10 +819,11 @@ export const LogoLoop = memo(
             ? undefined
             : toCssLength(width)
           : toCssLength(width) ?? "100%",
+        ...(speed === 0 && { display: "flex", justifyContent: "center" }),
         ...cssVariables,
         ...style,
       }),
-      [width, cssVariables, style, isVertical]
+      [width, cssVariables, style, isVertical, speed]
     );
 
     return (
