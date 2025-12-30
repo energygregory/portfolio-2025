@@ -79,6 +79,24 @@ body {
   color: #ffffff;
 }
 
+/* Mobile scroll optimization */
+@media (max-width: 640px) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  .will-change-transform {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  
+  /* Reduce paint operations on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 /* Horizontal logo scrolling bar
 .logo-marquee {
   white-space: nowrap;

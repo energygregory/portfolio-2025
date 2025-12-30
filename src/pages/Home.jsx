@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import LiquidLogo from "../components/LiquidLogo";
@@ -109,8 +109,13 @@ const portfolioLogos = [
 export default function Home({ theme = "dark" }) {
   const [isPhone, setIsPhone] = useState(false);
   const [isTabletOrLarger, setIsTabletOrLarger] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const logoContainerRef = useRef(null);
+  const clRef = useRef(null);
+  const crRef = useRef(null);
+  const logoWrapperRef = useRef(null);
+  const imagesRef = useRef(null);
+  const scrollYRef = useRef(0);
+  const rafRef = useRef(null);
 
   useEffect(() => {
     const phoneMql = window.matchMedia("(max-width: 640px)");
@@ -140,40 +145,73 @@ export default function Home({ theme = "dark" }) {
     };
   }, []);
 
-  // Scroll-based 3D animation
+  // Optimized scroll handler - updates DOM directly without React re-renders
+  const updateScrollAnimations = useCallback(() => {
+    const scrollY = scrollYRef.current;
+    const maxScroll = 600;
+    const progress = Math.min(scrollY / maxScroll, 1);
+    
+    // Logo transforms
+    const logoTranslateY = progress * -150;
+    const logoScale = 1 - progress * 0.15;
+    const logoOpacity = 1 - progress * 0.3;
+    
+    // Shoulder transforms
+    const shoulderOpacity = Math.max(0, 1 - progress);
+    const baseRotation = isPhone ? 25 : 0;
+    const shoulderRotation = baseRotation + progress * 360;
+    
+    // Apply transforms directly to DOM elements
+    if (logoWrapperRef.current) {
+      logoWrapperRef.current.style.transform = `translate3d(0, ${logoTranslateY}px, 0) scale(${logoScale})`;
+      logoWrapperRef.current.style.opacity = logoOpacity;
+    }
+    
+    if (clRef.current) {
+      clRef.current.style.transform = `scaleX(-1) rotate3d(0, 0, 1, ${shoulderRotation}deg)`;
+      clRef.current.style.opacity = shoulderOpacity;
+    }
+    
+    if (crRef.current) {
+      crRef.current.style.transform = `rotate3d(0, 0, 1, ${shoulderRotation}deg)`;
+      crRef.current.style.opacity = shoulderOpacity;
+    }
+    
+    if (imagesRef.current) {
+      imagesRef.current.style.opacity = progress;
+      imagesRef.current.style.transform = `translate3d(0, ${(1 - progress) * 100}px, 0)`;
+    }
+  }, [isPhone]);
+
+  // Scroll-based animation with direct DOM manipulation
   useEffect(() => {
-    let ticking = false;
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrollY(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
+      scrollYRef.current = window.scrollY;
+      
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      
+      rafRef.current = requestAnimationFrame(updateScrollAnimations);
+    };
+    
+    // Initial update
+    scrollYRef.current = window.scrollY;
+    updateScrollAnimations();
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [updateScrollAnimations]);
 
   const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
   const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
   const logoGap = useMemo(() => (isPhone ? 40 : 80), [isPhone]);
   const logoHeight = useMemo(() => (isPhone ? 22 : 28), [isPhone]);
-
-  // Calculate transforms based on scroll
-  const maxScroll = 600;
-  const scrollProgress = Math.min(scrollY / maxScroll, 1);
-  
-  // Logo moves up as you scroll down
-  const logoTranslateY = scrollProgress * -150;
-  const logoScale = 1 - scrollProgress * 0.15;
-  const logoOpacity = 1 - scrollProgress * 0.3;
-  
-  // Shoulder symbols disappear completely when logo is out of view
-  const shoulderOpacity = Math.max(0, 1 - scrollProgress);
-  const baseRotation = isPhone ? 25 : 0; // Starting rotation offset on mobile
-  const shoulderRotation = baseRotation + scrollProgress * 360; // Full rotation as you scroll
 
   return (
     <main className={`min-h-screen flex flex-col overflow-x-hidden relative ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
@@ -207,33 +245,35 @@ export default function Home({ theme = "dark" }) {
       
       {/* cl: Left shoulder symbol with liquid chrome metallic effect - rotates anticlockwise and disappears on scroll */}
       <div 
-        className="fixed z-[100] pointer-events-none"
+        ref={clRef}
+        className="fixed z-[100] pointer-events-none will-change-transform"
         style={{
           top: isPhone ? '-8vh' : '-10vh',
           left: isPhone ? '-25vw' : '0',
           width: isPhone ? '60vw' : '35vw',
           height: isPhone ? '60vw' : '35vw',
-          transform: `scaleX(-1) rotate3d(0, 0, 1, ${shoulderRotation}deg)`,
+          transform: `scaleX(-1) rotate3d(0, 0, 1, ${isPhone ? 25 : 0}deg)`,
           transformOrigin: '50% 50%',
           backfaceVisibility: 'hidden',
         }}
       >
-        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" opacity={shoulderOpacity} />
+        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
       </div>
       {/* cr: Right shoulder symbol with liquid chrome metallic effect - rotates clockwise and disappears on scroll */}
       <div 
-        className="fixed z-[100] pointer-events-none"
+        ref={crRef}
+        className="fixed z-[100] pointer-events-none will-change-transform"
         style={{
           top: isPhone ? '-8vh' : '-10vh',
           right: isPhone ? '-25vw' : '0',
           width: isPhone ? '60vw' : '35vw',
           height: isPhone ? '60vw' : '35vw',
-          transform: `rotate3d(0, 0, 1, ${shoulderRotation}deg)`,
+          transform: `rotate3d(0, 0, 1, ${isPhone ? 25 : 0}deg)`,
           transformOrigin: '50% 50%',
           backfaceVisibility: 'hidden',
         }}
       >
-        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" opacity={shoulderOpacity} />
+        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
       </div>
 
       {/* Hero section with sticky logo */}
@@ -245,16 +285,13 @@ export default function Home({ theme = "dark" }) {
           style={{ marginTop: isPhone ? '-180px' : '0' }}
         >
           <div 
-            className="w-full"
+            ref={logoWrapperRef}
+            className="w-full will-change-transform"
             style={{ 
               maxWidth: '800px', 
               maxHeight: '800px',
               height: '70vh',
-              transform: `translate3d(0, ${logoTranslateY}px, 0) scale(${logoScale})`,
-              opacity: logoOpacity,
-              willChange: 'transform, opacity',
               backfaceVisibility: 'hidden',
-              perspective: '1000px',
             }}
           >
             <LiquidLogo logoUrl={logoPath} />
@@ -263,11 +300,10 @@ export default function Home({ theme = "dark" }) {
 
         {/* 2025 Content - 5 columns of images - appears as you scroll */}
         <div 
-          className="relative z-10 px-6 pb-24 -mt-[50vh]"
+          ref={imagesRef}
+          className="relative z-10 px-6 pb-24 -mt-[50vh] will-change-transform"
           style={{
-            opacity: scrollProgress,
-            transform: `translateY(${(1 - scrollProgress) * 100}px)`,
-            transition: 'none',
+            opacity: 0,
           }}
         >
           <div className="max-w-7xl mx-auto">

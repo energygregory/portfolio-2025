@@ -325,7 +325,7 @@ const chromePreset = {
 // Mobile-optimized preset (fewer iterations, simpler calculations)
 const mobilePreset = {
   speed: 1.0,
-  iterations: 12,
+  iterations: 8,
   scale: 2.4,
   dotFactor: 1.2,
   dotMultiplier: 2.0,
@@ -336,7 +336,7 @@ const mobilePreset = {
   greenFactor: -3.0,
   blueFactor: -3.0,
   colorShift: 0.3,
-  noiseIntensity: 5.0,
+  noiseIntensity: 3.0,
   logoScale: 0.9,
   logoInteractStrength: 0.03,
 };
@@ -476,10 +476,23 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
 
     // Get preset based on device
     const preset = isMobile() ? mobilePreset : chromePreset;
+    const targetFPS = isMobile() ? 30 : 60;
+    const frameInterval = 1000 / targetFPS;
+    let lastFrameTime = 0;
 
     // Animation loop
-    const render = () => {
-      const currentTime = Date.now() - startTimeRef.current;
+    const render = (currentTime) => {
+      // Throttle frame rate on mobile
+      if (isMobile()) {
+        const elapsed = currentTime - lastFrameTime;
+        if (elapsed < frameInterval) {
+          frameRef.current = requestAnimationFrame(render);
+          return;
+        }
+        lastFrameTime = currentTime - (elapsed % frameInterval);
+      }
+      
+      const time = Date.now() - startTimeRef.current;
 
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
@@ -488,7 +501,7 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
 
       // Set uniforms
       gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
-      gl.uniform1f(uniforms.time, currentTime / 1000);
+      gl.uniform1f(uniforms.time, time / 1000);
       gl.uniform1f(uniforms.speed, preset.speed);
       gl.uniform1f(uniforms.iterations, preset.iterations);
       gl.uniform1f(uniforms.scale, preset.scale);
@@ -513,7 +526,7 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
 
       frameRef.current = requestAnimationFrame(render);
     };
-    render();
+    frameRef.current = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener('resize', resize);
