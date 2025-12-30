@@ -150,29 +150,8 @@ function App() {
   const [slideTransition, setSlideTransition] = useState(false);
   const prevPathRef = useRef(location.pathname);
 
-  // Force default to dark mode, ignoring local storage for the initial state if desired,
-  // or just ensure the fallback is "dark".
-  // The user wants "default mode for the site to be dark mode".
-  // If we want to force it every time the app loads (e.g. on refresh), we can just set it to "dark".
-  // But usually users expect persistence.
-  // However, since the user complained "default mode... wasn't dark mode",
-  // I will initialize it to "dark" directly to ensure the first paint is correct.
-  // If we want persistence, we can read it in an effect, but that causes a flash.
-  // Let's stick to the user's request: "default mode... is dark mode".
-  const [theme, setTheme] = useState(() => {
-    try {
-      // Changed key to 'theme_v2' to reset preferences and ensure default is dark for everyone
-      return localStorage.getItem("theme_v2") || "dark";
-    } catch (e) {
-      return "dark";
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("theme_v2", theme);
-    } catch (e) {}
-  }, [theme]);
+  // Dark mode only
+  const theme = "dark";
 
   // Scroll to top on route change
   useEffect(() => {
@@ -194,26 +173,20 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    // Tailwind uses the 'dark' class (now configured via darkMode: 'class').
-    root.classList.toggle("dark", theme === "dark");
-    root.classList.toggle("theme-dark", theme === "dark");
-    root.classList.toggle("theme-light", theme === "light");
+    // Dark mode only
+    root.classList.add("dark", "theme-dark");
+    root.classList.remove("theme-light");
 
-    // Force html and body backgrounds for mobile overscroll
-    const bgColor = theme === "dark" ? "#000000" : "#ffffff";
-    const textColor = theme === "dark" ? "#ffffff" : "#000000";
+    root.style.backgroundColor = "#000000";
+    root.style.color = "#ffffff";
+    document.body.style.backgroundColor = "#000000";
+    document.body.style.color = "#ffffff";
 
-    root.style.backgroundColor = bgColor;
-    root.style.color = textColor;
-    document.body.style.backgroundColor = bgColor;
-    document.body.style.color = textColor;
-
-    // Update mobile status bar color
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", bgColor);
+      metaTheme.setAttribute("content", "#000000");
     }
-  }, [theme]);
+  }, []);
 
   return (
     <div
@@ -279,58 +252,6 @@ function App() {
             Contact
           </NavLink>
         </nav>
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          <button
-            onClick={() => setTheme("light")}
-            aria-label="Light mode"
-            className="p-1 rounded hover:bg-neutral-200/10"
-            title="Light mode"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-current"
-            >
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2"></path>
-              <path d="M12 20v2"></path>
-              <path d="M4.93 4.93l1.41 1.41"></path>
-              <path d="M17.66 17.66l1.41 1.41"></path>
-              <path d="M2 12h2"></path>
-              <path d="M20 12h2"></path>
-              <path d="M4.93 19.07l1.41-1.41"></path>
-              <path d="M17.66 6.34l1.41-1.41"></path>
-            </svg>
-          </button>
-          <button
-            onClick={() => setTheme("dark")}
-            aria-label="Dark mode"
-            className="p-1 rounded hover:bg-neutral-200/10"
-            title="Dark mode"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-current"
-            >
-              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-            </svg>
-          </button>
-        </div>
       </header>
 
       <main className={`flex-1 p-4 ${slideTransition ? 'page-transition' : ''}`}>
