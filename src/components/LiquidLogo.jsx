@@ -324,8 +324,8 @@ const chromePreset = {
 
 // Mobile-optimized preset (fewer iterations, simpler calculations)
 const mobilePreset = {
-  speed: 1.0,
-  iterations: 8,
+  speed: 0.8,
+  iterations: 6,
   scale: 2.4,
   dotFactor: 1.2,
   dotMultiplier: 2.0,
@@ -336,9 +336,9 @@ const mobilePreset = {
   greenFactor: -3.0,
   blueFactor: -3.0,
   colorShift: 0.3,
-  noiseIntensity: 3.0,
+  noiseIntensity: 2.0,
   logoScale: 0.9,
-  logoInteractStrength: 0.03,
+  logoInteractStrength: 0.02,
 };
 
 const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 768;
@@ -351,7 +351,32 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
   const frameRef = useRef(null);
   const startTimeRef = useRef(Date.now());
   const mouseRef = useRef({ x: 0, y: 0 });
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Track scroll state to pause animation on mobile
+  useEffect(() => {
+    if (!isMobile()) return;
+    
+    const handleScroll = () => {
+      isScrollingRef.current = true;
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 150);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -476,12 +501,18 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
 
     // Get preset based on device
     const preset = isMobile() ? mobilePreset : chromePreset;
-    const targetFPS = isMobile() ? 30 : 60;
+    const targetFPS = isMobile() ? 24 : 60;
     const frameInterval = 1000 / targetFPS;
     let lastFrameTime = 0;
 
     // Animation loop
     const render = (currentTime) => {
+      // Skip rendering while scrolling on mobile for smoother scroll
+      if (isMobile() && isScrollingRef.current) {
+        frameRef.current = requestAnimationFrame(render);
+        return;
+      }
+      
       // Throttle frame rate on mobile
       if (isMobile()) {
         const elapsed = currentTime - lastFrameTime;

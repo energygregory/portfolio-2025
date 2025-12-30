@@ -115,7 +115,6 @@ export default function Home({ theme = "dark" }) {
   const logoWrapperRef = useRef(null);
   const imagesRef = useRef(null);
   const scrollYRef = useRef(0);
-  const rafRef = useRef(null);
 
   useEffect(() => {
     const phoneMql = window.matchMedia("(max-width: 640px)");
@@ -145,54 +144,104 @@ export default function Home({ theme = "dark" }) {
     };
   }, []);
 
+  // State for pressed image (mobile hold feature)
+  const [pressedImageIdx, setPressedImageIdx] = useState(null);
+
+  // Touch handlers for press-and-hold
+  const handleTouchStart = useCallback((idx) => {
+    if (isPhone) {
+      setPressedImageIdx(idx);
+    }
+  }, [isPhone]);
+
+  const handleTouchEnd = useCallback(() => {
+    setPressedImageIdx(null);
+  }, []);
+
   // Optimized scroll handler - updates DOM directly without React re-renders
+  // On mobile, simplify animations for smoother scrolling
   const updateScrollAnimations = useCallback(() => {
     const scrollY = scrollYRef.current;
     const maxScroll = 600;
     const progress = Math.min(scrollY / maxScroll, 1);
     
-    // Logo transforms
-    const logoTranslateY = progress * -150;
-    const logoScale = 1 - progress * 0.15;
-    const logoOpacity = 1 - progress * 0.3;
-    
-    // Shoulder transforms
-    const shoulderOpacity = Math.max(0, 1 - progress);
-    const baseRotation = isPhone ? 25 : 0;
-    const shoulderRotation = baseRotation + progress * 360;
-    
-    // Apply transforms directly to DOM elements
-    if (logoWrapperRef.current) {
-      logoWrapperRef.current.style.transform = `translate3d(0, ${logoTranslateY}px, 0) scale(${logoScale})`;
-      logoWrapperRef.current.style.opacity = logoOpacity;
-    }
-    
-    if (clRef.current) {
-      clRef.current.style.transform = `scaleX(-1) rotate3d(0, 0, 1, ${shoulderRotation}deg)`;
-      clRef.current.style.opacity = shoulderOpacity;
-    }
-    
-    if (crRef.current) {
-      crRef.current.style.transform = `rotate3d(0, 0, 1, ${shoulderRotation}deg)`;
-      crRef.current.style.opacity = shoulderOpacity;
-    }
-    
-    if (imagesRef.current) {
-      imagesRef.current.style.opacity = progress;
-      imagesRef.current.style.transform = `translate3d(0, ${(1 - progress) * 100}px, 0)`;
+    if (isPhone) {
+      // MOBILE: Simplified animations - no rotation, just opacity and translate
+      const logoTranslateY = progress * -100;
+      const logoOpacity = 1 - progress * 0.5;
+      const shoulderOpacity = Math.max(0, 1 - progress * 1.5);
+      
+      if (logoWrapperRef.current) {
+        logoWrapperRef.current.style.transform = `translate3d(0, ${logoTranslateY}px, 0)`;
+        logoWrapperRef.current.style.opacity = logoOpacity;
+      }
+      
+      if (clRef.current) {
+        clRef.current.style.opacity = shoulderOpacity;
+      }
+      
+      if (crRef.current) {
+        crRef.current.style.opacity = shoulderOpacity;
+      }
+      
+      if (imagesRef.current) {
+        imagesRef.current.style.opacity = progress;
+      }
+    } else {
+      // DESKTOP: Full animations
+      const logoTranslateY = progress * -150;
+      const logoScale = 1 - progress * 0.15;
+      const logoOpacity = 1 - progress * 0.3;
+      const shoulderOpacity = Math.max(0, 1 - progress);
+      const shoulderRotation = progress * 360;
+      
+      if (logoWrapperRef.current) {
+        logoWrapperRef.current.style.transform = `translate3d(0, ${logoTranslateY}px, 0) scale(${logoScale})`;
+        logoWrapperRef.current.style.opacity = logoOpacity;
+      }
+      
+      if (clRef.current) {
+        clRef.current.style.transform = `scaleX(-1) rotate3d(0, 0, 1, ${shoulderRotation}deg)`;
+        clRef.current.style.opacity = shoulderOpacity;
+      }
+      
+      if (crRef.current) {
+        crRef.current.style.transform = `rotate3d(0, 0, 1, ${shoulderRotation}deg)`;
+        crRef.current.style.opacity = shoulderOpacity;
+      }
+      
+      if (imagesRef.current) {
+        imagesRef.current.style.opacity = progress;
+        imagesRef.current.style.transform = `translate3d(0, ${(1 - progress) * 100}px, 0)`;
+      }
     }
   }, [isPhone]);
 
   // Scroll-based animation with direct DOM manipulation
   useEffect(() => {
+    let lastScrollY = 0;
+    let ticking = false;
+    
     const handleScroll = () => {
-      scrollYRef.current = window.scrollY;
+      lastScrollY = window.scrollY;
       
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
+      if (!ticking) {
+        ticking = true;
+        // Use setTimeout on mobile for smoother performance
+        if (isPhone) {
+          setTimeout(() => {
+            scrollYRef.current = lastScrollY;
+            updateScrollAnimations();
+            ticking = false;
+          }, 16); // ~60fps max
+        } else {
+          requestAnimationFrame(() => {
+            scrollYRef.current = lastScrollY;
+            updateScrollAnimations();
+            ticking = false;
+          });
+        }
       }
-      
-      rafRef.current = requestAnimationFrame(updateScrollAnimations);
     };
     
     // Initial update
@@ -202,11 +251,8 @@ export default function Home({ theme = "dark" }) {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
     };
-  }, [updateScrollAnimations]);
+  }, [updateScrollAnimations, isPhone]);
 
   const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
   const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
@@ -243,34 +289,34 @@ export default function Home({ theme = "dark" }) {
         </div>
       )}
       
-      {/* cl: Left shoulder symbol with liquid chrome metallic effect - rotates anticlockwise and disappears on scroll */}
+      {/* cl: Left shoulder symbol with liquid chrome metallic effect */}
       <div 
         ref={clRef}
-        className="fixed z-[100] pointer-events-none will-change-transform"
+        className="fixed z-[100] pointer-events-none"
         style={{
           top: isPhone ? '-8vh' : '-10vh',
           left: isPhone ? '-25vw' : '0',
           width: isPhone ? '60vw' : '35vw',
           height: isPhone ? '60vw' : '35vw',
-          transform: `scaleX(-1) rotate3d(0, 0, 1, ${isPhone ? 25 : 0}deg)`,
+          transform: isPhone ? 'scaleX(-1)' : 'scaleX(-1) rotate3d(0, 0, 1, 0deg)',
           transformOrigin: '50% 50%',
-          backfaceVisibility: 'hidden',
+          willChange: isPhone ? 'opacity' : 'transform, opacity',
         }}
       >
         <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
       </div>
-      {/* cr: Right shoulder symbol with liquid chrome metallic effect - rotates clockwise and disappears on scroll */}
+      {/* cr: Right shoulder symbol with liquid chrome metallic effect */}
       <div 
         ref={crRef}
-        className="fixed z-[100] pointer-events-none will-change-transform"
+        className="fixed z-[100] pointer-events-none"
         style={{
           top: isPhone ? '-8vh' : '-10vh',
           right: isPhone ? '-25vw' : '0',
           width: isPhone ? '60vw' : '35vw',
           height: isPhone ? '60vw' : '35vw',
-          transform: `rotate3d(0, 0, 1, ${isPhone ? 25 : 0}deg)`,
+          transform: isPhone ? 'none' : 'rotate3d(0, 0, 1, 0deg)',
           transformOrigin: '50% 50%',
-          backfaceVisibility: 'hidden',
+          willChange: isPhone ? 'opacity' : 'transform, opacity',
         }}
       >
         <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
@@ -301,9 +347,10 @@ export default function Home({ theme = "dark" }) {
         {/* 2025 Content - 5 columns of images - appears as you scroll */}
         <div 
           ref={imagesRef}
-          className="relative z-10 px-6 pb-24 -mt-[50vh] will-change-transform"
+          className="relative z-10 px-6 pb-24 -mt-[50vh]"
           style={{
             opacity: 0,
+            willChange: isPhone ? 'opacity' : 'transform, opacity',
           }}
         >
           <div className="max-w-7xl mx-auto">
@@ -313,12 +360,24 @@ export default function Home({ theme = "dark" }) {
                 <div 
                   key={idx}
                   className="w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] mx-auto flex items-center justify-center"
+                  onTouchStart={() => handleTouchStart(idx)}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchCancel={handleTouchEnd}
                 >
                   <img 
                     src={src} 
                     alt={`Work ${idx + 1}`}
-                    className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-500"
+                    className={`max-w-full max-h-full object-contain transition-transform duration-200 select-none ${
+                      !isPhone ? 'hover:scale-110 duration-500' : ''
+                    }`}
+                    style={{
+                      transform: pressedImageIdx === idx ? 'scale(2.5)' : 'scale(1)',
+                      zIndex: pressedImageIdx === idx ? 50 : 1,
+                      position: 'relative',
+                      pointerEvents: 'none',
+                    }}
                     loading="lazy"
+                    draggable={false}
                   />
                 </div>
               ))}
