@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import LiquidLogo from "../components/LiquidLogo";
@@ -6,6 +6,58 @@ import logos from "../data/logos";
 
 // Logo for chrome effect (PNG)
 const logoPath = "/LOGOS/newlogo.png";
+
+// 2025 Images from public/Images/2025 folder - organized in rows of 6
+const images2025 = [
+  // Row 1 - black1, black2, white1, white2 together
+  "/Images/2025/black1.png",
+  "/Images/2025/black2.png",
+  "/Images/2025/white1.png",
+  "/Images/2025/white2.png",
+  "/Images/2025/black.png",
+  "/Images/2025/white.png",
+  // Row 2
+  "/Images/2025/1.png",
+  "/Images/2025/2.png",
+  "/Images/2025/3.png",
+  "/Images/2025/4b.png",
+  "/Images/2025/4.png",
+  "/Images/2025/5.png",
+  // Row 3 - hoodie blue 1, hoodie blue 2, final pants 2, hoodie black 1, hoodie black 2, final pants
+  "/Images/2025/hoodie blue 1.png",
+  "/Images/2025/hoodie blue 2.png",
+  "/Images/2025/final pants 2.png",
+  "/Images/2025/hoodie black 1.png",
+  "/Images/2025/hoodie black 2.png",
+  "/Images/2025/final pants.png",
+  // Row 4
+  "/Images/2025/BEANIE 1.png",
+  "/Images/2025/grey beanie.png",
+  "/Images/2025/RED.png",
+  "/Images/2025/front.png",
+  "/Images/2025/coloured puffer.png",
+  "/Images/2025/cream front.png",
+  // Row 5
+  "/Images/2025/bandana3.png",
+  "/Images/2025/bandana4.png",
+  "/Images/2025/bandana5.png",
+  "/Images/2025/bandana8.png",
+  "/Images/2025/t shirt 1.png",
+  "/Images/2025/sweapants 1.png",
+  // Row 6 - boxes (using box2a and box3a)
+  "/Images/2025/box2a.png",
+  "/Images/2025/box3a.png",
+  "/Images/2025/gyan front.png",
+  "/Images/2025/gyan back.png",
+  "/Images/2025/hofa.png",
+  "/Images/2025/hofb.png",
+  // Row 7
+  "/Images/2025/mockup.png",
+  "/Images/2025/zm.png",
+  "/Images/2025/zm2.png",
+  "/Images/2025/s1.png",
+  "/Images/2025/s2.png",
+];
 
 // Logos used for the logo-strip — same source as App's list (kept local here for the Home page placement)
 const portfolioLogos = [
@@ -56,6 +108,8 @@ const portfolioLogos = [
 
 export default function Home() {
   const [isPhone, setIsPhone] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const logoContainerRef = useRef(null);
 
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 640px)");
@@ -69,27 +123,88 @@ export default function Home() {
     };
   }, []);
 
+  // Scroll-based 3D animation
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
   const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
   const logoGap = useMemo(() => (isPhone ? 40 : 80), [isPhone]);
   const logoHeight = useMemo(() => (isPhone ? 22 : 28), [isPhone]);
 
+  // Calculate transforms based on scroll
+  const maxScroll = 600;
+  const scrollProgress = Math.min(scrollY / maxScroll, 1);
+  
+  // Logo moves up as you scroll down
+  const logoTranslateY = scrollProgress * -150;
+  const logoScale = 1 - scrollProgress * 0.15;
+  const logoOpacity = 1 - scrollProgress * 0.3;
+
   return (
-    <main className="min-h-screen px-6 py-16 flex flex-col overflow-x-hidden">
-      {/* Top spacer */}
-      <div className="w-full h-16"></div>
-
-      <div className="w-full mb-6 flex justify-center">
-        <div className="w-full h-[70vh]" style={{ maxWidth: '800px', maxHeight: '800px' }}>
-          <LiquidLogo logoUrl={logoPath} />
+    <main className="min-h-screen flex flex-col overflow-x-hidden">
+      {/* Hero section with sticky logo */}
+      <section className="relative min-h-[150vh]">
+        {/* Sticky logo container */}
+        <div 
+          ref={logoContainerRef}
+          className="sticky top-0 h-screen flex items-center justify-center px-6"
+        >
+          <div 
+            className="w-full"
+            style={{ 
+              maxWidth: '800px', 
+              maxHeight: '800px',
+              height: '70vh',
+              transform: `translateY(${logoTranslateY}px) scale(${logoScale})`,
+              opacity: logoOpacity,
+              willChange: 'transform, opacity',
+            }}
+          >
+            <LiquidLogo logoUrl={logoPath} />
+          </div>
         </div>
-      </div>
 
-      {/* Responsive spacing: show 'Trusted By' and part of the first logo row across devices */}
-      <div className="w-full h-20 sm:h-28 md:h-40 lg:h-56"></div>
+        {/* 2025 Content - 5 columns of images - appears as you scroll */}
+        <div 
+          className="relative z-10 px-6 pb-24 -mt-[50vh]"
+          style={{
+            opacity: scrollProgress,
+            transform: `translateY(${(1 - scrollProgress) * 100}px)`,
+            transition: 'none',
+          }}
+        >
+          <div className="max-w-7xl mx-auto">
+            {/* 6 Column Image Grid - Small with lots of space */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-12 sm:gap-16 md:gap-20">
+              {images2025.map((src, idx) => (
+                <div 
+                  key={idx}
+                  className="w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] mx-auto flex items-center justify-center"
+                >
+                  <img 
+                    src={src} 
+                    alt={`Work ${idx + 1}`}
+                    className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Spacer */}
+      <div className="w-full h-20 sm:h-28 md:h-40"></div>
 
       {/* Trusted By Section + logo strip — push down on mobile only */}
-      <div className="w-full mt-24 sm:mt-0">
+      <div className="w-full mt-24 sm:mt-0 px-6">
         <div className="w-full mb-3 text-center">
           <h3
             className="trusted-by text-sm tracking-widest text-neutral-600 dark:text-neutral-400"

@@ -353,7 +353,7 @@ export default function Footer() {
                     </ul>
                     <div className="flex items-center gap-3">
                       <a
-                        href="https://www.behance.net"
+                        href="https://www.behance.net/grega"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={
@@ -372,7 +372,7 @@ export default function Footer() {
                         </svg>
                       </a>
                       <a
-                        href="https://www.instagram.com"
+                        href="https://www.instagram.com/0021.studio"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={
@@ -589,7 +589,7 @@ export default function Footer() {
             {/* Social Media Icons */}
             <div className="flex items-center gap-3 mt-4">
               <a
-                href="https://www.behance.net"
+                href="https://www.behance.net/grega"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={
@@ -608,7 +608,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.instagram.com"
+                href="https://www.instagram.com/0021.studio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={

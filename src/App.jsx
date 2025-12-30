@@ -253,6 +253,31 @@ function App() {
           <Route path="/pricelist" element={<PriceList />} />
         </Routes>
       </main>
+      
+      {/* Metallic Shoulder Symbol Border */}
+      <div className="w-full overflow-hidden py-6 bg-black">
+        <div 
+          className="flex justify-center items-center"
+          style={{
+            display: 'flex',
+            gap: '0px',
+          }}
+        >
+          {[...Array(30)].map((_, i) => (
+            <img 
+              key={i} 
+              src="/LOGOS/shoulder symbol.png" 
+              alt=""
+              className="h-8 w-auto flex-shrink-0"
+              style={{
+                filter: 'brightness(1.5) contrast(1.2) saturate(0.3) drop-shadow(0 0 2px rgba(255,255,255,0.3))',
+                opacity: 0.7,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
       <Footer />
     </div>
   );
