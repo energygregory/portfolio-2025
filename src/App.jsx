@@ -217,7 +217,7 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen relative ${
+      className={`min-h-screen relative flex flex-col ${
         theme === "dark"
           ? "bg-black text-white theme-dark"
           : "bg-white text-black theme-light"
@@ -333,7 +333,7 @@ function App() {
         </div>
       </header>
 
-      <main className={`p-4 ${slideTransition ? 'page-transition' : ''}`}>
+      <main className={`flex-1 p-4 ${slideTransition ? 'page-transition' : ''}`}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/work" element={<Work />} />
