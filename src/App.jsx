@@ -150,8 +150,12 @@ function App() {
   const [slideTransition, setSlideTransition] = useState(false);
   const prevPathRef = useRef(location.pathname);
 
-  // Dark mode only
-  const theme = "dark";
+  // Theme state with toggle
+  const [theme, setTheme] = useState("dark");
+  
+  const toggleTheme = () => {
+    setTheme(prev => prev === "dark" ? "light" : "dark");
+  };
 
   // Scroll to top on route change
   useEffect(() => {
@@ -173,20 +177,27 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    // Dark mode only
-    root.classList.add("dark", "theme-dark");
-    root.classList.remove("theme-light");
-
-    root.style.backgroundColor = "#000000";
-    root.style.color = "#ffffff";
-    document.body.style.backgroundColor = "#000000";
-    document.body.style.color = "#ffffff";
+    if (theme === "dark") {
+      root.classList.add("dark", "theme-dark");
+      root.classList.remove("theme-light");
+      root.style.backgroundColor = "#000000";
+      root.style.color = "#ffffff";
+      document.body.style.backgroundColor = "#000000";
+      document.body.style.color = "#ffffff";
+    } else {
+      root.classList.add("theme-light");
+      root.classList.remove("dark", "theme-dark");
+      root.style.backgroundColor = "#ffffff";
+      root.style.color = "#000000";
+      document.body.style.backgroundColor = "#ffffff";
+      document.body.style.color = "#000000";
+    }
 
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", "#000000");
+      metaTheme.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
     }
-  }, []);
+  }, [theme]);
 
   return (
     <div
@@ -201,47 +212,66 @@ function App() {
 
       {/* NAV BAR (CENTERED LINKS) */}
       <header
-        className={`sticky top-0 z-50 p-4 border-b flex justify-center items-center sm:gap-56 gap-3 app-header ${
+        className={`sticky top-0 z-50 p-3 sm:p-4 border-b flex justify-center items-center app-header ${
           theme === "dark"
             ? "border-neutral-800 bg-black"
             : "border-neutral-300 bg-white"
         }`}
       >
         {/* Top-left clickable logo that always links to home */}
-        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+        <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2">
           <Link to="/" aria-label="Home">
             <img
               src="/LOGOS/newlogo.svg"
               alt="Home"
-              className="nav-logo sm:h-8 h-6"
+              className="nav-logo h-5 sm:h-8"
             />
           </Link>
         </div>
-        {/* Show all nav links on all devices with small gaps on mobile */}
-        <nav className="flex items-center gap-3 sm:gap-6">
+        
+        {/* Theme toggle - top right */}
+        <button
+          onClick={toggleTheme}
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          {theme === "dark" ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
+              <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
+              <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
+            </svg>
+          )}
+        </button>
+        
+        {/* Show all nav links on all devices */}
+        <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `nav-link inline mx-1 ${isActive ? "active" : ""}`
+              `nav-link inline ${isActive ? "active" : ""}`
             }
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Home
           </NavLink>
-          <span className="nav-link mx-1 opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{ width: '12px', height: '12px', display: 'inline', verticalAlign: 'middle', marginLeft: '4px' }}><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5 sm:ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </span>
-          <span className="nav-link mx-1 opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{ width: '12px', height: '12px', display: 'inline', verticalAlign: 'middle', marginLeft: '4px' }}><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5 sm:ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </span>
-          <span className="nav-link mx-1 opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{ width: '12px', height: '12px', display: 'inline', verticalAlign: 'middle', marginLeft: '4px' }}><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5 sm:ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </span>
         </nav>
       </header>
 
       <main className={`flex-1 p-4 ${slideTransition ? 'page-transition' : ''}`}>
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home theme={theme} />} />
           <Route path="/work" element={<Work />} />
           <Route path="/about" element={<About />} />
           <Route path="/around" element={<Around />} />
@@ -255,7 +285,7 @@ function App() {
       </main>
       
       {/* Metallic Shoulder Symbol Border */}
-      <div className="w-full overflow-hidden py-6 bg-black">
+      <div className={`w-full overflow-hidden py-6 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
         <div 
           className="flex justify-center items-center"
           style={{

@@ -13,12 +13,7 @@ export default defineConfig({
       "evil-chefs-type.loca.lt",
       "54a93074926f.ngrok-free.app",
       "clear-women-fly.loca.lt",
-      "9c1297dd5f86.ngrok-free.app",
-      "40c41d82bf93.ngrok-free.app",
-      "b4906d848688.ngrok-free.app",
-      "542750dba6de.ngrok-free.app",
-      "446af1b24303.ngrok-free.app",
-      "8a88da4d903a.ngrok-free.app",
+      "ff614dd5ac9f.ngrok-free.app",
     ],
   },
 });

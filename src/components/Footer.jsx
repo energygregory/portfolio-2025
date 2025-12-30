@@ -204,281 +204,63 @@ export default function Footer() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-4 relative z-10">
-        {/* Mobile Accordion Layout */}
-        <div className="lg:hidden">
-          <div className="flex flex-row items-start gap-4 mb-8">
-            {/* Logo - Left side */}
-            <div className="flex-shrink-0">
-              <AnimatedLogo className="w-48" />
-            </div>
-
-            {/* Collapsible Sections - Right side */}
-            <div className="flex-1 space-y-2">
-              {/* Commissions - Collapsible */}
-              <div
-                className={`border overflow-hidden ${
-                  isDark ? "border-white/30" : "border-black/30"
-                }`}
-              >
-                <button
-                  onClick={() =>
-                    setActiveSection(
-                      activeSection === "commissions" ? null : "commissions"
-                    )
-                  }
-                  className="w-full px-3 py-2 flex justify-between items-center text-left"
-                >
-                  <span className="text-xs font-semibold">
-                    COMMISSIONS OPEN
-                  </span>
-                  <span className="text-lg">
-                    {activeSection === "commissions" ? "−" : "+"}
-                  </span>
-                </button>
-                {activeSection === "commissions" && (
-                  <div
-                    className="px-3 pb-3 border-t pt-3"
-                    style={{
-                      borderColor: isDark
-                        ? "rgba(255,255,255,0.3)"
-                        : "rgba(0,0,0,0.3)",
-                    }}
-                  >
-                    <p className="text-[10px] mb-2">and open for collabs</p>
-                    <form onSubmit={handleSubscribe} className="space-y-1.5">
-                      <input
-                        type="text"
-                        placeholder="Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        disabled={isSubmitting}
-                        className="w-full px-3 py-2 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 bg-white text-black focus:ring-gray-400 disabled:opacity-50"
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={isSubmitting}
-                        className="w-full px-3 py-2 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 bg-white text-black focus:ring-gray-400 disabled:opacity-50"
-                      />
-                      <textarea
-                        placeholder="Message"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        rows="2"
-                        disabled={isSubmitting}
-                        className="w-full px-3 py-2 text-sm rounded focus:outline-none focus:ring-2 resize-none placeholder:opacity-50 bg-white text-black focus:ring-gray-400 disabled:opacity-50"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={`w-full px-3 py-2 text-sm bg-transparent border rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                          isDark
-                            ? "border-white text-white hover:bg-white hover:text-black"
-                            : "border-black text-black hover:bg-black hover:text-white"
-                        }`}
-                      >
-                        {isSubmitting ? "SENDING..." : "SUBMIT"}
-                      </button>
-                      {submitStatus && (
-                        <p
-                          className={`text-[10px] text-center ${
-                            submitStatus.includes("success")
-                              ? "text-green-500"
-                              : "text-red-500"
-                          }`}
-                        >
-                          {submitStatus}
-                        </p>
-                      )}
-                    </form>
-                  </div>
-                )}
-              </div>
-
-              {/* Resources - Collapsible */}
-              <div
-                className={`border overflow-hidden ${
-                  isDark ? "border-white/30" : "border-black/30"
-                }`}
-              >
-                <button
-                  onClick={() =>
-                    setActiveSection(
-                      activeSection === "resources" ? null : "resources"
-                    )
-                  }
-                  className="w-full px-3 py-2 flex justify-between items-center text-left"
-                >
-                  <span className="text-xs font-semibold">RESOURCES</span>
-                  <span className="text-lg">
-                    {activeSection === "resources" ? "−" : "+"}
-                  </span>
-                </button>
-                {activeSection === "resources" && (
-                  <div
-                    className="px-3 pb-3 border-t pt-3"
-                    style={{
-                      borderColor: isDark
-                        ? "rgba(255,255,255,0.3)"
-                        : "rgba(0,0,0,0.3)",
-                    }}
-                  >
-                    <ul className="space-y-1.5 text-xs mb-3">
-                      <li>
-                        <button
-                          onClick={() => setActiveModal("ratecard")}
-                          className={`text-left ${
-                            isDark
-                              ? "text-gray-300 hover:text-white transition-colors"
-                              : "text-gray-600 hover:text-black transition-colors"
-                          }`}
-                        >
-                          RATE CARD
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => setActiveModal("policy")}
-                          className={`text-left ${
-                            isDark
-                              ? "text-gray-300 hover:text-white transition-colors"
-                              : "text-gray-600 hover:text-black transition-colors"
-                          }`}
-                        >
-                          POLICY/WORKING TERMS
-                        </button>
-                      </li>
-                    </ul>
-                    <div className="flex items-center gap-3">
-                      <a
-                        href="https://www.behance.net/grega"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={
-                          isDark
-                            ? "hover:text-white transition-colors"
-                            : "hover:text-black transition-colors"
-                        }
-                        aria-label="Behance"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14h-8.027c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988h-6.466v-14.967h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zm-3.466-8.988h3.584c2.508 0 2.906-3-.312-3h-3.272v3zm3.391 3h-3.391v3.016h3.341c3.055 0 2.868-3.016.05-3.016z" />
-                        </svg>
-                      </a>
-                      <a
-                        href="https://www.instagram.com/0021.studio"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={
-                          isDark
-                            ? "hover:text-white transition-colors"
-                            : "hover:text-black transition-colors"
-                        }
-                        aria-label="Instagram"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                        </svg>
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Legal - Collapsible */}
-              <div
-                className={`border overflow-hidden ${
-                  isDark ? "border-white/30" : "border-black/30"
-                }`}
-              >
-                <button
-                  onClick={() =>
-                    setActiveSection(activeSection === "legal" ? null : "legal")
-                  }
-                  className="w-full px-3 py-2 flex justify-between items-center text-left"
-                >
-                  <span className="text-xs font-semibold">LEGAL</span>
-                  <span className="text-lg">
-                    {activeSection === "legal" ? "−" : "+"}
-                  </span>
-                </button>
-                {activeSection === "legal" && (
-                  <div
-                    className="px-3 pb-3 border-t pt-3"
-                    style={{
-                      borderColor: isDark
-                        ? "rgba(255,255,255,0.3)"
-                        : "rgba(0,0,0,0.3)",
-                    }}
-                  >
-                    <ul className="space-y-1.5 text-xs">
-                      <li>
-                        <button
-                          onClick={() => setActiveModal("privacy")}
-                          className={`text-left ${
-                            isDark
-                              ? "text-gray-300 hover:text-white transition-colors"
-                              : "text-gray-600 hover:text-black transition-colors"
-                          }`}
-                        >
-                          PRIVACY POLICY
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => setActiveModal("terms")}
-                          className={`text-left ${
-                            isDark
-                              ? "text-gray-300 hover:text-white transition-colors"
-                              : "text-gray-600 hover:text-black transition-colors"
-                          }`}
-                        >
-                          TERMS OF USE
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() => setActiveModal("legal")}
-                          className={`text-left ${
-                            isDark
-                              ? "text-gray-300 hover:text-white transition-colors"
-                              : "text-gray-600 hover:text-black transition-colors"
-                          }`}
-                        >
-                          LEGAL
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Bottom Bar */}
-          <div
-            className={`border-t pt-2 mt-2 ${
-              isDark ? "border-gray-600" : "border-gray-400"
-            }`}
-          >
-            <div
-              className={`text-center text-xs space-y-1 ${
-                isDark ? "text-gray-400" : "text-gray-600"
+        {/* Mobile Compact Layout */}
+        <div className="lg:hidden py-2">
+          <div className="flex items-center justify-between gap-4">
+            {/* Logo */}
+            <AnimatedLogo className="w-24" />
+            
+            {/* Commission Button */}
+            <button
+              onClick={() => setActiveModal("commission")}
+              className={`text-[10px] font-semibold px-3 py-1.5 border transition-colors ${
+                isDark
+                  ? "border-white/50 hover:bg-white hover:text-black"
+                  : "border-black/50 hover:bg-black hover:text-white"
               }`}
             >
-              <p>DESIGNED BY GREG</p>
-              <p>© 2026 All Rights Reserved</p>
-            </div>
+              COMMISSIONS OPEN
+            </button>
+          </div>
+          
+          {/* Resources & Legal links */}
+          <div className="flex justify-center gap-4 mt-3">
+            <button
+              onClick={() => setActiveModal("ratecard")}
+              className={`text-[9px] ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-black"} transition-colors`}
+            >
+              RATE CARD
+            </button>
+            <span className={`text-[9px] ${isDark ? "text-gray-600" : "text-gray-400"}`}>•</span>
+            <button
+              onClick={() => setActiveModal("policy")}
+              className={`text-[9px] ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-black"} transition-colors`}
+            >
+              POLICY
+            </button>
+            <span className={`text-[9px] ${isDark ? "text-gray-600" : "text-gray-400"}`}>•</span>
+            <button
+              onClick={() => setActiveModal("privacy")}
+              className={`text-[9px] ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-black"} transition-colors`}
+            >
+              PRIVACY
+            </button>
+            <span className={`text-[9px] ${isDark ? "text-gray-600" : "text-gray-400"}`}>•</span>
+            <button
+              onClick={() => setActiveModal("legal")}
+              className={`text-[9px] ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-black"} transition-colors`}
+            >
+              LEGAL
+            </button>
+          </div>
+          
+          {/* Bottom text */}
+          <div
+            className={`text-center text-[9px] mt-3 ${
+              isDark ? "text-gray-500" : "text-gray-500"
+            }`}
+          >
+            <p>© 2026 DESIGNED BY GREG</p>
           </div>
         </div>
 
@@ -691,7 +473,7 @@ export default function Footer() {
       </div>
 
       {/* Policy Modal */}
-      {activeModal && MODAL_CONTENT[activeModal] && (
+      {activeModal && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
           onClick={() => setActiveModal(null)}
@@ -709,12 +491,66 @@ export default function Footer() {
             >
               ×
             </button>
-            <h2 className="text-2xl font-bold mb-4 font-mono">
-              {MODAL_CONTENT[activeModal].title}
-            </h2>
-            <div className="space-y-4 text-sm leading-relaxed font-mono uppercase">
-              {MODAL_CONTENT[activeModal].content}
-            </div>
+            
+            {activeModal === "commission" ? (
+              <>
+                <h2 className="text-2xl font-bold mb-2 font-mono">COMMISSIONS OPEN</h2>
+                <p className="text-xs opacity-70 mb-4">and open for collabs</p>
+                <form onSubmit={handleSubscribe} className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    disabled={isSubmitting}
+                    className="w-full px-3 py-2 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 bg-white text-black focus:ring-gray-400 disabled:opacity-50"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
+                    className="w-full px-3 py-2 text-sm rounded focus:outline-none focus:ring-2 placeholder:opacity-50 bg-white text-black focus:ring-gray-400 disabled:opacity-50"
+                  />
+                  <textarea
+                    placeholder="Message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    rows="3"
+                    disabled={isSubmitting}
+                    className="w-full px-3 py-2 text-sm rounded focus:outline-none focus:ring-2 resize-none placeholder:opacity-50 bg-white text-black focus:ring-gray-400 disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full px-3 py-2 text-sm bg-white text-black border border-black rounded hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? "SENDING..." : "SUBMIT"}
+                  </button>
+                  {submitStatus && (
+                    <p
+                      className={`text-xs text-center ${
+                        submitStatus.includes("success")
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {submitStatus}
+                    </p>
+                  )}
+                </form>
+              </>
+            ) : MODAL_CONTENT[activeModal] ? (
+              <>
+                <h2 className="text-2xl font-bold mb-4 font-mono">
+                  {MODAL_CONTENT[activeModal].title}
+                </h2>
+                <div className="space-y-4 text-sm leading-relaxed font-mono uppercase">
+                  {MODAL_CONTENT[activeModal].content}
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       )}

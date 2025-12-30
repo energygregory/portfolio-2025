@@ -106,27 +106,51 @@ const portfolioLogos = [
   },
 ];
 
-export default function Home() {
+export default function Home({ theme = "dark" }) {
   const [isPhone, setIsPhone] = useState(false);
+  const [isTabletOrLarger, setIsTabletOrLarger] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const logoContainerRef = useRef(null);
 
   useEffect(() => {
-    const mql = window.matchMedia("(max-width: 640px)");
-    const onChange = (e) => setIsPhone(e.matches);
-    setIsPhone(mql.matches);
-    if (mql.addEventListener) mql.addEventListener("change", onChange);
-    else mql.addListener(onChange);
+    const phoneMql = window.matchMedia("(max-width: 640px)");
+    const tabletMql = window.matchMedia("(min-width: 641px)");
+    
+    const onPhoneChange = (e) => setIsPhone(e.matches);
+    const onTabletChange = (e) => setIsTabletOrLarger(e.matches);
+    
+    setIsPhone(phoneMql.matches);
+    setIsTabletOrLarger(tabletMql.matches);
+    
+    if (phoneMql.addEventListener) {
+      phoneMql.addEventListener("change", onPhoneChange);
+      tabletMql.addEventListener("change", onTabletChange);
+    } else {
+      phoneMql.addListener(onPhoneChange);
+      tabletMql.addListener(onTabletChange);
+    }
     return () => {
-      if (mql.removeEventListener) mql.removeEventListener("change", onChange);
-      else mql.removeListener(onChange);
+      if (phoneMql.removeEventListener) {
+        phoneMql.removeEventListener("change", onPhoneChange);
+        tabletMql.removeEventListener("change", onTabletChange);
+      } else {
+        phoneMql.removeListener(onPhoneChange);
+        tabletMql.removeListener(onTabletChange);
+      }
     };
   }, []);
 
   // Scroll-based 3D animation
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrollY(window.scrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -148,43 +172,77 @@ export default function Home() {
   
   // Shoulder symbols disappear completely when logo is out of view
   const shoulderOpacity = Math.max(0, 1 - scrollProgress);
-  const shoulderRotation = scrollProgress * 360; // Full rotation as you scroll
+  const baseRotation = isPhone ? 25 : 0; // Starting rotation offset on mobile
+  const shoulderRotation = baseRotation + scrollProgress * 360; // Full rotation as you scroll
 
   return (
-    <main className="min-h-screen flex flex-col overflow-x-hidden">
+    <main className={`min-h-screen flex flex-col overflow-x-hidden relative ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
+      {/* Light mode video background */}
+      {theme === 'light' && (
+        <div className="fixed inset-0 z-0 overflow-hidden">
+          {/* Mobile video (portrait) */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="sm:hidden absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/6707366-hd_1080_1920_30fps.mp4" type="video/mp4" />
+          </video>
+          {/* Tablet/Desktop video (landscape) */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="hidden sm:block absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/854985-hd_1280_720_25fps.mp4" type="video/mp4" />
+          </video>
+          {/* Overlay to ensure content readability */}
+          <div className="absolute inset-0 bg-white/40" />
+        </div>
+      )}
+      
       {/* cl: Left shoulder symbol with liquid chrome metallic effect - rotates anticlockwise and disappears on scroll */}
       <div 
-        className="fixed left-0 z-[100] pointer-events-none"
+        className="fixed z-[100] pointer-events-none"
         style={{
-          top: '-10vh',
-          width: '35vw',
-          height: '35vw',
-          transform: `scaleX(-1) rotate(${shoulderRotation}deg)`,
+          top: isPhone ? '-8vh' : '-10vh',
+          left: isPhone ? '-25vw' : '0',
+          width: isPhone ? '60vw' : '35vw',
+          height: isPhone ? '60vw' : '35vw',
+          transform: `scaleX(-1) rotate3d(0, 0, 1, ${shoulderRotation}deg)`,
           transformOrigin: '50% 50%',
+          backfaceVisibility: 'hidden',
         }}
       >
         <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" opacity={shoulderOpacity} />
       </div>
       {/* cr: Right shoulder symbol with liquid chrome metallic effect - rotates clockwise and disappears on scroll */}
       <div 
-        className="fixed right-0 z-[100] pointer-events-none"
+        className="fixed z-[100] pointer-events-none"
         style={{
-          top: '-10vh',
-          width: '35vw',
-          height: '35vw',
-          transform: `rotate(${shoulderRotation}deg)`,
+          top: isPhone ? '-8vh' : '-10vh',
+          right: isPhone ? '-25vw' : '0',
+          width: isPhone ? '60vw' : '35vw',
+          height: isPhone ? '60vw' : '35vw',
+          transform: `rotate3d(0, 0, 1, ${shoulderRotation}deg)`,
           transformOrigin: '50% 50%',
+          backfaceVisibility: 'hidden',
         }}
       >
         <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" opacity={shoulderOpacity} />
       </div>
 
       {/* Hero section with sticky logo */}
-      <section className="relative min-h-[150vh]">
+      <section className="relative min-h-[150vh] z-10">
         {/* Sticky logo container */}
         <div 
           ref={logoContainerRef}
           className="sticky top-0 h-screen flex items-center justify-center px-6"
+          style={{ marginTop: isPhone ? '-180px' : '0' }}
         >
           <div 
             className="w-full"
@@ -192,9 +250,11 @@ export default function Home() {
               maxWidth: '800px', 
               maxHeight: '800px',
               height: '70vh',
-              transform: `translateY(${logoTranslateY}px) scale(${logoScale})`,
+              transform: `translate3d(0, ${logoTranslateY}px, 0) scale(${logoScale})`,
               opacity: logoOpacity,
               willChange: 'transform, opacity',
+              backfaceVisibility: 'hidden',
+              perspective: '1000px',
             }}
           >
             <LiquidLogo logoUrl={logoPath} />
@@ -212,11 +272,11 @@ export default function Home() {
         >
           <div className="max-w-7xl mx-auto">
             {/* 6 Column Image Grid - Small with lots of space */}
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-12 sm:gap-16 md:gap-20">
+            <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 gap-12 sm:gap-16 md:gap-20">
               {images2025.map((src, idx) => (
                 <div 
                   key={idx}
-                  className="w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] mx-auto flex items-center justify-center"
+                  className="w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] mx-auto flex items-center justify-center"
                 >
                   <img 
                     src={src} 

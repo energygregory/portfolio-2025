@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const vertexShader = `
 attribute vec2 aVertexPosition;
@@ -322,6 +322,27 @@ const chromePreset = {
   logoInteractStrength: 0.03,
 };
 
+// Mobile-optimized preset (fewer iterations, simpler calculations)
+const mobilePreset = {
+  speed: 1.0,
+  iterations: 12,
+  scale: 2.4,
+  dotFactor: 1.2,
+  dotMultiplier: 2.0,
+  vOffset: 5.1,
+  intensityFactor: 0.23,
+  expFactor: 0.47,
+  redFactor: -3.0,
+  greenFactor: -3.0,
+  blueFactor: -3.0,
+  colorShift: 0.3,
+  noiseIntensity: 5.0,
+  logoScale: 0.9,
+  logoInteractStrength: 0.03,
+};
+
+const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 768;
+
 export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
   const canvasRef = useRef(null);
   const glRef = useRef(null);
@@ -330,6 +351,7 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
   const frameRef = useRef(null);
   const startTimeRef = useRef(Date.now());
   const mouseRef = useRef({ x: 0, y: 0 });
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -444,13 +466,16 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
     // Resize handler
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio, 2);
+      const dpr = isMobile() ? 1 : Math.min(window.devicePixelRatio, 2);
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     resize();
     window.addEventListener('resize', resize);
+
+    // Get preset based on device
+    const preset = isMobile() ? mobilePreset : chromePreset;
 
     // Animation loop
     const render = () => {
@@ -464,19 +489,19 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
       // Set uniforms
       gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
       gl.uniform1f(uniforms.time, currentTime / 1000);
-      gl.uniform1f(uniforms.speed, chromePreset.speed);
-      gl.uniform1f(uniforms.iterations, chromePreset.iterations);
-      gl.uniform1f(uniforms.scale, chromePreset.scale);
-      gl.uniform1f(uniforms.dotFactor, chromePreset.dotFactor);
-      gl.uniform1f(uniforms.vOffset, chromePreset.vOffset);
-      gl.uniform1f(uniforms.intensityFactor, chromePreset.intensityFactor);
-      gl.uniform1f(uniforms.expFactor, chromePreset.expFactor);
-      gl.uniform3f(uniforms.colorFactors, chromePreset.redFactor, chromePreset.greenFactor, chromePreset.blueFactor);
-      gl.uniform1f(uniforms.colorShift, chromePreset.colorShift);
-      gl.uniform1f(uniforms.dotMultiplier, chromePreset.dotMultiplier);
-      gl.uniform1f(uniforms.noiseIntensity, chromePreset.noiseIntensity);
-      gl.uniform1f(uniforms.logoScale, chromePreset.logoScale);
-      gl.uniform1f(uniforms.logoInteractStrength, chromePreset.logoInteractStrength);
+      gl.uniform1f(uniforms.speed, preset.speed);
+      gl.uniform1f(uniforms.iterations, preset.iterations);
+      gl.uniform1f(uniforms.scale, preset.scale);
+      gl.uniform1f(uniforms.dotFactor, preset.dotFactor);
+      gl.uniform1f(uniforms.vOffset, preset.vOffset);
+      gl.uniform1f(uniforms.intensityFactor, preset.intensityFactor);
+      gl.uniform1f(uniforms.expFactor, preset.expFactor);
+      gl.uniform3f(uniforms.colorFactors, preset.redFactor, preset.greenFactor, preset.blueFactor);
+      gl.uniform1f(uniforms.colorShift, preset.colorShift);
+      gl.uniform1f(uniforms.dotMultiplier, preset.dotMultiplier);
+      gl.uniform1f(uniforms.noiseIntensity, preset.noiseIntensity);
+      gl.uniform1f(uniforms.logoScale, preset.logoScale);
+      gl.uniform1f(uniforms.logoInteractStrength, preset.logoInteractStrength);
       gl.uniform1f(uniforms.logoAspect, logoAspectRatio);
       gl.uniform2f(uniforms.mouse, mouseRef.current.x, mouseRef.current.y);
 
@@ -501,7 +526,13 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
     <canvas
       ref={canvasRef}
       className={className}
-      style={{ width: '100%', height: '100%', display: 'block', opacity: opacity }}
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        display: 'block', 
+        opacity: opacity,
+        backgroundColor: 'transparent',
+      }}
     />
   );
 }
