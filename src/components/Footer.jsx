@@ -187,17 +187,17 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-4 relative z-10">
         {/* Mobile Accordion Layout */}
         <div className="lg:hidden">
-          <div className="flex flex-col items-center gap-6 mb-8">
-            {/* Logo - Centered */}
-            <div>
+          <div className="flex flex-row items-start gap-4 mb-8">
+            {/* Logo - Left side */}
+            <div className="flex-shrink-0">
               <AnimatedLogo className="w-48" />
             </div>
 
-            {/* Collapsible Sections */}
-            <div className="w-full space-y-4">
+            {/* Collapsible Sections - Right side */}
+            <div className="flex-1 space-y-2">
               {/* Commissions - Collapsible */}
               <div
-                className={`border rounded-lg overflow-hidden ${
+                className={`border overflow-hidden ${
                   isDark ? "border-white/30" : "border-black/30"
                 }`}
               >
@@ -280,7 +280,7 @@ export default function Footer() {
 
               {/* Resources - Collapsible */}
               <div
-                className={`border rounded-lg overflow-hidden ${
+                className={`border overflow-hidden ${
                   isDark ? "border-white/30" : "border-black/30"
                 }`}
               >
@@ -378,7 +378,7 @@ export default function Footer() {
 
               {/* Legal - Collapsible */}
               <div
-                className={`border rounded-lg overflow-hidden ${
+                className={`border overflow-hidden ${
                   isDark ? "border-white/30" : "border-black/30"
                 }`}
               >
