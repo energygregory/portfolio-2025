@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
-import React, { useEffect, useRef, useState } from "react";
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 import './MetallicPaint.css';
 
 const defaultParams = {
@@ -30,7 +32,7 @@ export function parseLogoImage(file) {
         img.height = 1000;
       }
 
-      const MAX_SIZE = 2000;
+      const MAX_SIZE = 1000;
       const MIN_SIZE = 500;
       let width = img.naturalWidth;
       let height = img.naturalHeight;
@@ -70,9 +72,11 @@ export function parseLogoImage(file) {
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const idx4 = (y * width + x) * 4;
+          const r = data[idx4];
+          const g = data[idx4 + 1];
+          const b = data[idx4 + 2];
           const a = data[idx4 + 3];
-          // Consider any pixel with alpha > 0 as part of the shape
-          shapeMask[y * width + x] = a > 10;
+          shapeMask[y * width + x] = !((r === 255 && g === 255 && b === 255 && a === 255) || a === 0);
         }
       }
 
@@ -297,7 +301,7 @@ void main() {
     vec3 color = vec3(0.);
     float opacity = 1.;
     vec3 color1 = vec3(.98, 0.98, 1.);
-    vec3 color2 = vec3(.3, .4, .6 + .3 * smoothstep(.7, 1.3, uv.x + uv.y));
+    vec3 color2 = vec3(.1, .1, .1 + .1 * smoothstep(.7, 1.3, uv.x + uv.y));
     float edge = img.r;
     vec2 grad_uv = uv;
     grad_uv -= .5;
@@ -348,17 +352,7 @@ void main() {
     float stripe_b = mod(dir - refr_b, 1.);
     float b = get_color_channel(color1.b, color2.b, stripe_b, w, .01, bulge);
     color = vec3(r, g, b);
-    
-    // Apply full grayscale effect for pure metallic appearance
-    float gray = dot(color, vec3(0.299, 0.587, 0.114));
-    color = vec3(gray);
-    
-    // Boost brightness for vibrant metallic effect
-    color += vec3(0.15, 0.1, 0.2) * (1. - edge) * bulge * 0.5;
-    
-    // Apply opacity but keep highlight areas bright
-    color = mix(color, color * 1.2, (1. - opacity) * 0.3);
-    color *= mix(0.6, 1.0, opacity);
+    color *= opacity;
     fragColor = vec4(color, opacity);
 }
 `;
@@ -495,19 +489,11 @@ export default function MetallicPaint({ imageData, params = defaultParams }) {
       const imgRatio = imageData.width / imageData.height;
       gl.uniform1f(uniforms.u_img_ratio, imgRatio);
 
-      // Size the drawing buffer to match the wrapper's displayed size for crisp rendering
-      const clientW = Math.max(1, canvasEl.clientWidth);
-      const clientH = Math.max(1, canvasEl.clientHeight);
-      const sidePx = Math.min(clientW, clientH);
-
-      canvasEl.width = Math.round(sidePx * devicePixelRatio);
-      canvasEl.height = Math.round(sidePx * devicePixelRatio);
-
-      // viewport uses pixel dimensions
-      gl.viewport(0, 0, canvasEl.width, canvasEl.height);
-
-      // u_ratio: width / height in normalized units (should be 1 for a square)
-      gl.uniform1f(uniforms.u_ratio, canvasEl.width / canvasEl.height);
+      const side = 1000;
+      canvasEl.width = side * devicePixelRatio;
+      canvasEl.height = side * devicePixelRatio;
+      gl.viewport(0, 0, canvasEl.height, canvasEl.height);
+      gl.uniform1f(uniforms.u_ratio, 1);
       gl.uniform1f(uniforms.u_img_ratio, imgRatio);
     }
 
