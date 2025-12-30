@@ -186,12 +186,8 @@ void main() {
     vec4 logoColor = texture2D(u_logoTexture, logoUV);
     float logoAlpha = logoColor.a;
     
-    float brightness = dot(logoColor.rgb, vec3(0.299, 0.587, 0.114));
-    if (logoAlpha > 0.99) {
-        logoAlpha = 1.0 - brightness;
-    }
-    
-    bool insideLogo = logoAlpha > 0.1;
+    // For shoulder symbols, apply effect to entire fill
+    bool insideLogo = logoAlpha > 0.01;
     
     if (!insideLogo && logoUV.x >= 0.0 && logoUV.x <= 1.0 && logoUV.y >= 0.0 && logoUV.y <= 1.0) {
         discard;
@@ -292,7 +288,7 @@ void main() {
     finalColor3D = clamp(finalColor3D, 0.0, 1.0);
     
     if (logoUV.x >= 0.0 && logoUV.x <= 1.0 && logoUV.y >= 0.0 && logoUV.y <= 1.0) {
-        if (insideLogo) {
+        if (logoAlpha > 0.01) {
             // Extra edge highlight for 3D depth
             float edgeHighlight = pow(edge * 2.0, 3.0);
             finalColor3D += edgeHighlight * vec3(0.8, 0.85, 1.0);
@@ -326,7 +322,7 @@ const chromePreset = {
   logoInteractStrength: 0.03,
 };
 
-export default function LiquidLogo({ logoUrl, className = '' }) {
+export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
   const canvasRef = useRef(null);
   const glRef = useRef(null);
   const programRef = useRef(null);
@@ -505,7 +501,7 @@ export default function LiquidLogo({ logoUrl, className = '' }) {
     <canvas
       ref={canvasRef}
       className={className}
-      style={{ width: '100%', height: '100%', display: 'block' }}
+      style={{ width: '100%', height: '100%', display: 'block', opacity: opacity }}
     />
   );
 }

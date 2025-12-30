@@ -145,9 +145,40 @@ export default function Home() {
   const logoTranslateY = scrollProgress * -150;
   const logoScale = 1 - scrollProgress * 0.15;
   const logoOpacity = 1 - scrollProgress * 0.3;
+  
+  // Shoulder symbols disappear completely when logo is out of view
+  const shoulderOpacity = Math.max(0, 1 - scrollProgress);
+  const shoulderRotation = scrollProgress * 360; // Full rotation as you scroll
 
   return (
     <main className="min-h-screen flex flex-col overflow-x-hidden">
+      {/* cl: Left shoulder symbol with liquid chrome metallic effect - rotates anticlockwise and disappears on scroll */}
+      <div 
+        className="fixed left-0 z-[100] pointer-events-none"
+        style={{
+          top: '-10vh',
+          width: '35vw',
+          height: '35vw',
+          transform: `scaleX(-1) rotate(${shoulderRotation}deg)`,
+          transformOrigin: '50% 50%',
+        }}
+      >
+        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" opacity={shoulderOpacity} />
+      </div>
+      {/* cr: Right shoulder symbol with liquid chrome metallic effect - rotates clockwise and disappears on scroll */}
+      <div 
+        className="fixed right-0 z-[100] pointer-events-none"
+        style={{
+          top: '-10vh',
+          width: '35vw',
+          height: '35vw',
+          transform: `rotate(${shoulderRotation}deg)`,
+          transformOrigin: '50% 50%',
+        }}
+      >
+        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" opacity={shoulderOpacity} />
+      </div>
+
       {/* Hero section with sticky logo */}
       <section className="relative min-h-[150vh]">
         {/* Sticky logo container */}
