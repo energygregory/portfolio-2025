@@ -36,7 +36,6 @@ const images2025 = [
   "/Images/2025/RED.png",
   "/Images/2025/front.png",
   "/Images/2025/coloured puffer.png",
-  "/Images/2025/cream front.png",
   // Row 5
   "/Images/2025/bandana3.png",
   "/Images/2025/bandana4.png",
@@ -57,7 +56,58 @@ const images2025 = [
   "/Images/2025/zm2.png",
   "/Images/2025/s1.png",
   "/Images/2025/s2.png",
+  // Row 8 - hats and headwear
+  "/Images/2025/HAT1.png",
+  "/Images/2025/HAT5.png",
+  "/Images/2025/HAT6.png",
+  "/Images/2025/wrhat1.png",
+  "/Images/2025/wrhat2.png",
+  "/Images/2025/wrhat3.png",
+  "/Images/2025/wrhat4.png",
+  // Row 9 - Around + caps + first WR set
+  "/Images/2025/around1.png",
+  "/Images/2025/around2.png",
+  "/Images/2025/mcap1.png",
+  "/Images/2025/mcap2.png",
+  "/Images/2025/wr1.png",
+  "/Images/2025/wr2.png",
+  // Row 10 - remaining WR looks
+  "/Images/2025/wr3.png",
+  "/Images/2025/wr4.png",
+  "/Images/2025/wr5.png",
+  "/Images/2025/wr6.png",
+  "/Images/2025/wr7.png",
+  "/Images/2025/wr8.png",
+  // Row 11 - cream & brown line
+  "/Images/2025/cream front.png",
+  "/Images/2025/cream back.png",
+  "/Images/2025/cream pants back.png",
+  "/Images/2025/brown front.png",
+  "/Images/2025/brown back.png",
+  "/Images/2025/brown pants back.png",
 ];
+
+const reducedSizeImages2025 = new Set([
+  "/Images/2025/HAT1.png",
+  "/Images/2025/HAT5.png",
+  "/Images/2025/HAT6.png",
+  "/Images/2025/wrhat1.png",
+  "/Images/2025/wrhat2.png",
+  "/Images/2025/wrhat3.png",
+  "/Images/2025/wrhat4.png",
+]);
+
+const expandedSizeImages2025 = new Set([
+  "/Images/2025/wr1.png",
+  "/Images/2025/wr2.png",
+  "/Images/2025/wr3.png",
+  "/Images/2025/wr4.png",
+]);
+
+const slightlyExpandedImages2025 = new Set([
+  "/Images/2025/mcap1.png",
+  "/Images/2025/mcap2.png",
+]);
 
 // Logos used for the logo-strip — same source as App's list (kept local here for the Home page placement)
 const portfolioLogos = [
@@ -309,30 +359,43 @@ export default function Home({ theme = "dark" }) {
           <div className="max-w-7xl mx-auto">
             {/* 6 Column Image Grid - Small with lots of space */}
             <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 gap-12 sm:gap-16 md:gap-20">
-              {images2025.map((src, idx) => (
-                <div 
-                  key={idx}
-                  className="w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] mx-auto flex items-center justify-center relative"
-                  onTouchStart={(e) => handleTouchStart(idx, src, e)}
-                  onTouchEnd={handleTouchEnd}
-                  onTouchCancel={handleTouchEnd}
-                  onContextMenu={(e) => e.preventDefault()}
-                >
-                  <img 
-                    src={src} 
-                    alt=""
-                    className={`max-w-full max-h-full object-contain select-none ${
-                      !isPhone ? 'hover:scale-110 transition-transform duration-500' : ''
-                    }`}
-                    loading="lazy"
-                    draggable={false}
+              {images2025.map((src, idx) => {
+                const isReduced = reducedSizeImages2025.has(src);
+                const isExpanded = expandedSizeImages2025.has(src);
+                const isSlightlyExpanded = slightlyExpandedImages2025.has(src);
+                const sizeClasses = isExpanded
+                  ? 'w-[60px] h-[60px] sm:w-[110px] sm:h-[110px] md:w-[140px] md:h-[140px]'
+                  : isSlightlyExpanded
+                    ? 'w-[55px] h-[55px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px]'
+                    : isReduced
+                      ? 'w-[35px] h-[35px] sm:w-[70px] sm:h-[70px] md:w-[80px] md:h-[80px]'
+                      : 'w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px]';
+
+                return (
+                  <div 
+                    key={idx}
+                    className={`${sizeClasses} mx-auto flex items-center justify-center relative`}
+                    onTouchStart={(e) => handleTouchStart(idx, src, e)}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchCancel={handleTouchEnd}
                     onContextMenu={(e) => e.preventDefault()}
-                    onDragStart={(e) => e.preventDefault()}
-                  />
-                  {/* Transparent overlay to block direct image interaction */}
-                  <div className="absolute inset-0" onContextMenu={(e) => e.preventDefault()} />
-                </div>
-              ))}
+                  >
+                    <img 
+                      src={src} 
+                      alt=""
+                      className={`max-w-full max-h-full object-contain select-none ${
+                        !isPhone ? 'hover:scale-110 transition-transform duration-500' : ''
+                      }`}
+                      loading="lazy"
+                      draggable={false}
+                      onContextMenu={(e) => e.preventDefault()}
+                      onDragStart={(e) => e.preventDefault()}
+                    />
+                    {/* Transparent overlay to block direct image interaction */}
+                    <div className="absolute inset-0" onContextMenu={(e) => e.preventDefault()} />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
