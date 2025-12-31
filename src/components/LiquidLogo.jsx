@@ -310,7 +310,7 @@ void main() {
 
 // Chrome preset from the liquid-logo repo (matching your screenshot settings)
 const chromePreset = {
-  speed: 1.27,
+  speed: 0.6,
   iterations: 24,
   scale: 2.4,
   dotFactor: 1.2,
@@ -329,7 +329,7 @@ const chromePreset = {
 
 // Mobile-optimized preset (better quality)
 const mobilePreset = {
-  speed: 0.8,
+  speed: 0.45,
   iterations: 16,
   scale: 2.4,
   dotFactor: 1.2,
