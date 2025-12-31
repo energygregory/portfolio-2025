@@ -10,7 +10,7 @@ export default defineConfig({
     allowedHosts: [
       "rude-dryers-beg.loca.lt",
       "happy-moles-cut.loca.lt",
-      "evil-chefs-type.loca.lt",
+      "36df0344a33f.ngrok-free.app",
       "54a93074926f.ngrok-free.app",
       "88eda831a155.ngrok-free.app",
       "ff614dd5ac9f.ngrok-free.app",

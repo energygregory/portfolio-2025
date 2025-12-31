@@ -246,8 +246,8 @@ export default function Home({ theme = "dark" }) {
         </div>
       )}
       
-      {/* cl: Left shoulder symbol with liquid chrome metallic effect */}
-      <div 
+      {/* cl: Left shoulder symbol with liquid chrome metallic effect - HIDDEN */}
+      {/* <div 
         ref={clRef}
         className="fixed z-[100] pointer-events-none"
         style={{
@@ -261,9 +261,9 @@ export default function Home({ theme = "dark" }) {
         }}
       >
         <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
-      </div>
-      {/* cr: Right shoulder symbol with liquid chrome metallic effect */}
-      <div 
+      </div> */}
+      {/* cr: Right shoulder symbol with liquid chrome metallic effect - HIDDEN */}
+      {/* <div 
         ref={crRef}
         className="fixed z-[100] pointer-events-none"
         style={{
@@ -277,7 +277,7 @@ export default function Home({ theme = "dark" }) {
         }}
       >
         <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
-      </div>
+      </div> */}
 
       {/* Hero section with sticky logo */}
       <section className={`relative z-10 ${isPhone ? 'min-h-screen' : 'min-h-[150vh]'}`}>

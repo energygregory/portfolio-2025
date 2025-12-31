@@ -101,59 +101,6 @@ if (typeof document !== 'undefined') {
       e.preventDefault();
     }
   });
-  
-  // Disable keyboard shortcuts for saving/copying/screenshot
-  document.addEventListener('keydown', (e) => {
-    // Block Ctrl/Cmd + S, C, U, P (save, copy, view source, print)
-    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.key === 'c' || e.key === 'C' || e.key === 'u' || e.key === 'U' || e.key === 'p' || e.key === 'P')) {
-      if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-      }
-    }
-    // Block PrintScreen key
-    if (e.key === 'PrintScreen') {
-      e.preventDefault();
-      navigator.clipboard.writeText('');
-      showScreenshotBlock();
-    }
-    // Block Shift+Cmd+3, Shift+Cmd+4 (Mac screenshot)
-    if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) {
-      e.preventDefault();
-      showScreenshotBlock();
-    }
-  });
-
-  // Visibility change detection (screenshot often triggers this)
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      showScreenshotBlock();
-    } else {
-      hideScreenshotBlock();
-    }
-  });
-
-  // Blur/focus detection
-  window.addEventListener('blur', () => {
-    showScreenshotBlock();
-  });
-  
-  window.addEventListener('focus', () => {
-    hideScreenshotBlock();
-  });
-}
-
-function showScreenshotBlock() {
-  const overlay = document.getElementById('screenshot-overlay');
-  const content = document.getElementById('app-content');
-  if (overlay) overlay.classList.add('visible');
-  if (content) content.classList.add('blurred');
-}
-
-function hideScreenshotBlock() {
-  const overlay = document.getElementById('screenshot-overlay');
-  const content = document.getElementById('app-content');
-  if (overlay) overlay.classList.remove('visible');
-  if (content) content.classList.remove('blurred');
 }
 import Home from "./pages/Home.jsx";
 import Work from "./pages/Work.jsx";
@@ -264,14 +211,9 @@ function App() {
 
   return (
     <>
-      {/* Screenshot protection overlay */}
-      <div id="screenshot-overlay" className="screenshot-overlay">
-        Content Protected
-      </div>
-      
       <div
         id="app-content"
-        className={`min-h-screen relative flex flex-col screenshot-protect ${
+        className={`min-h-screen relative flex flex-col ${
           theme === "dark"
             ? "bg-black text-white theme-dark"
             : "bg-white text-black theme-light"
@@ -339,30 +281,45 @@ function App() {
         </nav>
       </header>
 
-      <main className={`flex-1 p-4 ${slideTransition ? 'page-transition' : ''}`}>
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home theme={theme} />} />
-          <Route path="/work" element={<Work />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/around" element={<Around />} />
-          <Route path="/flyhigh" element={<FlyHigh />} />
-          <Route path="/legacydrip" element={<LegacyDrip />} />
-          <Route path="/terzo" element={<Terzo />} />
-          <Route path="/williamru" element={<WilliamRu />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/pricelist" element={<PriceList />} />
-        </Routes>
-      </main>
+      {/* Asset1.svg decorative element - positioned between navbar and footer */}
+      <div className="relative flex-1">
+        {/* The decorative SVG - on top of everything */}
+        <div 
+          className="absolute inset-0 pointer-events-none z-50 overflow-hidden flex items-center justify-center"
+          style={{ transform: 'scaleX(1.15)' }}
+        >
+          <LiquidLogo 
+            logoUrl="/LOGOS/Asset 1.png" 
+            logoScale={1.2} 
+            effectScale={0.6} 
+          />
+        </div>
+        
+        {/* Main content */}
+        <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home theme={theme} />} />
+            <Route path="/work" element={<Work />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/around" element={<Around />} />
+            <Route path="/flyhigh" element={<FlyHigh />} />
+            <Route path="/legacydrip" element={<LegacyDrip />} />
+            <Route path="/terzo" element={<Terzo />} />
+            <Route path="/williamru" element={<WilliamRu />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/pricelist" element={<PriceList />} />
+          </Routes>
+        </main>
+      </div>
       
-      {/* Metallic Chain Border with Liquid Metal Effect */}
-      <div className={`w-full overflow-hidden py-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
+      {/* Metallic Chain Border with Liquid Metal Effect - HIDDEN */}
+      {/* <div className={`w-full overflow-hidden py-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
         <div 
           className="w-full flex"
           style={{
             height: '60px',
           }}
         >
-          {/* 3 on web, 2 on mobile - no gaps */}
           <div className="hidden md:block flex-1 h-full">
             <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
           </div>
@@ -373,7 +330,7 @@ function App() {
             <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
           </div>
         </div>
-      </div>
+      </div> */}
 
       <Footer />
     </div>

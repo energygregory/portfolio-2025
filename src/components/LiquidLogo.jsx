@@ -189,6 +189,8 @@ void main() {
     // For shoulder symbols, apply effect to entire fill
     bool insideLogo = logoAlpha > 0.01;
     
+    float edgeMask = detectEdges(logoUV, 0.1);
+
     if (!insideLogo && logoUV.x >= 0.0 && logoUV.x <= 1.0 && logoUV.y >= 0.0 && logoUV.y <= 1.0) {
         discard;
     }
@@ -346,7 +348,13 @@ const mobilePreset = {
 
 const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 768;
 
-export default function LiquidLogo({ logoUrl, className = '', opacity = 1, logoScale: propLogoScale, effectScale: propEffectScale }) {
+export default function LiquidLogo({ 
+  logoUrl, 
+  className = '', 
+  opacity = 1, 
+  logoScale: propLogoScale, 
+  effectScale: propEffectScale
+}) {
   const canvasRef = useRef(null);
   const glRef = useRef(null);
   const programRef = useRef(null);
