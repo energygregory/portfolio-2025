@@ -12,7 +12,7 @@ export default defineConfig({
       "happy-moles-cut.loca.lt",
       "evil-chefs-type.loca.lt",
       "54a93074926f.ngrok-free.app",
-      "clear-women-fly.loca.lt",
+      "88eda831a155.ngrok-free.app",
       "ff614dd5ac9f.ngrok-free.app",
     ],
   },

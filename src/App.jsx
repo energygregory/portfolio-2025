@@ -93,6 +93,68 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+
+// Disable right-click context menu on images
+if (typeof document !== 'undefined') {
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+  
+  // Disable keyboard shortcuts for saving/copying/screenshot
+  document.addEventListener('keydown', (e) => {
+    // Block Ctrl/Cmd + S, C, U, P (save, copy, view source, print)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.key === 'c' || e.key === 'C' || e.key === 'u' || e.key === 'U' || e.key === 'p' || e.key === 'P')) {
+      if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+      }
+    }
+    // Block PrintScreen key
+    if (e.key === 'PrintScreen') {
+      e.preventDefault();
+      navigator.clipboard.writeText('');
+      showScreenshotBlock();
+    }
+    // Block Shift+Cmd+3, Shift+Cmd+4 (Mac screenshot)
+    if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) {
+      e.preventDefault();
+      showScreenshotBlock();
+    }
+  });
+
+  // Visibility change detection (screenshot often triggers this)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      showScreenshotBlock();
+    } else {
+      hideScreenshotBlock();
+    }
+  });
+
+  // Blur/focus detection
+  window.addEventListener('blur', () => {
+    showScreenshotBlock();
+  });
+  
+  window.addEventListener('focus', () => {
+    hideScreenshotBlock();
+  });
+}
+
+function showScreenshotBlock() {
+  const overlay = document.getElementById('screenshot-overlay');
+  const content = document.getElementById('app-content');
+  if (overlay) overlay.classList.add('visible');
+  if (content) content.classList.add('blurred');
+}
+
+function hideScreenshotBlock() {
+  const overlay = document.getElementById('screenshot-overlay');
+  const content = document.getElementById('app-content');
+  if (overlay) overlay.classList.remove('visible');
+  if (content) content.classList.remove('blurred');
+}
 import Home from "./pages/Home.jsx";
 import Work from "./pages/Work.jsx";
 import About from "./pages/About.jsx";
@@ -107,6 +169,7 @@ import PriceList from "./pages/PriceList.jsx";
 import LogoLoop from "./components/LogoLoop";
 import NavigationLoader from "./components/NavigationLoader";
 import Footer from "./components/Footer";
+import LiquidLogo from "./components/LiquidLogo";
 
 // Use the actual files in public/LOGOS (filenames used as-is).
 const portfolioLogos = [
@@ -200,13 +263,20 @@ function App() {
   }, [theme]);
 
   return (
-    <div
-      className={`min-h-screen relative flex flex-col ${
-        theme === "dark"
-          ? "bg-black text-white theme-dark"
-          : "bg-white text-black theme-light"
-      }`}
-    >
+    <>
+      {/* Screenshot protection overlay */}
+      <div id="screenshot-overlay" className="screenshot-overlay">
+        Content Protected
+      </div>
+      
+      <div
+        id="app-content"
+        className={`min-h-screen relative flex flex-col screenshot-protect ${
+          theme === "dark"
+            ? "bg-black text-white theme-dark"
+            : "bg-white text-black theme-light"
+        }`}
+      >
       <NavigationLoader theme={theme} />
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
@@ -284,32 +354,30 @@ function App() {
         </Routes>
       </main>
       
-      {/* Metallic Shoulder Symbol Border */}
-      <div className={`w-full overflow-hidden py-6 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
+      {/* Metallic Chain Border with Liquid Metal Effect */}
+      <div className={`w-full overflow-hidden py-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
         <div 
-          className="flex justify-center items-center"
+          className="w-full flex"
           style={{
-            display: 'flex',
-            gap: '0px',
+            height: '60px',
           }}
         >
-          {[...Array(30)].map((_, i) => (
-            <img 
-              key={i} 
-              src="/LOGOS/shoulder symbol.png" 
-              alt=""
-              className="h-8 w-auto flex-shrink-0"
-              style={{
-                filter: 'brightness(1.5) contrast(1.2) saturate(0.3) drop-shadow(0 0 2px rgba(255,255,255,0.3))',
-                opacity: 0.7,
-              }}
-            />
-          ))}
+          {/* 3 on web, 2 on mobile - no gaps */}
+          <div className="hidden md:block flex-1 h-full">
+            <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
+          </div>
+          <div className="flex-1 h-full">
+            <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
+          </div>
+          <div className="flex-1 h-full">
+            <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
+          </div>
         </div>
       </div>
 
       <Footer />
     </div>
+    </>
   );
 }
 

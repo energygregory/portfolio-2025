@@ -277,26 +277,29 @@ void main() {
     
     vec3 finalColor3D = ambient + diffuseLight + specularLight + reflection * baseColor;
     
-    // Add rim lighting
-    finalColor3D += fresnel * vec3(0.6, 0.7, 0.9) * 0.5;
-    
+    // Exaggerate 3D look: much stronger rim, edge, specular, fresnel, and bump
+    finalColor3D += fresnel * vec3(1.2, 1.3, 1.5) * 1.7; // Rim light
+
+    float edgeHighlight = pow(edge * 2.2, 2.0);
+    finalColor3D += edgeHighlight * vec3(1.0, 1.0, 1.0) * 1.2;
+
+    // Stronger specular and fresnel
+    finalColor3D += (spec1 + spec2) * vec3(1.2, 1.1, 1.0) * 1.2;
+    finalColor3D += fresnel * vec3(1.1, 1.2, 1.3) * 0.7;
+
     // Film grain
     vec2 noiseCoord = FC / 1.5;
     float noise = random(noiseCoord + time * 0.0004) * 0.08 - 0.04;
     finalColor3D += noise;
-    
+
     finalColor3D = clamp(finalColor3D, 0.0, 1.0);
-    
+
     if (logoUV.x >= 0.0 && logoUV.x <= 1.0 && logoUV.y >= 0.0 && logoUV.y <= 1.0) {
-        if (logoAlpha > 0.01) {
-            // Extra edge highlight for 3D depth
-            float edgeHighlight = pow(edge * 2.0, 3.0);
-            finalColor3D += edgeHighlight * vec3(0.8, 0.85, 1.0);
-            
-            gl_FragColor = vec4(finalColor3D, min(logoAlpha + 0.4, 1.0));
-        } else {
-            discard;
-        }
+      if (logoAlpha > 0.01) {
+        gl_FragColor = vec4(finalColor3D, min(logoAlpha + 0.4, 1.0));
+      } else {
+        discard;
+      }
     } else {
         discard;
     }
@@ -322,10 +325,10 @@ const chromePreset = {
   logoInteractStrength: 0.03,
 };
 
-// Mobile-optimized preset (fewer iterations, simpler calculations)
+// Mobile-optimized preset (better quality)
 const mobilePreset = {
   speed: 0.8,
-  iterations: 6,
+  iterations: 16,
   scale: 2.4,
   dotFactor: 1.2,
   dotMultiplier: 2.0,
@@ -336,14 +339,14 @@ const mobilePreset = {
   greenFactor: -3.0,
   blueFactor: -3.0,
   colorShift: 0.3,
-  noiseIntensity: 2.0,
+  noiseIntensity: 6.0,
   logoScale: 0.9,
   logoInteractStrength: 0.02,
 };
 
 const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 768;
 
-export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
+export default function LiquidLogo({ logoUrl, className = '', opacity = 1, logoScale: propLogoScale, effectScale: propEffectScale }) {
   const canvasRef = useRef(null);
   const glRef = useRef(null);
   const programRef = useRef(null);
@@ -491,7 +494,7 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
     // Resize handler
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = isMobile() ? 1 : Math.min(window.devicePixelRatio, 2);
+      const dpr = Math.min(window.devicePixelRatio, 2);
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -535,7 +538,7 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
       gl.uniform1f(uniforms.time, time / 1000);
       gl.uniform1f(uniforms.speed, preset.speed);
       gl.uniform1f(uniforms.iterations, preset.iterations);
-      gl.uniform1f(uniforms.scale, preset.scale);
+      gl.uniform1f(uniforms.scale, propEffectScale !== undefined ? propEffectScale : preset.scale);
       gl.uniform1f(uniforms.dotFactor, preset.dotFactor);
       gl.uniform1f(uniforms.vOffset, preset.vOffset);
       gl.uniform1f(uniforms.intensityFactor, preset.intensityFactor);
@@ -544,7 +547,7 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
       gl.uniform1f(uniforms.colorShift, preset.colorShift);
       gl.uniform1f(uniforms.dotMultiplier, preset.dotMultiplier);
       gl.uniform1f(uniforms.noiseIntensity, preset.noiseIntensity);
-      gl.uniform1f(uniforms.logoScale, preset.logoScale);
+      gl.uniform1f(uniforms.logoScale, propLogoScale !== undefined ? propLogoScale : preset.logoScale);
       gl.uniform1f(uniforms.logoInteractStrength, preset.logoInteractStrength);
       gl.uniform1f(uniforms.logoAspect, logoAspectRatio);
       gl.uniform2f(uniforms.mouse, mouseRef.current.x, mouseRef.current.y);
@@ -566,6 +569,7 @@ export default function LiquidLogo({ logoUrl, className = '', opacity = 1 }) {
     };
   }, [logoUrl]);
 
+  // Remove outer glow, keep all other 3D effects
   return (
     <canvas
       ref={canvasRef}

@@ -72,6 +72,66 @@ button:focus-visible {
 @tailwind components;
 @tailwind utilities;
 
+/* Image protection - prevent copying/saving */
+img {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+  -webkit-touch-callout: none;
+}
+
+/* Allow pointer events on interactive images */
+img.interactive {
+  pointer-events: auto;
+}
+
+/* Prevent text/image selection globally */
+.no-select {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Screenshot protection - blur when not focused */
+.screenshot-protect {
+  transition: filter 0.05s ease;
+}
+
+.screenshot-protect.blurred {
+  filter: blur(30px) brightness(0.3);
+}
+
+/* Screenshot overlay */
+.screenshot-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: black;
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+}
+
+.screenshot-overlay.visible {
+  display: flex;
+}
+
 /* Default to dark to prevent white flash, but let JS override */
 html,
 body {

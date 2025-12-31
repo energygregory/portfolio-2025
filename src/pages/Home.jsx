@@ -163,18 +163,15 @@ export default function Home({ theme = "dark" }) {
     setPressedImage(null);
   }, []);
 
-  // MOBILE: No scroll animations at all - pure CSS handles everything
-  // DESKTOP: Scroll-based animations
+  // MOBILE & DESKTOP: Scroll-based animations
   const updateScrollAnimations = useCallback(() => {
-    if (isPhone) return; // Skip all JS animations on mobile
-    
     const scrollY = scrollYRef.current;
-    const maxScroll = 600;
+    const maxScroll = isPhone ? 400 : 600;
     const progress = Math.min(scrollY / maxScroll, 1);
     
-    // DESKTOP: Full animations
-    const logoTranslateY = progress * -150;
-    const logoScale = 1 - progress * 0.15;
+    // Animations for both mobile and desktop
+    const logoTranslateY = progress * (isPhone ? -100 : -150);
+    const logoScale = 1 - progress * (isPhone ? 0.1 : 0.15);
     const logoOpacity = 1 - progress * 0.3;
     const shoulderOpacity = Math.max(0, 1 - progress);
     const shoulderRotation = progress * 360;
@@ -200,10 +197,8 @@ export default function Home({ theme = "dark" }) {
     }
   }, [isPhone]);
 
-  // Scroll handler - DESKTOP ONLY
+  // Scroll handler - BOTH MOBILE AND DESKTOP
   useEffect(() => {
-    if (isPhone) return; // No scroll listener on mobile at all
-    
     const handleScroll = () => {
       scrollYRef.current = window.scrollY;
       requestAnimationFrame(updateScrollAnimations);
@@ -214,7 +209,7 @@ export default function Home({ theme = "dark" }) {
     
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [updateScrollAnimations, isPhone]);
+  }, [updateScrollAnimations]);
 
   const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
   const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
@@ -252,41 +247,37 @@ export default function Home({ theme = "dark" }) {
       )}
       
       {/* cl: Left shoulder symbol with liquid chrome metallic effect */}
-      {!isPhone && (
-        <div 
-          ref={clRef}
-          className="fixed z-[100] pointer-events-none"
-          style={{
-            top: '-10vh',
-            left: '0',
-            width: '35vw',
-            height: '35vw',
-            transform: 'scaleX(-1) rotate3d(0, 0, 1, 0deg)',
-            transformOrigin: '50% 50%',
-            willChange: 'transform, opacity',
-          }}
-        >
-          <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
-        </div>
-      )}
+      <div 
+        ref={clRef}
+        className="fixed z-[100] pointer-events-none"
+        style={{
+          top: isPhone ? '5vh' : '-10vh',
+          left: isPhone ? '-15vw' : '0',
+          width: isPhone ? '50vw' : '35vw',
+          height: isPhone ? '50vw' : '35vw',
+          transform: 'scaleX(-1) rotate3d(0, 0, 1, 0deg)',
+          transformOrigin: '50% 50%',
+          willChange: 'transform, opacity',
+        }}
+      >
+        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
+      </div>
       {/* cr: Right shoulder symbol with liquid chrome metallic effect */}
-      {!isPhone && (
-        <div 
-          ref={crRef}
-          className="fixed z-[100] pointer-events-none"
-          style={{
-            top: '-10vh',
-            right: '0',
-            width: '35vw',
-            height: '35vw',
-            transform: 'rotate3d(0, 0, 1, 0deg)',
-            transformOrigin: '50% 50%',
-            willChange: 'transform, opacity',
-          }}
-        >
-          <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
-        </div>
-      )}
+      <div 
+        ref={crRef}
+        className="fixed z-[100] pointer-events-none"
+        style={{
+          top: isPhone ? '5vh' : '-10vh',
+          right: isPhone ? '-15vw' : '0',
+          width: isPhone ? '50vw' : '35vw',
+          height: isPhone ? '50vw' : '35vw',
+          transform: 'rotate3d(0, 0, 1, 0deg)',
+          transformOrigin: '50% 50%',
+          willChange: 'transform, opacity',
+        }}
+      >
+        <LiquidLogo logoUrl="/LOGOS/shoulder symbol.png" />
+      </div>
 
       {/* Hero section with sticky logo */}
       <section className={`relative z-10 ${isPhone ? 'min-h-screen' : 'min-h-[150vh]'}`}>
@@ -294,6 +285,7 @@ export default function Home({ theme = "dark" }) {
         <div 
           ref={logoContainerRef}
           className={`${isPhone ? '' : 'sticky top-0'} h-screen flex items-center justify-center px-6`}
+          style={isPhone ? { marginTop: '-15vh' } : {}}
         >
           <div 
             ref={logoWrapperRef}
@@ -312,7 +304,7 @@ export default function Home({ theme = "dark" }) {
         <div 
           ref={imagesRef}
           className={`relative z-10 px-6 pb-24 ${isPhone ? 'mt-8' : '-mt-[50vh]'}`}
-          style={isPhone ? {} : { opacity: 0, willChange: 'transform, opacity' }}
+          style={{ opacity: 0, willChange: 'transform, opacity' }}
         >
           <div className="max-w-7xl mx-auto">
             {/* 6 Column Image Grid - Small with lots of space */}
@@ -320,20 +312,25 @@ export default function Home({ theme = "dark" }) {
               {images2025.map((src, idx) => (
                 <div 
                   key={idx}
-                  className="w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] mx-auto flex items-center justify-center"
+                  className="w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] mx-auto flex items-center justify-center relative"
                   onTouchStart={(e) => handleTouchStart(idx, src, e)}
                   onTouchEnd={handleTouchEnd}
                   onTouchCancel={handleTouchEnd}
+                  onContextMenu={(e) => e.preventDefault()}
                 >
                   <img 
                     src={src} 
-                    alt={`Work ${idx + 1}`}
+                    alt=""
                     className={`max-w-full max-h-full object-contain select-none ${
                       !isPhone ? 'hover:scale-110 transition-transform duration-500' : ''
                     }`}
                     loading="lazy"
                     draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
                   />
+                  {/* Transparent overlay to block direct image interaction */}
+                  <div className="absolute inset-0" onContextMenu={(e) => e.preventDefault()} />
                 </div>
               ))}
             </div>
