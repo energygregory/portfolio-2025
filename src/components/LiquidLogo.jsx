@@ -364,7 +364,7 @@ export default function LiquidLogo({
   const mouseRef = useRef({ x: 0, y: 0 });
   const isScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [textureReady, setTextureReady] = useState(false);
 
   // Track scroll state to pause animation on mobile
   useEffect(() => {
@@ -492,6 +492,7 @@ export default function LiquidLogo({
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
       logoAspectRatio = img.width / img.height;
+      setTextureReady(true);
     };
     img.src = logoUrl;
 
@@ -502,13 +503,31 @@ export default function LiquidLogo({
     // Resize handler
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return; // Skip if not visible
       const dpr = Math.min(window.devicePixelRatio, 2);
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      gl.viewport(0, 0, canvas.width, canvas.height);
+      const newWidth = Math.floor(rect.width * dpr);
+      const newHeight = Math.floor(rect.height * dpr);
+      // Only resize if dimensions actually changed
+      if (canvas.width !== newWidth || canvas.height !== newHeight) {
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
     };
     resize();
+    
+    // Use ResizeObserver for more reliable resize detection
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+    });
+    resizeObserver.observe(canvas);
+    
+    // Also listen to window resize as fallback
     window.addEventListener('resize', resize);
+    
+    // Call resize again after a delay to catch late layout changes
+    const resizeTimeout = setTimeout(resize, 100);
+    const resizeTimeout2 = setTimeout(resize, 500);
 
     // Get preset based on device
     const preset = isMobile() ? mobilePreset : chromePreset;
@@ -571,6 +590,9 @@ export default function LiquidLogo({
     frameRef.current = requestAnimationFrame(render);
 
     return () => {
+      resizeObserver.disconnect();
+      clearTimeout(resizeTimeout);
+      clearTimeout(resizeTimeout2);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
@@ -586,7 +608,8 @@ export default function LiquidLogo({
         width: '100%', 
         height: '100%', 
         display: 'block', 
-        opacity: opacity,
+        opacity: textureReady ? opacity : 0,
+        transition: 'opacity 0.3s ease-in-out',
         backgroundColor: 'transparent',
       }}
     />

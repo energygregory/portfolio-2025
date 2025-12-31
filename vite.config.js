@@ -12,8 +12,10 @@ export default defineConfig({
       "happy-moles-cut.loca.lt",
       "36df0344a33f.ngrok-free.app",
       "54a93074926f.ngrok-free.app",
-      "88eda831a155.ngrok-free.app",
+      "b6e9448af744.ngrok-free.app",
       "ff614dd5ac9f.ngrok-free.app",
+      "upset-symbols-rest.loca.lt",
+      "unabashed-dayfly-coraline.ngrok-free.dev",
     ],
   },
 });

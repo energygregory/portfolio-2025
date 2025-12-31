@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AnimatedLogo from "./AnimatedLogo";
 
-export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
+export default function NavigationLoader({ theme = "dark", onVisibleChange, onInitialLoad }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true); // Start visible to match HTML loader
   const targetRef = useRef(null);
   const navigatingRef = useRef(false);
+  const initialLoadDone = useRef(false);
 
   // Sync visible state with parent
   useEffect(() => {
@@ -18,6 +19,15 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange }) {
 
   // Initial load animation: show overlay with animated logo, then fade
   useEffect(() => {
+    // Remove the HTML initial loader immediately when React takes over
+    const initialLoader = document.getElementById('initial-loader');
+    if (initialLoader) {
+      initialLoader.remove();
+    }
+    if (onInitialLoad) {
+      onInitialLoad();
+    }
+    
     const runInitialLoader = async () => {
       setVisible(true);
 

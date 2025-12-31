@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
 import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import LiquidLogo from "../components/LiquidLogo";
@@ -172,6 +173,7 @@ const portfolioLogos = [
 export default function Home({ theme = "dark" }) {
   const [isPhone, setIsPhone] = useState(false);
   const [isTabletOrLarger, setIsTabletOrLarger] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const logoContainerRef = useRef(null);
   const clRef = useRef(null);
   const crRef = useRef(null);
@@ -232,6 +234,11 @@ export default function Home({ theme = "dark" }) {
     const maxScroll = isPhone ? 400 : 600;
     const progress = Math.min(scrollY / maxScroll, 1);
     
+    // Track if user has scrolled (for mobile marquee)
+    if (isPhone) {
+      setHasScrolled(scrollY > 20);
+    }
+    
     // Animations for both mobile and desktop
     const logoTranslateY = progress * (isPhone ? -100 : -150);
     const logoScale = 1 - progress * (isPhone ? 0.1 : 0.15);
@@ -255,10 +262,12 @@ export default function Home({ theme = "dark" }) {
     }
     
     if (imagesRef.current) {
-      imagesRef.current.style.opacity = progress;
-      imagesRef.current.style.transform = `translate3d(0, ${(1 - progress) * 100}px, 0)`;
+      // On mobile, start at opacity 0 then fade to 1 when scrolled
+      const gridOpacity = isPhone ? (hasScrolled ? 1 : 0) : progress;
+      imagesRef.current.style.opacity = gridOpacity;
+      imagesRef.current.style.transform = `translate3d(0, ${isPhone ? 0 : (1 - progress) * 100}px, 0)`;
     }
-  }, [isPhone]);
+  }, [isPhone, hasScrolled]);
 
   // Scroll handler - BOTH MOBILE AND DESKTOP
   useEffect(() => {
@@ -343,34 +352,63 @@ export default function Home({ theme = "dark" }) {
       </div> */}
 
       {/* Hero section with sticky logo */}
-      <section className={`relative z-10 ${isPhone ? 'min-h-screen' : 'min-h-[150vh]'}`}>
+      <section className={`relative z-10 ${isPhone ? '' : 'min-h-[150vh]'}`}>
         {/* Sticky logo container */}
         <div 
           ref={logoContainerRef}
-          className={`${isPhone ? '' : 'sticky top-0'} h-screen flex items-center justify-center px-6`}
-          style={isPhone ? { marginTop: '-15vh' } : {}}
+          className={`${isPhone ? '' : 'sticky top-0'} ${isPhone ? '' : 'h-screen'} flex items-center justify-center px-6`}
+          style={isPhone ? { paddingTop: '1vh', minHeight: '45vh' } : {}}
         >
           <div 
             ref={logoWrapperRef}
-            className="w-full relative flex flex-col items-center gap-4"
+            className="w-full relative flex flex-col items-center gap-2"
             style={{ 
               maxWidth: isPhone ? '90vw' : '800px', 
-              maxHeight: isPhone ? '90vw' : '800px',
+              maxHeight: isPhone ? '80vw' : '800px',
               height: isPhone ? 'auto' : '70vh',
             }}
           >
-            <div className="w-full flex justify-center px-2 -mt-4">
+            <div className="w-full flex justify-center px-2">
               <SpotifyNowPlaying theme={theme} />
             </div>
             <LiquidLogo logoUrl={logoPath} />
           </div>
         </div>
 
+        {/* Mobile: Scrolling marquee of 2025 images (before user scrolls) */}
+        {isPhone && !hasScrolled && (
+          <div className="w-full overflow-hidden py-4 mt-12">
+            <div 
+              className="flex gap-6 animate-marquee"
+              style={{
+                animation: 'marquee 60s linear infinite',
+                width: 'max-content',
+              }}
+            >
+              {[...images2025, ...images2025].map((src, idx) => (
+                <img 
+                  key={idx}
+                  src={src} 
+                  alt="" 
+                  className="w-12 h-12 object-contain flex-shrink-0"
+                  draggable={false}
+                />
+              ))}
+            </div>
+            <style>{`
+              @keyframes marquee {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+            `}</style>
+          </div>
+        )}
+
         {/* 2025 Content - images grid */}
         <div 
           ref={imagesRef}
-          className={`relative z-10 px-6 pb-24 ${isPhone ? 'mt-8' : '-mt-[50vh]'}`}
-          style={{ opacity: 0, willChange: 'transform, opacity' }}
+          className={`relative z-10 px-6 pb-24 ${isPhone ? 'mt-4' : '-mt-[50vh]'}`}
+          style={{ opacity: isPhone && !hasScrolled ? 0 : undefined, willChange: 'transform, opacity' }}
         >
           <div className="max-w-7xl mx-auto">
             {/* 6 Column Image Grid - Small with lots of space */}
@@ -434,51 +472,65 @@ export default function Home({ theme = "dark" }) {
       {/* Spacer */}
       <div className="w-full h-20 sm:h-28 md:h-40"></div>
 
-      {/* Trusted By Section + logo strip — push down on mobile only */}
-      <div className="w-full mt-24 sm:mt-0 px-6">
-        <div className="w-full mb-3 text-center">
+      {/* Clientele Section - Properly centered grid layout */}
+      <section className="w-full mt-24 sm:mt-0 px-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Title */}
           <h3
-            className="trusted-by text-sm tracking-widest text-neutral-600 dark:text-neutral-400"
+            className="text-center text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400 mb-12"
             style={{
               fontFamily:
                 "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
             }}
           >
-            T R U S T E D &nbsp; B Y
+            C L I E N T E L E
           </h3>
-        </div>
 
-        {/* Slow, multi-row logo section (moved from top bar). 4 stacked rows, drastically reduced speed. */}
-        {/* Make the logo strip span the full viewport width so it starts at the edges */}
-        
-        {/* Original - HIDDEN */}
-        <section className="w-full mb-12 hidden">
-          <MultiRowLogoLoop
-            logos={logos}
-            rows={3}
-            /* slower speed and much tighter vertical spacing between rows */
-            speed={logoSpeed}
-            logoHeight={36}
-            gap={140}
-            rowGap={logoRowGap}
-          />
-        </section>
+          {/* Logo Grid - 2 rows, first row longer, all centered */}
+          <div className="flex flex-col items-center gap-6 sm:gap-12 mb-16 sm:mb-32">
+            {/* Row 1: Around, Tribe of God, Terzo, Sleekster, Legacy Drip, Asset 3 */}
+            <div className="flex items-center justify-center gap-4 sm:gap-12 md:gap-16">
+              <Link to="/around" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/around.svg" alt="Around" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
+              </Link>
+              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/tribeofGod.svg" alt="Tribe of God" className="h-4 sm:h-8 w-auto dark:invert" draggable={false} />
+              </Link>
+              <Link to="/terzo" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/Logo 1 in whitw.svg" alt="Terzo" className="h-4 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
+              </Link>
+              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/sleekster.svg" alt="Sleekster" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
+              </Link>
+              <Link to="/legacydrip" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/legacydrip.svg" alt="Legacy Drip" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
+              </Link>
+              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/Asset 3.svg" alt="Asset 3" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
+              </Link>
+            </div>
 
-        {/* Duplicate - No Animation - 2 rows with distributed logos */}
-        <section className="w-full mb-12 pointer-events-none flex justify-center overflow-hidden">
-          <div className="w-full max-w-6xl px-4">
-            <MultiRowLogoLoop
-              logos={logos}
-              rows={3}
-              speed={0}
-              logoHeight={logoHeight}
-              gap={logoGap}
-              rowGap={logoRowGap}
-              className="no-fade"
-            />
+            {/* Row 2: William Ru, En Garde, Brand Two, Fly High, Semanu Studios */}
+            <div className="flex items-center justify-center gap-4 sm:gap-12 md:gap-16">
+              <Link to="/williamru" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/William Ru.svg" alt="William Ru" className="h-4 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
+              </Link>
+              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/en garde.svg" alt="En Garde" className="h-6 sm:h-12 w-auto dark:invert" draggable={false} />
+              </Link>
+              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/BRAND-TWO.svg" alt="Brand Two" className="h-6 sm:h-12 w-auto dark:invert" draggable={false} />
+              </Link>
+              <Link to="/flyhigh" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/flyhigh.svg" alt="Fly High" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
+              </Link>
+              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+                <img src="/LOGOS/semanu studios.svg" alt="Semanu Studios" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
+              </Link>
+            </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       <div className="flex-1" />
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import emailjs from "@emailjs/browser";
 import AnimatedLogo from "./AnimatedLogo";
 import Dither from "./Dither";
 
@@ -129,7 +128,7 @@ export default function Footer() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
 
     // Validate fields
@@ -142,35 +141,34 @@ export default function Footer() {
     setIsSubmitting(true);
     setSubmitStatus("");
 
-    // EmailJS configuration
-    const serviceID = "service_clnatbs";
-    const templateID = "template_l8e5iwg";
-    const publicKey = "qeNUbwHcQWXZdkquR";
+    try {
+      const { default: emailjs } = await import("@emailjs/browser");
 
-    const templateParams = {
-      from_name: name,
-      from_email: email,
-      message: message,
-      to_email: "gregory.gfx1@gmail.com",
-    };
+      // EmailJS configuration
+      const serviceID = "service_clnatbs";
+      const templateID = "template_l8e5iwg";
+      const publicKey = "qeNUbwHcQWXZdkquR";
 
-    emailjs
-      .send(serviceID, templateID, templateParams, publicKey)
-      .then(() => {
-        setSubmitStatus("Message sent successfully!");
-        setName("");
-        setEmail("");
-        setMessage("");
-        setTimeout(() => setSubmitStatus(""), 5000);
-      })
-      .catch((error) => {
-        console.error("EmailJS Error:", error);
-        setSubmitStatus("Failed to send message. Please try again.");
-        setTimeout(() => setSubmitStatus(""), 5000);
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+      const templateParams = {
+        from_name: name,
+        from_email: email,
+        message: message,
+        to_email: "gregory.gfx1@gmail.com",
+      };
+
+      await emailjs.send(serviceID, templateID, templateParams, publicKey);
+      setSubmitStatus("Message sent successfully!");
+      setName("");
+      setEmail("");
+      setMessage("");
+      setTimeout(() => setSubmitStatus(""), 5000);
+    } catch (error) {
+      console.error("EmailJS Error:", error);
+      setSubmitStatus("Failed to send message. Please try again.");
+      setTimeout(() => setSubmitStatus(""), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

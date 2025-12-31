@@ -2,15 +2,17 @@
 
 Vite + React frontend powering the portfolio site.
 
-## Spotify "Now Playing" widget
+## Now Playing widget (Last.fm bridge)
 
-The hero section can display the track currently playing on your Spotify account directly above the chrome logo. To enable it:
+The hero section can show whatever song you're listening to on Spotify by piggy-backing on Last.fm's scrobbling API (no custom backend needed):
 
-1. Deploy a tiny endpoint (serverless function, simple API route, etc.) that returns JSON with the keys `isPlaying`, `title`, `artist`, `albumArtUrl`, and `songUrl`. You can also forward the response from Spotify's `currently-playing` endpoint.
-2. Copy `.env.example` to `.env` and set `VITE_SPOTIFY_NOW_PLAYING_URL` to that endpoint. Optionally adjust `VITE_SPOTIFY_POLL_INTERVAL` (milliseconds, default 45000).
-3. Restart `npm run dev` so Vite picks up the new env vars.
+1. Create or log into a free [Last.fm](https://www.last.fm) account.
+2. In Last.fm ➝ **Settings** ➝ **Applications**, enable **Connect Spotify Scrobbling** so your plays sync automatically.
+3. Create a Last.fm API key (Settings ➝ API ➝ "Create an API account"). Copy the generated key; you do **not** need the shared secret.
+4. Copy `.env.example` to `.env` and set `VITE_LASTFM_USERNAME` and `VITE_LASTFM_API_KEY`. Optional: override `VITE_LASTFM_POLL_INTERVAL` (ms, min 5000) if you want faster updates.
+5. Restart `npm run dev` so Vite picks up the environment variables.
 
-When an endpoint isn't configured the widget is hidden in production and shows a reminder during local development.
+When the credentials are missing the widget stays hidden in production (and shows a reminder locally).
 
 ## Development
 

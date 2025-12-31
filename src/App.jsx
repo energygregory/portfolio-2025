@@ -92,7 +92,7 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense, lazy } from "react";
 
 // Disable right-click context menu on images
 if (typeof document !== 'undefined') {
@@ -102,21 +102,20 @@ if (typeof document !== 'undefined') {
     }
   });
 }
-import Home from "./pages/Home.jsx";
-import Work from "./pages/Work.jsx";
-import About from "./pages/About.jsx";
-import Contact from "./pages/Contact.jsx";
-import Terzo from "./pages/Terzo.jsx";
-import WilliamRu from "./pages/WilliamRu.jsx";
-import Around from "./pages/Around.jsx";
-import FlyHigh from "./pages/FlyHigh.jsx";
-import LegacyDrip from "./pages/LegacyDrip.jsx";
-import PriceList from "./pages/PriceList.jsx";
+const Home = lazy(() => import("./pages/Home.jsx"));
+const Work = lazy(() => import("./pages/Work.jsx"));
+const About = lazy(() => import("./pages/About.jsx"));
+const Contact = lazy(() => import("./pages/Contact.jsx"));
+const Terzo = lazy(() => import("./pages/Terzo.jsx"));
+const WilliamRu = lazy(() => import("./pages/WilliamRu.jsx"));
+const Around = lazy(() => import("./pages/Around.jsx"));
+const FlyHigh = lazy(() => import("./pages/FlyHigh.jsx"));
+const LegacyDrip = lazy(() => import("./pages/LegacyDrip.jsx"));
+const PriceList = lazy(() => import("./pages/PriceList.jsx"));
 
-import LogoLoop from "./components/LogoLoop";
 import NavigationLoader from "./components/NavigationLoader";
-import Footer from "./components/Footer";
-import LiquidLogo from "./components/LiquidLogo";
+const Footer = lazy(() => import("./components/Footer"));
+const LiquidLogo = lazy(() => import("./components/LiquidLogo"));
 
 // Use the actual files in public/LOGOS (filenames used as-is).
 const portfolioLogos = [
@@ -159,6 +158,18 @@ function App() {
   // Track if navigating from Work page to brand page
   const [slideTransition, setSlideTransition] = useState(false);
   const prevPathRef = useRef(location.pathname);
+  
+  // Track scroll to hide Asset1 on mobile
+  const [hideAsset1, setHideAsset1] = useState(false);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setHideAsset1(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Theme state with toggle
   const [theme, setTheme] = useState("dark");
@@ -213,13 +224,17 @@ function App() {
     <>
       <div
         id="app-content"
-        className={`min-h-screen relative flex flex-col ${
+        className={`min-h-screen relative flex flex-col overflow-x-hidden ${
           theme === "dark"
             ? "bg-black text-white theme-dark"
             : "bg-white text-black theme-light"
         }`}
       >
-      <NavigationLoader theme={theme} />
+      <NavigationLoader theme={theme} onInitialLoad={() => {
+        // Remove the initial HTML loader when React's NavigationLoader takes over
+        const initialLoader = document.getElementById('initial-loader');
+        if (initialLoader) initialLoader.remove();
+      }} />
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       {/* NAV BAR (CENTERED LINKS) */}
@@ -282,33 +297,40 @@ function App() {
       </header>
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
-      <div className="relative flex-1">
+      <div className="relative flex-1 overflow-hidden">
         {/* The decorative SVG - on top of everything */}
+        {/* Mobile: stretched horizontally, squeezed vertically, hide on scroll */}
+        {/* Desktop: fills entire content area */}
         <div 
-          className="absolute inset-0 pointer-events-none z-50 overflow-hidden flex items-center justify-center"
-          style={{ transform: 'scaleX(1.15)' }}
+          className={`absolute pointer-events-none z-50 overflow-hidden flex items-center justify-center left-[-25%] right-[-25%] top-0 h-[55vh] sm:left-0 sm:right-0 sm:h-auto sm:inset-0 transition-opacity duration-300 ${hideAsset1 ? 'opacity-0 sm:opacity-100' : 'opacity-100'}`}
         >
-          <LiquidLogo 
-            logoUrl="/LOGOS/Asset 1.png" 
-            logoScale={1.2} 
-            effectScale={0.6} 
-          />
+          <Suspense fallback={null}> 
+            <LiquidLogo 
+              logoUrl="/LOGOS/Asset 1.png" 
+              logoScale={1.2} 
+              effectScale={0.6} 
+            />
+          </Suspense>
         </div>
         
         {/* Main content */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Home theme={theme} />} />
-            <Route path="/work" element={<Work />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/around" element={<Around />} />
-            <Route path="/flyhigh" element={<FlyHigh />} />
-            <Route path="/legacydrip" element={<LegacyDrip />} />
-            <Route path="/terzo" element={<Terzo />} />
-            <Route path="/williamru" element={<WilliamRu />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/pricelist" element={<PriceList />} />
-          </Routes>
+          <Suspense
+            fallback={<div className="min-h-screen" />}
+          >
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home theme={theme} />} />
+              <Route path="/work" element={<Work />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/around" element={<Around />} />
+              <Route path="/flyhigh" element={<FlyHigh />} />
+              <Route path="/legacydrip" element={<LegacyDrip />} />
+              <Route path="/terzo" element={<Terzo />} />
+              <Route path="/williamru" element={<WilliamRu />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/pricelist" element={<PriceList />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
       
@@ -332,7 +354,9 @@ function App() {
         </div>
       </div> */}
 
-      <Footer />
+      <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
+        <Footer />
+      </Suspense>
     </div>
     </>
   );

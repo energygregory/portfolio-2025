@@ -1,281 +1,75 @@
-/* eslint-disable react/no-unknown-property */
-import { useRef, useEffect, forwardRef } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { EffectComposer, wrapEffect } from "@react-three/postprocessing";
-import { Effect } from "postprocessing";
-import * as THREE from "three";
+import { useEffect, useMemo, useRef } from "react";
 
 import "./Dither.css";
 
-const waveVertexShader = `
-precision highp float;
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-  vec4 viewPosition = viewMatrix * modelPosition;
-  gl_Position = projectionMatrix * viewPosition;
-}
-`;
+const BAYER_MATRIX = [
+  0 / 64,
+  48 / 64,
+  12 / 64,
+  60 / 64,
+  3 / 64,
+  51 / 64,
+  15 / 64,
+  63 / 64,
+  32 / 64,
+  16 / 64,
+  44 / 64,
+  28 / 64,
+  35 / 64,
+  19 / 64,
+  47 / 64,
+  31 / 64,
+  8 / 64,
+  56 / 64,
+  4 / 64,
+  52 / 64,
+  11 / 64,
+  59 / 64,
+  7 / 64,
+  55 / 64,
+  40 / 64,
+  24 / 64,
+  36 / 64,
+  20 / 64,
+  43 / 64,
+  27 / 64,
+  39 / 64,
+  23 / 64,
+  2 / 64,
+  50 / 64,
+  14 / 64,
+  62 / 64,
+  1 / 64,
+  49 / 64,
+  13 / 64,
+  61 / 64,
+  34 / 64,
+  18 / 64,
+  46 / 64,
+  30 / 64,
+  33 / 64,
+  17 / 64,
+  45 / 64,
+  29 / 64,
+  10 / 64,
+  58 / 64,
+  6 / 64,
+  54 / 64,
+  9 / 64,
+  57 / 64,
+  5 / 64,
+  53 / 64,
+  42 / 64,
+  26 / 64,
+  38 / 64,
+  22 / 64,
+  41 / 64,
+  25 / 64,
+  37 / 64,
+  21 / 64,
+];
 
-const waveFragmentShader = `
-precision highp float;
-uniform vec2 resolution;
-uniform float time;
-uniform float waveSpeed;
-uniform float waveFrequency;
-uniform float waveAmplitude;
-uniform vec3 waveColor;
-uniform vec2 mousePos;
-uniform int enableMouseInteraction;
-uniform float mouseRadius;
-
-vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
-vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
-vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
-
-float cnoise(vec2 P) {
-  vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0);
-  vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0);
-  Pi = mod289(Pi);
-  vec4 ix = Pi.xzxz;
-  vec4 iy = Pi.yyww;
-  vec4 fx = Pf.xzxz;
-  vec4 fy = Pf.yyww;
-  vec4 i = permute(permute(ix) + iy);
-  vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0;
-  vec4 gy = abs(gx) - 0.5;
-  vec4 tx = floor(gx + 0.5);
-  gx = gx - tx;
-  vec2 g00 = vec2(gx.x, gy.x);
-  vec2 g10 = vec2(gx.y, gy.y);
-  vec2 g01 = vec2(gx.z, gy.z);
-  vec2 g11 = vec2(gx.w, gy.w);
-  vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
-  g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
-  float n00 = dot(g00, vec2(fx.x, fy.x));
-  float n10 = dot(g10, vec2(fx.y, fy.y));
-  float n01 = dot(g01, vec2(fx.z, fy.z));
-  float n11 = dot(g11, vec2(fx.w, fy.w));
-  vec2 fade_xy = fade(Pf.xy);
-  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-  return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
-}
-
-const int OCTAVES = 4;
-float fbm(vec2 p) {
-  float value = 0.0;
-  float amp = 1.0;
-  float freq = waveFrequency;
-  for (int i = 0; i < OCTAVES; i++) {
-    value += amp * abs(cnoise(p));
-    p *= freq;
-    amp *= waveAmplitude;
-  }
-  return value;
-}
-
-float pattern(vec2 p) {
-  vec2 p2 = p - time * waveSpeed;
-  return fbm(p + fbm(p2)); 
-}
-
-void main() {
-  vec2 uv = gl_FragCoord.xy / resolution.xy;
-  uv -= 0.5;
-  uv.x *= resolution.x / resolution.y;
-  float f = pattern(uv);
-  if (enableMouseInteraction == 1) {
-    vec2 mouseNDC = (mousePos / resolution - 0.5) * vec2(1.0, -1.0);
-    mouseNDC.x *= resolution.x / resolution.y;
-    float dist = length(uv - mouseNDC);
-    float effect = 1.0 - smoothstep(0.0, mouseRadius, dist);
-    f -= 0.5 * effect;
-  }
-  vec3 col = mix(vec3(0.0), waveColor, f);
-  gl_FragColor = vec4(col, 1.0);
-}
-`;
-
-const ditherFragmentShader = `
-precision highp float;
-uniform float colorNum;
-uniform float pixelSize;
-uniform float bias;
-const float bayerMatrix8x8[64] = float[64](
-  0.0/64.0, 48.0/64.0, 12.0/64.0, 60.0/64.0,  3.0/64.0, 51.0/64.0, 15.0/64.0, 63.0/64.0,
-  32.0/64.0,16.0/64.0, 44.0/64.0, 28.0/64.0, 35.0/64.0,19.0/64.0, 47.0/64.0, 31.0/64.0,
-  8.0/64.0, 56.0/64.0,  4.0/64.0, 52.0/64.0, 11.0/64.0,59.0/64.0,  7.0/64.0, 55.0/64.0,
-  40.0/64.0,24.0/64.0, 36.0/64.0, 20.0/64.0, 43.0/64.0,27.0/64.0, 39.0/64.0, 23.0/64.0,
-  2.0/64.0, 50.0/64.0, 14.0/64.0, 62.0/64.0,  1.0/64.0,49.0/64.0, 13.0/64.0, 61.0/64.0,
-  34.0/64.0,18.0/64.0, 46.0/64.0, 30.0/64.0, 33.0/64.0,17.0/64.0, 45.0/64.0, 29.0/64.0,
-  10.0/64.0,58.0/64.0,  6.0/64.0, 54.0/64.0,  9.0/64.0,57.0/64.0,  5.0/64.0, 53.0/64.0,
-  42.0/64.0,26.0/64.0, 38.0/64.0, 22.0/64.0, 41.0/64.0,25.0/64.0, 37.0/64.0, 21.0/64.0
-);
-
-vec3 dither(vec2 uv, vec3 color) {
-  vec2 scaledCoord = floor(uv * resolution / pixelSize);
-  int x = int(mod(scaledCoord.x, 8.0));
-  int y = int(mod(scaledCoord.y, 8.0));
-  float threshold = bayerMatrix8x8[y * 8 + x] - 0.25;
-  float step = 1.0 / (colorNum - 1.0);
-  color += threshold * step;
-  color = clamp(color - bias, 0.0, 1.0);
-  return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
-}
-
-void mainImage(in vec4 inputColor, in vec2 uv, out vec4 outputColor) {
-  vec2 normalizedPixelSize = pixelSize / resolution;
-  vec2 uvPixel = normalizedPixelSize * floor(uv / normalizedPixelSize);
-  vec4 color = texture2D(inputBuffer, uvPixel);
-  color.rgb = dither(uv, color.rgb);
-  outputColor = color;
-}
-`;
-
-class RetroEffectImpl extends Effect {
-  constructor() {
-    const uniforms = new Map([
-      ["colorNum", new THREE.Uniform(4.0)],
-      ["pixelSize", new THREE.Uniform(2.0)],
-      ["bias", new THREE.Uniform(0.2)],
-    ]);
-    super("RetroEffect", ditherFragmentShader, { uniforms });
-    this.uniforms = uniforms;
-  }
-  set colorNum(v) {
-    this.uniforms.get("colorNum").value = v;
-  }
-  get colorNum() {
-    return this.uniforms.get("colorNum").value;
-  }
-  set pixelSize(v) {
-    this.uniforms.get("pixelSize").value = v;
-  }
-  get pixelSize() {
-    return this.uniforms.get("pixelSize").value;
-  }
-  set bias(v) {
-    this.uniforms.get("bias").value = v;
-  }
-  get bias() {
-    return this.uniforms.get("bias").value;
-  }
-}
-
-const WrappedRetro = wrapEffect(RetroEffectImpl);
-
-const RetroEffect = forwardRef((props, ref) => {
-  const { colorNum, pixelSize, bias } = props;
-  return (
-    <WrappedRetro ref={ref} colorNum={colorNum} pixelSize={pixelSize} bias={bias} />
-  );
-});
-RetroEffect.displayName = "RetroEffect";
-
-function DitheredWaves({
-  waveSpeed,
-  waveFrequency,
-  waveAmplitude,
-  waveColor,
-  colorNum,
-  pixelSize,
-  disableAnimation,
-  enableMouseInteraction,
-  mouseRadius,
-  bias,
-}) {
-  const mesh = useRef(null);
-  const mouseRef = useRef(new THREE.Vector2());
-  const { viewport, size, gl } = useThree();
-
-  const waveUniformsRef = useRef({
-    time: new THREE.Uniform(0),
-    resolution: new THREE.Uniform(new THREE.Vector2(0, 0)),
-    waveSpeed: new THREE.Uniform(waveSpeed),
-    waveFrequency: new THREE.Uniform(waveFrequency),
-    waveAmplitude: new THREE.Uniform(waveAmplitude),
-    waveColor: new THREE.Uniform(new THREE.Color(...waveColor)),
-    mousePos: new THREE.Uniform(new THREE.Vector2(0, 0)),
-    enableMouseInteraction: new THREE.Uniform(enableMouseInteraction ? 1 : 0),
-    mouseRadius: new THREE.Uniform(mouseRadius),
-  });
-
-  useEffect(() => {
-    const dpr = gl.getPixelRatio();
-    const w = Math.floor(size.width * dpr),
-      h = Math.floor(size.height * dpr);
-    const res = waveUniformsRef.current.resolution.value;
-    if (res.x !== w || res.y !== h) {
-      res.set(w, h);
-    }
-  }, [size, gl]);
-
-  const prevColor = useRef([...waveColor]);
-  useFrame(({ clock }) => {
-    const u = waveUniformsRef.current;
-
-    if (!disableAnimation) {
-      u.time.value = clock.getElapsedTime();
-    }
-
-    if (u.waveSpeed.value !== waveSpeed) u.waveSpeed.value = waveSpeed;
-    if (u.waveFrequency.value !== waveFrequency)
-      u.waveFrequency.value = waveFrequency;
-    if (u.waveAmplitude.value !== waveAmplitude)
-      u.waveAmplitude.value = waveAmplitude;
-
-    if (!prevColor.current.every((v, i) => v === waveColor[i])) {
-      u.waveColor.value.set(...waveColor);
-      prevColor.current = [...waveColor];
-    }
-
-    u.enableMouseInteraction.value = enableMouseInteraction ? 1 : 0;
-    u.mouseRadius.value = mouseRadius;
-
-    if (enableMouseInteraction) {
-      u.mousePos.value.copy(mouseRef.current);
-    }
-  });
-
-  const handlePointerMove = (e) => {
-    if (!enableMouseInteraction) return;
-    const rect = gl.domElement.getBoundingClientRect();
-    const dpr = gl.getPixelRatio();
-    mouseRef.current.set(
-      (e.clientX - rect.left) * dpr,
-      (e.clientY - rect.top) * dpr
-    );
-  };
-
-  return (
-    <>
-      <mesh ref={mesh} scale={[viewport.width, viewport.height, 1]}>
-        <planeGeometry args={[1, 1]} />
-        <shaderMaterial
-          vertexShader={waveVertexShader}
-          fragmentShader={waveFragmentShader}
-          uniforms={waveUniformsRef.current}
-        />
-      </mesh>
-
-      <EffectComposer>
-        <RetroEffect colorNum={colorNum} pixelSize={pixelSize} bias={bias} />
-      </EffectComposer>
-
-      <mesh
-        onPointerMove={handlePointerMove}
-        position={[0, 0, 0.01]}
-        scale={[viewport.width, viewport.height, 1]}
-        visible={false}
-      >
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial transparent opacity={0} />
-      </mesh>
-    </>
-  );
-}
+const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 
 export default function Dither({
   waveSpeed = 0.05,
@@ -289,25 +83,202 @@ export default function Dither({
   mouseRadius = 1,
   bias = 0.2,
 }) {
-  return (
-    <Canvas
-      className="dither-container"
-      camera={{ position: [0, 0, 6] }}
-      dpr={1}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
-    >
-      <DitheredWaves
-        waveSpeed={waveSpeed}
-        waveFrequency={waveFrequency}
-        waveAmplitude={waveAmplitude}
-        waveColor={waveColor}
-        colorNum={colorNum}
-        pixelSize={pixelSize}
-        disableAnimation={disableAnimation}
-        enableMouseInteraction={enableMouseInteraction}
-        mouseRadius={mouseRadius}
-        bias={bias}
-      />
-    </Canvas>
+  const canvasRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  const mouseRef = useRef({ x: 0, y: 0, active: false });
+
+  const colorKey = useMemo(
+    () => waveColor.map((value) => Number(value) || 0).join(","),
+    [waveColor]
   );
+
+  const normalizedColor = useMemo(() => {
+    const [r = 0.5, g = 0.5, b = 0.5] = waveColor;
+    return [clamp(r), clamp(g), clamp(b)];
+  }, [colorKey]);
+
+  const safePixelSize = Math.max(1, Number(pixelSize) || 1);
+  const safeColorSteps = Math.max(2, Math.floor(Number(colorNum) || 2));
+  const safeMouseRadius = Math.max(0.001, Number(mouseRadius) || 0.001);
+  const safeBias = typeof bias === "number" ? bias : 0;
+  const safeFrequency = Math.max(0.5, Number(waveFrequency) || 1);
+  const safeSpeed = Math.max(0, Number(waveSpeed) || 0);
+  const safeAmplitude = Math.max(0, Number(waveAmplitude) || 0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    const container = canvas.parentElement ?? canvas;
+    const offscreen = document.createElement("canvas");
+    const offCtx = offscreen.getContext("2d", { willReadFrequently: true });
+    if (!offCtx) return;
+
+    let width = 0;
+    let height = 0;
+    let sampleWidth = 0;
+    let sampleHeight = 0;
+    let buffer = null;
+
+    const updateSize = () => {
+      const rect = container.getBoundingClientRect();
+      width = Math.max(1, Math.floor(rect.width) || 1);
+      height = Math.max(1, Math.floor(rect.height) || 1);
+      canvas.width = width;
+      canvas.height = height;
+      ctx.imageSmoothingEnabled = false;
+
+      sampleWidth = Math.max(1, Math.round(width / safePixelSize));
+      sampleHeight = Math.max(1, Math.round(height / safePixelSize));
+      offscreen.width = sampleWidth;
+      offscreen.height = sampleHeight;
+      buffer = offCtx.createImageData(sampleWidth, sampleHeight);
+    };
+
+    const pointer = mouseRef.current;
+
+    const sampleWave = (ux, uy, timeFactor) => {
+      let freq = safeFrequency;
+      let amp = 0.6 + safeAmplitude;
+      let sum = 0;
+      for (let octave = 0; octave < 4; octave++) {
+        const phase = timeFactor * (octave + 1);
+        sum += amp * Math.sin(ux * freq + phase);
+        sum += amp * 0.5 * Math.cos(uy * freq * 0.85 - phase * 1.3);
+        sum += amp * 0.25 * Math.sin((ux + uy) * freq * 0.65 - phase * 0.7);
+        freq *= 1.45;
+        amp *= 0.55 + safeAmplitude * 0.35;
+      }
+      return sum;
+    };
+
+    const drawFrame = (time = performance.now()) => {
+      if (!buffer) return;
+      const data = buffer.data;
+      const aspect = width / height || 1;
+      const pointerActive = enableMouseInteraction && pointer.active;
+      const colorStep = 1 / (safeColorSteps - 1);
+      const timeFactor = time * 0.001 * safeSpeed;
+
+      let ptr = 0;
+      for (let y = 0; y < sampleHeight; y++) {
+        for (let x = 0; x < sampleWidth; x++) {
+          const pixelIndex = ptr;
+          ptr += 4;
+
+          const pixelX = ((x + 0.5) / sampleWidth) * width;
+          const pixelY = ((y + 0.5) / sampleHeight) * height;
+          const normX = pixelX / width - 0.5;
+          const normY = pixelY / height - 0.5;
+          const uvx = normX * aspect;
+          const uvy = normY;
+
+          let value = sampleWave(uvx + uvy * 0.5, uvy - uvx * 0.35, timeFactor);
+          value = 0.5 + value * 0.35;
+          value = clamp(value, 0, 1);
+
+          if (pointerActive) {
+            const mouseX = pointer.x / width - 0.5;
+            const mouseY = pointer.y / height - 0.5;
+            const mouseAspectX = mouseX * aspect;
+            const mouseAspectY = -mouseY;
+            const dist = Math.hypot(uvx - mouseAspectX, uvy - mouseAspectY);
+            const influence = Math.max(0, 1 - dist / safeMouseRadius);
+            value -= 0.35 * influence;
+          }
+
+          const threshold = BAYER_MATRIX[(y & 7) * 8 + (x & 7)] - 0.25;
+          let quantized = clamp(value - safeBias + threshold * colorStep, 0, 1);
+          quantized = Math.round(quantized * (safeColorSteps - 1)) / (safeColorSteps - 1);
+
+          data[pixelIndex] = Math.round(clamp(normalizedColor[0] * quantized) * 255);
+          data[pixelIndex + 1] = Math.round(clamp(normalizedColor[1] * quantized) * 255);
+          data[pixelIndex + 2] = Math.round(clamp(normalizedColor[2] * quantized) * 255);
+          data[pixelIndex + 3] = 255;
+        }
+      }
+
+      offCtx.putImageData(buffer, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(offscreen, 0, 0, width, height);
+    };
+
+    updateSize();
+    if (disableAnimation) {
+      drawFrame();
+    } else {
+      const loop = (time) => {
+        drawFrame(time);
+        animationFrameRef.current = requestAnimationFrame(loop);
+      };
+      animationFrameRef.current = requestAnimationFrame(loop);
+    }
+
+    const handleResize = () => {
+      updateSize();
+      if (disableAnimation) {
+        drawFrame();
+      }
+    };
+
+    const handlePointerMove = (event) => {
+      if (!enableMouseInteraction) return;
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = event.clientX - rect.left;
+      pointer.y = event.clientY - rect.top;
+      pointer.active = true;
+      if (disableAnimation) {
+        drawFrame();
+      }
+    };
+
+    const handlePointerLeave = () => {
+      pointer.active = false;
+      if (disableAnimation) {
+        drawFrame();
+      }
+    };
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(handleResize)
+        : null;
+
+    resizeObserver?.observe(container);
+    window.addEventListener("resize", handleResize);
+    if (enableMouseInteraction) {
+      canvas.addEventListener("pointermove", handlePointerMove);
+      canvas.addEventListener("pointerdown", handlePointerMove);
+      canvas.addEventListener("pointerleave", handlePointerLeave);
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", handleResize);
+      if (enableMouseInteraction) {
+        canvas.removeEventListener("pointermove", handlePointerMove);
+        canvas.removeEventListener("pointerdown", handlePointerMove);
+        canvas.removeEventListener("pointerleave", handlePointerLeave);
+      }
+    };
+  }, [
+    safeBias,
+    disableAnimation,
+    enableMouseInteraction,
+    normalizedColor,
+    safeAmplitude,
+    safeColorSteps,
+    safeFrequency,
+    safeMouseRadius,
+    safePixelSize,
+    safeSpeed,
+  ]);
+
+  return <canvas ref={canvasRef} className="dither-container" />;
 }

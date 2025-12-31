@@ -1,182 +1,190 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-const DEFAULT_POLL_INTERVAL = 45000;
+const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
+const POLL_INTERVAL_MS = 20_000;
 
-const parseTrack = (payload) => {
-  if (!payload) return null;
-  const item = payload.item || payload.track || null;
+const getEnvVar = (key) => {
+  const value = import.meta.env[key];
+  if (!value || typeof value !== "string") return "";
+  return value.trim();
+};
 
-  const title = payload.title || item?.name || null;
-  const artist =
-    payload.artist ||
-    (item?.artists ? item.artists.map((artistEntry) => artistEntry.name).join(", ") : null);
-  const albumArtUrl = payload.albumArtUrl || item?.album?.images?.[0]?.url || null;
-  const songUrl = payload.songUrl || item?.external_urls?.spotify || payload.url || null;
+const extractArtwork = (images = []) => {
+  if (!Array.isArray(images) || !images.length) return null;
+  const reversed = [...images].reverse();
+  const withSrc = reversed.find((img) => typeof img?.["#text"] === "string" && img["#text"].trim());
+  return withSrc ? withSrc["#text"].trim() : null;
+};
 
-  if (!title || !artist) {
-    return null;
-  }
+const mapTrack = (entry) => {
+  if (!entry) return null;
+  const name = entry?.name?.trim();
+  const artistValue = entry?.artist?.["#text"] ?? entry?.artist;
+  const artist = typeof artistValue === "string" ? artistValue.trim() : "";
+  const albumValue = entry?.album?.["#text"] ?? entry?.album;
+  const album = typeof albumValue === "string" ? albumValue.trim() : "";
+  const nowPlaying = entry?.["@attr"]?.nowplaying === "true";
 
   return {
-    isPlaying: payload.isPlaying ?? payload.is_playing ?? false,
-    title,
-    artist,
-    albumArtUrl,
-    songUrl,
+    title: name || "Unknown track",
+    artist: artist || "Unknown artist",
+    album,
+    songUrl: entry?.url || "https://open.spotify.com",
+    artwork: extractArtwork(entry?.image),
+    isPlaying: nowPlaying,
   };
 };
 
+const buildRequestUrl = (username, apiKey) => {
+  if (!username || !apiKey) return null;
+  const params = new URLSearchParams({
+    method: "user.getrecenttracks",
+    user: username,
+    api_key: apiKey,
+    limit: "1",
+    format: "json",
+  });
+  return `${LASTFM_ENDPOINT}?${params.toString()}`;
+};
+
 export default function SpotifyNowPlaying({ theme = "dark" }) {
-  const endpoint = useMemo(
-    () => (import.meta.env.VITE_SPOTIFY_NOW_PLAYING_URL || "").trim(),
-    []
-  );
-  const isDev = import.meta.env.DEV;
-  const pollInterval = useMemo(() => {
-    const raw = Number(import.meta.env.VITE_SPOTIFY_POLL_INTERVAL);
-    if (Number.isFinite(raw) && raw > 5000) {
-      return raw;
-    }
-    return DEFAULT_POLL_INTERVAL;
-  }, []);
+  const username = useMemo(() => getEnvVar("VITE_LASTFM_USERNAME"), []);
+  const apiKey = useMemo(() => getEnvVar("VITE_LASTFM_API_KEY"), []);
+  const canFetch = Boolean(username && apiKey);
+
+  const requestUrl = useMemo(() => buildRequestUrl(username, apiKey), [username, apiKey]);
 
   const [track, setTrack] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const isMountedRef = useRef(true);
+  const mountedRef = useRef(false);
 
   useEffect(() => {
-    isMountedRef.current = true;
+    mountedRef.current = true;
     return () => {
-      isMountedRef.current = false;
+      mountedRef.current = false;
     };
   }, []);
 
-  const fetchNowPlaying = useCallback(async () => {
-    if (!endpoint) {
-      setIsLoading(false);
+  const fetchTrack = useCallback(async () => {
+    if (!requestUrl) {
+      if (mountedRef.current) {
+        setIsLoading(false);
+      }
       return;
     }
 
     try {
-      if (!isMountedRef.current) return;
+      if (!mountedRef.current) return;
       setError(null);
-      const response = await fetch(endpoint, {
-        headers: {
-          "cache-control": "no-cache",
-        },
-      });
-
-      if (response.status === 204) {
-        if (!isMountedRef.current) return;
-        setTrack(null);
-        setIsLoading(false);
-        return;
-      }
-
+      const response = await fetch(requestUrl, { headers: { "cache-control": "no-cache" } });
       if (!response.ok) {
-        throw new Error(`Spotify responded with ${response.status}`);
+        throw new Error(`Last.fm responded with ${response.status}`);
       }
-
       const payload = await response.json();
-      const parsedTrack = parseTrack(payload);
-      if (!isMountedRef.current) return;
-      setTrack(parsedTrack);
+      const latest = payload?.recenttracks?.track?.[0];
+      if (!mountedRef.current) return;
+      setTrack(mapTrack(latest));
     } catch (err) {
-      if (!isMountedRef.current) return;
-      setError("Unable to reach Spotify right now");
+      if (!mountedRef.current) return;
+      setError("Unable to reach Last.fm right now");
     } finally {
-      if (!isMountedRef.current) return;
+      if (!mountedRef.current) return;
       setIsLoading(false);
     }
-  }, [endpoint]);
+  }, [requestUrl]);
 
   useEffect(() => {
-    let isActive = true;
+    if (!canFetch) return undefined;
+    let intervalId;
 
-    const safeFetch = async () => {
-      if (!isActive) return;
-      await fetchNowPlaying();
+    const run = async () => {
+      await fetchTrack();
     };
 
-    safeFetch();
+    run();
 
-    if (!endpoint) {
-      return () => {
-        isActive = false;
-      };
-    }
-
-    const intervalId = window.setInterval(() => {
-      safeFetch();
-    }, pollInterval);
+    intervalId = window.setInterval(() => {
+      run();
+    }, POLL_INTERVAL_MS);
 
     return () => {
-      isActive = false;
       window.clearInterval(intervalId);
     };
-  }, [endpoint, fetchNowPlaying, pollInterval]);
+  }, [canFetch, fetchTrack]);
 
-  if (!endpoint) {
-    if (!isDev) {
-      return null;
-    }
-    return (
-      <div
-        className={`spotify-pill text-xs sm:text-sm font-semibold tracking-wide px-4 py-2 rounded-full border ${{
-          light: "bg-white/80 text-black border-black/10",
-          dark: "bg-black/70 text-white border-white/10",
-        }[theme]}`}
-      >
-        Configure Spotify to show what you're playing
-      </div>
-    );
+  if (!canFetch || !requestUrl) {
+    return null;
   }
 
-  const baseClasses =
+  const pillTheme =
     theme === "light"
       ? "bg-white/80 text-black border-black/10"
       : "bg-black/70 text-white border-white/10";
 
+  const iconTheme = theme === "light" ? "bg-black text-white" : "bg-white text-black";
+
+  const statusText = (() => {
+    if (isLoading) return "Connecting";
+    if (track?.isPlaying) return "Now Playing";
+    if (track) return "Recently Played";
+    if (error) return "Status";
+    return "Idle";
+  })();
+
   return (
-    <div
-      className={`spotify-pill relative flex items-center gap-3 px-4 py-2 rounded-full border ${baseClasses} backdrop-blur-md shadow-lg`}
-      aria-live="polite"
-    >
-      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
-      <div className="flex items-center gap-3">
-        {track?.albumArtUrl ? (
-          <img
-            src={track.albumArtUrl}
-            alt="Album art"
-            className="w-8 h-8 rounded-md object-cover border border-white/10"
-            draggable={false}
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-md bg-white/10" aria-hidden="true" />
-        )}
-        <div className="flex flex-col leading-tight">
-          <span className="text-xs uppercase opacity-60">Now Playing</span>
-          {isLoading ? (
-            <span className="text-sm font-semibold">Connecting…</span>
-          ) : error ? (
-            <span className="text-sm font-semibold">{error}</span>
-          ) : track ? (
-            <a
-              href={track.songUrl || "https://open.spotify.com"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-semibold hover:underline"
+    <div className="w-full flex justify-center">
+      <div
+        className={`spotify-pill relative flex items-center gap-3 px-4 py-2 rounded-full border ${pillTheme} backdrop-blur-md shadow-lg`}
+        aria-live="polite"
+      >
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${iconTheme}`}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="w-5 h-5"
+              aria-hidden="true"
+              role="img"
             >
-              {track.title}
-            </a>
-          ) : (
-            <span className="text-sm font-semibold">Paused</span>
-          )}
-          <span className="text-xs opacity-70">
-            {track?.artist || (error ? "" : "Spotify")}
-          </span>
+              <path d="M12 1.5C6.21 1.5 1.5 6.21 1.5 12S6.21 22.5 12 22.5 22.5 17.79 22.5 12 17.79 1.5 12 1.5zm4.82 15.39a.9.9 0 01-1.24.32 8.51 8.51 0 00-8.96 0 .9.9 0 11-.92-1.55 10.31 10.31 0 019.99 0 .9.9 0 01.32 1.23zm1.26-2.83a.99.99 0 01-1.36.34 11.77 11.77 0 00-12.09 0 .99.99 0 01-1-1.7 13.55 13.55 0 0114.09 0 .99.99 0 01.36 1.36zm.13-3.01a1.1 1.1 0 01-1.51.38 15.26 15.26 0 00-15.45 0 1.09 1.09 0 11-1.13-1.86 17.05 17.05 0 0117.71 0 1.09 1.09 0 01.38 1.48z" />
+            </svg>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="text-xs uppercase opacity-60 tracking-widest">{statusText}</span>
+            {error ? (
+              <span className="text-sm font-semibold">{error}</span>
+            ) : isLoading ? (
+              <span className="text-sm font-semibold">Connecting…</span>
+            ) : track ? (
+              <a
+                href={track.songUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-semibold hover:underline"
+              >
+                {track.title}
+              </a>
+            ) : (
+              <span className="text-sm font-semibold">Nothing queued</span>
+            )}
+            <span className="text-xs opacity-70">
+              {track?.artist || (error ? "Last.fm" : "Waiting for scrobbles")}
+            </span>
+          </div>
         </div>
+
+        {track?.artwork && (
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20">
+            <img
+              src={track.artwork}
+              alt={track.title}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
