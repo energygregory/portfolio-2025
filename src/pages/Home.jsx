@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useRef, useCallback } from "react"
 import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import LiquidLogo from "../components/LiquidLogo";
+import SpotifyNowPlaying from "../components/SpotifyNowPlaying";
 import logos from "../data/logos";
 
 // Logo for chrome effect (PNG)
@@ -34,6 +35,7 @@ const images2025 = [
   "/Images/2025/BEANIE 1.png",
   "/Images/2025/grey beanie.png",
   "/Images/2025/RED.png",
+  "/Images/2025/RED2b.png",
   "/Images/2025/front.png",
   "/Images/2025/coloured puffer.png",
   // Row 5
@@ -85,6 +87,13 @@ const images2025 = [
   "/Images/2025/brown front.png",
   "/Images/2025/brown back.png",
   "/Images/2025/brown pants back.png",
+  // Row 12 - new color drops
+  "/Images/2025/blue1.png",
+  "/Images/2025/blue2.png",
+  "/Images/2025/green1.png",
+  "/Images/2025/green2.png",
+  "/Images/2025/red1.png",
+  "/Images/2025/red2.png",
 ];
 
 const reducedSizeImages2025 = new Set([
@@ -107,6 +116,10 @@ const expandedSizeImages2025 = new Set([
 const slightlyExpandedImages2025 = new Set([
   "/Images/2025/mcap1.png",
   "/Images/2025/mcap2.png",
+  "/Images/2025/RED.png",
+  "/Images/2025/RED2b.png",
+  "/Images/2025/around1.png",
+  "/Images/2025/around2.png",
 ]);
 
 // Logos used for the logo-strip — same source as App's list (kept local here for the Home page placement)
@@ -339,13 +352,16 @@ export default function Home({ theme = "dark" }) {
         >
           <div 
             ref={logoWrapperRef}
-            className="w-full"
+            className="w-full relative flex flex-col items-center gap-4"
             style={{ 
               maxWidth: isPhone ? '90vw' : '800px', 
               maxHeight: isPhone ? '90vw' : '800px',
               height: isPhone ? 'auto' : '70vh',
             }}
           >
+            <div className="w-full flex justify-center px-2 -mt-4">
+              <SpotifyNowPlaying theme={theme} />
+            </div>
             <LiquidLogo logoUrl={logoPath} />
           </div>
         </div>
