@@ -397,6 +397,19 @@ body {
   }
 }
 
+/* Fully suppress focus/tap ring for theme toggle button */
+.theme-toggle-btn {
+  -webkit-tap-highlight-color: transparent;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.theme-toggle-btn:focus,
+.theme-toggle-btn:focus-visible,
+.theme-toggle-btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Sort bar styling (theme-aware) */
 .sort-button {
   font-family: "PT Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;

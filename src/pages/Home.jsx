@@ -670,7 +670,7 @@ function HeroLogoSequence({ theme = 'dark' }) {
   // Outline color: specific grey for dark mode on home page only
   const outlineColor = theme === 'dark' ? '#4d4d4d' : undefined;
 
-  const [scale, setScale] = useState(() => {
+  const [scale] = useState(() => {
     try {
       const v = localStorage.getItem('heroLogoScale');
       return v ? parseFloat(v) : 1.0;
@@ -679,28 +679,11 @@ function HeroLogoSequence({ theme = 'dark' }) {
     }
   });
 
-  useEffect(() => {
-    try { localStorage.setItem('heroLogoScale', String(scale)); } catch {}
-  }, [scale]);
-
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
       {/* Render AnimatedLogo with `start` controlled; style color sets stroke via currentColor */}
       <div style={{ transform: `translateZ(0) scale(${scale})`, transformOrigin: '50% 50%' }}>
         <AnimatedLogo start={start} className="w-full h-auto" style={{ color: outlineColor }} />
-      </div>
-      {/* Scale slider */}
-      <div className="mt-2 flex items-center gap-2 opacity-80">
-        <span className="text-[10px]">Scale</span>
-        <input
-          type="range"
-          min="0.7"
-          max="1.3"
-          step="0.01"
-          value={scale}
-          onChange={(e) => setScale(parseFloat(e.target.value))}
-          className="w-full"
-        />
       </div>
     </div>
   );

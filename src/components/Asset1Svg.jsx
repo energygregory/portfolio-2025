@@ -19,9 +19,22 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "" }
   }, []);
 
   // Theme styles: dark = fill #4d4d4d, light = stroke black, no fill
-  const overrideCss = theme === "dark"
-    ? `svg path { fill: #4d4d4d !important; stroke: #4d4d4d !important; }`
-    : `svg path { fill: none !important; stroke: #000000 !important; }`;
+  const darkCss = [
+    'svg path, svg rect, svg circle, svg polygon, svg polyline, svg ellipse {',
+    '  fill: #4d4d4d !important;',
+    '  stroke: none !important;',
+    '}',
+  ].join('\n');
+
+  const lightCss = [
+    'svg path, svg rect, svg circle, svg polygon, svg polyline, svg ellipse {',
+    '  fill: none !important;',
+    '  stroke: #000000 !important;',
+    '  stroke-width: 0.05px !important;',
+    '}',
+  ].join('\n');
+
+  const overrideCss = theme === "dark" ? darkCss : lightCss;
 
   if (!svgMarkup) return null;
 
