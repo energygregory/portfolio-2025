@@ -356,34 +356,33 @@ export default function Home({ theme = "dark" }) {
             <div className="w-full flex justify-center px-2">
               {/* <SpotifyNowPlaying theme={theme} /> */}
             </div>
-            {/* Light mode: 1221.webm, Dark mode: animation.webm */}
-            {theme === 'light' ? (
+            {/* Render both videos stacked and crossfade by opacity so switching
+                themes doesn't remount/restart playback. Both videos play in
+                parallel; we simply fade between them. This assumes the two
+                assets are identical content in different colours (as noted). */}
+            <div className="relative w-full h-auto select-none" style={{ transform: 'scale(1.5)' }}>
               <video
-                key="light-video"
                 autoPlay
                 loop
                 muted
                 playsInline
-                className="w-full h-auto object-contain select-none"
-                style={{ transform: 'scale(1.5)' }}
+                className={`w-full h-auto object-contain transition-opacity duration-500 ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
                 draggable={false}
               >
                 <source src="/1221.webm" type="video/webm" />
               </video>
-            ) : (
+
               <video
-                key="dark-video"
                 autoPlay
                 loop
                 muted
                 playsInline
-                className="w-full h-auto object-contain select-none"
-                style={{ transform: 'scale(1.5)' }}
+                className={`absolute inset-0 w-full h-auto object-contain transition-opacity duration-500 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
                 draggable={false}
               >
                 <source src="/animation.webm" type="video/webm" />
               </video>
-            )}
+            </div>
           </div>
         </div>
 

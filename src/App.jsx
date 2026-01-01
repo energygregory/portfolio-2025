@@ -163,12 +163,28 @@ function App() {
   
   // Asset1 remains visible on desktop; mobile stays hidden via CSS
 
-  // Theme state with toggle
-  const [theme, setTheme] = useState("dark");
-  
-  const toggleTheme = () => {
-    setTheme(prev => prev === "dark" ? "light" : "dark");
+  // Theme state with toggle — initialize from localStorage or prefers-color-scheme
+  const getInitialTheme = () => {
+    if (typeof window === 'undefined') return 'dark';
+    const stored = window.localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   };
+
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  // Persist theme choice so refresh keeps user's preference
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('theme', theme);
+    } catch (e) {
+      // ignore
+    }
+  }, [theme]);
 
   // Slider state to fine-tune the theme-toggle horizontal position (px)
   const [iconOffset, setIconOffset] = useState(-8); // default matches -right-2 (~-8px)
