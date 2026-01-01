@@ -233,8 +233,8 @@ function App() {
       <header
         className={`
           z-50 flex justify-center items-center app-header
-          sm:sticky sm:top-0 sm:p-4 sm:border-b 
-          fixed bottom-4 left-1/2 -translate-x-1/2 w-auto p-2 rounded-full border
+          sm:sticky sm:top-0 sm:p-4 sm:border-b
+          fixed bottom-4 left-1/2 -translate-x-1/2 w-auto py-2 px-6 sm:px-4 rounded-full border
           ${
             theme === "dark"
               ? "border-neutral-800 bg-black/80 backdrop-blur-sm"
