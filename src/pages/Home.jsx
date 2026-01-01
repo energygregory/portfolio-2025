@@ -660,8 +660,8 @@ export default function Home({ theme = "dark" }) {
 
 // Inline hero sequence: start AnimatedLogo immediately with theme-based stroke
 function HeroLogoSequence({ theme = 'dark' }) {
-  // Stroke color: #4d4d4d for dark mode, black for light mode
-  const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
+  // Stroke color: #4d4d4d for dark mode, white for light mode
+  const strokeColor = theme === 'dark' ? '#4d4d4d' : '#ffffff';
 
   const [scale] = useState(() => {
     try {
