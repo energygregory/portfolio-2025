@@ -342,7 +342,7 @@ function App() {
           alt=""
           className="block sm:hidden pointer-events-none opacity-30 absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{
-            transform: `translateX(${assetX}px) translateY(${assetY}px) scaleX(${assetH * assetScale}) scaleY(${assetV * assetScale})`,
+            transform: `translateX(calc(-50% + ${assetX}px)) translateY(${assetY}px) scaleX(${assetH * assetScale}) scaleY(${assetV * assetScale})`,
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
