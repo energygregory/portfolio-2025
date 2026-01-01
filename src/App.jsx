@@ -379,7 +379,7 @@ function App() {
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
         {/* Mobile-only decorative Asset1 - behind main content */}
         <img
-          src="/LOGOS/Asset 1.png"
+          src="/LOGOS/Asset 1.svg"
           alt=""
           className="block sm:hidden pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{

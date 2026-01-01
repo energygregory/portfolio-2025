@@ -1,19 +1,18 @@
 import { useEffect, useRef } from "react";
 import { animate, svg, stagger } from "animejs";
 
-export default function AnimatedLogo({ className = "" }) {
+export default function AnimatedLogo({ className = "", start = true, style = {} }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
+    if (!start) return;
 
     // Get all path elements in the SVG
     const paths = containerRef.current.querySelectorAll("path");
 
     // Create drawable proxies for each path
-    const drawables = Array.from(paths).map(
-      (path) => svg.createDrawable(path)[0]
-    );
+    const drawables = Array.from(paths).map((path) => svg.createDrawable(path)[0]);
 
     // Animate the draw property with stagger for a cascading effect, looping infinitely
     animate(drawables, {
@@ -24,10 +23,10 @@ export default function AnimatedLogo({ className = "" }) {
       loop: true,
       loopDelay: 2000,
     });
-  }, []);
+  }, [start]);
 
   return (
-    <div ref={containerRef} className={className}>
+    <div ref={containerRef} className={className} style={style}>
       <svg
         id="animated-logo"
         xmlns="http://www.w3.org/2000/svg"

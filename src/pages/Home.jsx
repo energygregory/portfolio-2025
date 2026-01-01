@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useRef, useCallback } from "react"
 import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import LiquidLogo from "../components/LiquidLogo";
+import AnimatedLogo from "../components/AnimatedLogo";
 // import SpotifyNowPlaying from "../components/SpotifyNowPlaying";
 import logos from "../data/logos";
 
@@ -240,12 +241,15 @@ export default function Home({ theme = "dark" }) {
       setHasScrolled(scrollY > 20);
     }
     
-    // Animations for both mobile and desktop
-    const logoTranslateY = progress * (isPhone ? -100 : -150);
-    const logoScale = 1 - progress * (isPhone ? 0.1 : 0.15);
-    const logoOpacity = 1 - progress; // Fully fade out the logo
-    const shoulderOpacity = Math.max(0, 1 - progress);
-    const shoulderRotation = progress * 360;
+    // Ease the progress for much smoother motion (easeOutCubic)
+    const eased = 1 - Math.pow(1 - progress, 3);
+
+    // Animations for both mobile and desktop (use eased values)
+    const logoTranslateY = eased * (isPhone ? -100 : -150);
+    const logoScale = 1 - eased * (isPhone ? 0.1 : 0.15);
+    const logoOpacity = 1 - eased; // Fully fade out the logo
+    const shoulderOpacity = Math.max(0, 1 - eased);
+    const shoulderRotation = eased * 360;
     
     if (logoWrapperRef.current) {
       logoWrapperRef.current.style.transform = `translate3d(0, ${logoTranslateY}px, 0) scale(${logoScale})`;
@@ -360,31 +364,14 @@ export default function Home({ theme = "dark" }) {
                 themes doesn't remount/restart playback. Both videos play in
                 parallel; we simply fade between them. This assumes the two
                 assets are identical content in different colours (as noted). */}
-            <div className="relative w-full h-auto select-none" style={{ transform: 'scale(1.5)' }}>
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className={`w-full h-auto object-contain transition-opacity duration-500 ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
-                draggable={false}
-              >
-                <source src="/1221.webm" type="video/webm" />
-              </video>
-
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className={`absolute inset-0 w-full h-auto object-contain transition-opacity duration-500 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
-                draggable={false}
-              >
-                <source src="/animation.webm" type="video/webm" />
-              </video>
+            <div className="relative w-full h-auto select-none flex items-center justify-center" style={{ transform: 'scale(1.5)' }}>
+              {/* Replace hero videos with loading animation placeholder + outlined logo sequence */}
+              <HeroLogoSequence theme={theme} />
             </div>
           </div>
         </div>
+
+        {/* Hero logo sequence component (inline below) */}
 
         {/* Mobile: Scrolling marquee of 2025 images - fades out as you scroll */}
         {isPhone && !hasScrolled && (
@@ -668,5 +655,25 @@ export default function Home({ theme = "dark" }) {
         </div>
       </section>
     </main>
+  );
+}
+
+// Inline hero sequence: show static outlined logo for 1s, then start the AnimatedLogo
+function HeroLogoSequence({ theme = 'dark' }) {
+  const [start, setStart] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setStart(true), 1000); // show outline for 1s
+    return () => clearTimeout(t);
+  }, []);
+
+  // Outline color: grey for dark mode on home page only
+  const outlineColor = theme === 'dark' ? '#9CA3AF' : undefined; // tailwind gray-400
+
+  return (
+    <div style={{ width: '100%', maxWidth: 420 }}>
+      {/* Render AnimatedLogo with `start` controlled; style color sets stroke via currentColor */}
+      <AnimatedLogo start={start} className="w-full h-auto" style={{ color: outlineColor }} />
+    </div>
   );
 }
