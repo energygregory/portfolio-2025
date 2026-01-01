@@ -658,17 +658,10 @@ export default function Home({ theme = "dark" }) {
   );
 }
 
-// Inline hero sequence: show static outlined logo for 1s, then start the AnimatedLogo
+// Inline hero sequence: start AnimatedLogo immediately with theme-based stroke
 function HeroLogoSequence({ theme = 'dark' }) {
-  const [start, setStart] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setStart(true), 1000); // show outline for 1s
-    return () => clearTimeout(t);
-  }, []);
-
-  // Outline color: specific grey for dark mode on home page only
-  const outlineColor = theme === 'dark' ? '#4d4d4d' : undefined;
+  // Stroke color: #4d4d4d for dark mode, black for light mode
+  const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
 
   const [scale] = useState(() => {
     try {
@@ -681,9 +674,9 @@ function HeroLogoSequence({ theme = 'dark' }) {
 
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
-      {/* Render AnimatedLogo with `start` controlled; style color sets stroke via currentColor */}
+      {/* Render AnimatedLogo starting immediately; style color sets stroke via currentColor */}
       <div style={{ transform: `translateZ(0) scale(${scale})`, transformOrigin: '50% 50%' }}>
-        <AnimatedLogo start={start} className="w-full h-auto" style={{ color: outlineColor }} />
+        <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor }} />
       </div>
     </div>
   );

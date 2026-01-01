@@ -415,7 +415,7 @@ function App() {
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
-            opacity: assetHidden ? 0 : (appliedTheme === 'dark' ? 0.3 : 1),
+            opacity: assetHidden ? 0 : 1,
             transition: 'opacity 300ms ease, transform 300ms ease',
             willChange: 'opacity, transform',
           }}
