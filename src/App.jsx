@@ -170,6 +170,10 @@ function App() {
     setTheme(prev => prev === "dark" ? "light" : "dark");
   };
 
+  // Slider state to fine-tune the theme-toggle horizontal position (px)
+  const [iconOffset, setIconOffset] = useState(-8); // default matches -right-2 (~-8px)
+  const [showSlider, setShowSlider] = useState(true);
+
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -229,6 +233,28 @@ function App() {
       }} />
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
+      {/* SLIDER (fixed above the pill) - visible while adjusting */}
+      <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-60 ${showSlider ? "" : "hidden"}`}>
+        <div className={`p-3 rounded-md flex items-center gap-3 shadow-lg ${theme === 'dark' ? 'bg-black/80 text-white border border-neutral-800' : 'bg-white/90 text-black border border-neutral-300'}`}>
+          <label className="text-xs font-medium">Adjust icon position</label>
+          <input
+            type="range"
+            min="-40"
+            max="40"
+            value={iconOffset}
+            onChange={(e) => setIconOffset(Number(e.target.value))}
+            className="w-48"
+          />
+          <span className="text-xs w-12 text-center">{iconOffset}px</span>
+          <button
+            onClick={() => setShowSlider(false)}
+            className="ml-2 px-3 py-1 rounded bg-green-600 text-white text-xs"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+
       {/* NAV BAR (CENTERED LINKS) */}
       <header
         className={`
@@ -256,7 +282,8 @@ function App() {
         {/* Theme toggle - Now visible on mobile floating nav */}
         <button
           onClick={toggleTheme}
-          className="absolute -right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+          className="absolute top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+          style={{ right: `${iconOffset}px` }}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         >
           {theme === "dark" ? (
