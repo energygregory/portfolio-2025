@@ -202,6 +202,8 @@ function App() {
   const [assetH, setAssetH] = useState(1); // horizontal stretch (scaleX)
   const [assetV, setAssetV] = useState(1); // vertical stretch (scaleY)
   const [assetX, setAssetX] = useState(0); // horizontal position (px)
+  const [assetScale, setAssetScale] = useState(1); // overall scale
+  const [assetY, setAssetY] = useState(0); // vertical position (px)
 
   // Scroll to top on route change
   useEffect(() => {
@@ -340,7 +342,7 @@ function App() {
           alt=""
           className="block sm:hidden pointer-events-none opacity-30 absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{
-            transform: `translateX(${assetX}px) scaleX(${assetH}) scaleY(${assetV})`,
+            transform: `translateX(${assetX}px) translateY(${assetY}px) scaleX(${assetH * assetScale}) scaleY(${assetV * assetScale})`,
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
@@ -350,6 +352,11 @@ function App() {
         {/* Mobile-only sliders: horizontal stretch, vertical stretch, horizontal position */}
         <div className="fixed bottom-32 left-1/2 -translate-x-1/2 sm:hidden" style={{ zIndex: 9999 }}>
           <div className={`p-3 rounded-md flex flex-col gap-3 shadow-lg ${appliedTheme === 'dark' ? 'bg-black/80 text-white border border-neutral-800' : 'bg-white/90 text-black border border-neutral-300'}`}>
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-medium">Scale</label>
+              <input type="range" min="0.5" max="2" step="0.01" value={assetScale} onChange={(e) => setAssetScale(Number(e.target.value))} className="w-40" />
+              <span className="text-xs w-12 text-center">{assetScale.toFixed(2)}</span>
+            </div>
             <div className="flex items-center gap-3">
               <label className="text-xs font-medium">Horiz stretch</label>
               <input type="range" min="0.5" max="2" step="0.01" value={assetH} onChange={(e) => setAssetH(Number(e.target.value))} className="w-40" />
@@ -361,9 +368,14 @@ function App() {
               <span className="text-xs w-12 text-center">{assetV.toFixed(2)}</span>
             </div>
             <div className="flex items-center gap-3">
-              <label className="text-xs font-medium">Position</label>
+              <label className="text-xs font-medium">X position</label>
               <input type="range" min="-200" max="200" step="1" value={assetX} onChange={(e) => setAssetX(Number(e.target.value))} className="w-40" />
               <span className="text-xs w-12 text-center">{assetX}px</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-medium">Y position</label>
+              <input type="range" min="-200" max="200" step="1" value={assetY} onChange={(e) => setAssetY(Number(e.target.value))} className="w-40" />
+              <span className="text-xs w-12 text-center">{assetY}px</span>
             </div>
           </div>
         </div>
