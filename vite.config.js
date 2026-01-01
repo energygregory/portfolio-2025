@@ -4,6 +4,18 @@ import react from "@vitejs/plugin-react";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'liquid-logo': ['./src/components/LiquidLogo.jsx'],
+          'dither': ['./src/components/Dither.jsx'],
+          'ascii-effects': ['./src/components/AsciiEffect.jsx', './src/components/AsciiSceneDark.jsx', './src/components/AsciiSceneLight.jsx'],
+          'animations': ['./src/components/LogoLoop.jsx', './src/components/MultiRowLogoLoop.jsx', './src/components/MetallicPaint.jsx'],
+        },
+      },
+    },
+  },
   server: {
     // Allow connections from specific public tunnel hosts used for testing.
     // You can add more hostnames here if needed.

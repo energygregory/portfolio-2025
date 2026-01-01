@@ -102,7 +102,7 @@ if (typeof document !== 'undefined') {
     }
   });
 }
-const Home = lazy(() => import("./pages/Home.jsx"));
+import Home from "./pages/Home.jsx";
 const Work = lazy(() => import("./pages/Work.jsx"));
 const About = lazy(() => import("./pages/About.jsx"));
 const Contact = lazy(() => import("./pages/Contact.jsx"));
@@ -152,6 +152,8 @@ const portfolioLogos = [
 ];
 
 function App() {
+  console.log('App component is rendering');
+  
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -159,17 +161,7 @@ function App() {
   const [slideTransition, setSlideTransition] = useState(false);
   const prevPathRef = useRef(location.pathname);
   
-  // Track scroll to hide Asset1 on mobile
-  const [hideAsset1, setHideAsset1] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      setHideAsset1(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check initial state
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Asset1 remains visible on desktop; mobile stays hidden via CSS
 
   // Theme state with toggle
   const [theme, setTheme] = useState("dark");
@@ -297,23 +289,13 @@ function App() {
       </header>
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
-      <div className="relative flex-1 overflow-hidden">
-        {/* The decorative SVG - on top of everything */}
-        {/* Mobile: stretched horizontally, squeezed vertically, hide on scroll */}
-        {/* Desktop: fills entire content area */}
-        <div 
-          className={`absolute pointer-events-none z-50 overflow-hidden flex items-center justify-center left-[-25%] right-[-25%] top-0 h-[55vh] sm:left-0 sm:right-0 sm:h-auto sm:inset-0 transition-opacity duration-300 ${hideAsset1 ? 'opacity-0 sm:opacity-100' : 'opacity-100'}`}
-        >
-          <Suspense fallback={null}> 
-            <LiquidLogo 
-              logoUrl="/LOGOS/Asset 1.png" 
-              logoScale={1.2} 
-              effectScale={0.6} 
-            />
-          </Suspense>
-        </div>
+      <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
+        {/* The decorative SVG - BEHIND main content */}
+        {/* Mobile: hidden */}
+        {/* Desktop: fills entire viewport height as background decoration, masked at center */}
+        {/* Asset1 overlay hidden */}
         
-        {/* Main content */}
+        {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}

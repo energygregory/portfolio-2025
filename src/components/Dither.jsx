@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef } from "react";
 
 import "./Dither.css";
 
+const isMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+};
+
 const BAYER_MATRIX = [
   0 / 64,
   48 / 64,
@@ -210,8 +214,15 @@ export default function Dither({
     if (disableAnimation) {
       drawFrame();
     } else {
+      const targetFPS = isMobile() ? 30 : 60;
+      const frameInterval = 1000 / targetFPS;
+      let lastFrameTime = 0;
       const loop = (time) => {
-        drawFrame(time);
+        const elapsed = time - lastFrameTime;
+        if (elapsed >= frameInterval) {
+          drawFrame(time);
+          lastFrameTime = time - (elapsed % frameInterval);
+        }
         animationFrameRef.current = requestAnimationFrame(loop);
       };
       animationFrameRef.current = requestAnimationFrame(loop);

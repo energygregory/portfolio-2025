@@ -353,7 +353,8 @@ export default function LiquidLogo({
   className = '', 
   opacity = 1, 
   logoScale: propLogoScale, 
-  effectScale: propEffectScale
+  effectScale: propEffectScale,
+  quality = 'auto' // 'auto' | 'high' | 'balanced' | 'mobile'
 }) {
   const canvasRef = useRef(null);
   const glRef = useRef(null);
@@ -366,10 +367,9 @@ export default function LiquidLogo({
   const scrollTimeoutRef = useRef(null);
   const [textureReady, setTextureReady] = useState(false);
 
-  // Track scroll state to pause animation on mobile
+  // Track scroll state on mobile (no longer pausing frames, just informative)
   useEffect(() => {
     if (!isMobile()) return;
-    
     const handleScroll = () => {
       isScrollingRef.current = true;
       if (scrollTimeoutRef.current) {
@@ -377,9 +377,8 @@ export default function LiquidLogo({
       }
       scrollTimeoutRef.current = setTimeout(() => {
         isScrollingRef.current = false;
-      }, 150);
+      }, 100);
     };
-    
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -529,22 +528,36 @@ export default function LiquidLogo({
     const resizeTimeout = setTimeout(resize, 100);
     const resizeTimeout2 = setTimeout(resize, 500);
 
-    // Get preset based on device
-    const preset = isMobile() ? mobilePreset : chromePreset;
-    const targetFPS = isMobile() ? 24 : 60;
+    // Select preset and FPS based on quality + device
+    let preset;
+    let targetFPS;
+    const mobile = isMobile();
+    if (quality === 'high') {
+      preset = chromePreset;
+      targetFPS = 60;
+    } else if (quality === 'balanced') {
+      preset = { ...chromePreset, iterations: Math.min(chromePreset.iterations, 20) };
+      targetFPS = 60;
+    } else if (quality === 'mobile') {
+      preset = { ...mobilePreset, iterations: 20, noiseIntensity: 8.0, logoInteractStrength: 0.03 };
+      targetFPS = 30;
+    } else {
+      // auto
+      if (mobile) {
+        preset = { ...mobilePreset, iterations: 20, noiseIntensity: 8.0, logoInteractStrength: 0.03 };
+        targetFPS = 30;
+      } else {
+        preset = chromePreset;
+        targetFPS = 60;
+      }
+    }
     const frameInterval = 1000 / targetFPS;
     let lastFrameTime = 0;
 
     // Animation loop
     const render = (currentTime) => {
-      // Skip rendering while scrolling on mobile for smoother scroll
-      if (isMobile() && isScrollingRef.current) {
-        frameRef.current = requestAnimationFrame(render);
-        return;
-      }
-      
       // Throttle frame rate on mobile
-      if (isMobile()) {
+      if (mobile) {
         const elapsed = currentTime - lastFrameTime;
         if (elapsed < frameInterval) {
           frameRef.current = requestAnimationFrame(render);

@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
 import LogoLoop from "../components/LogoLoop";
 import MultiRowLogoLoop from "../components/MultiRowLogoLoop";
 import LiquidLogo from "../components/LiquidLogo";
-import SpotifyNowPlaying from "../components/SpotifyNowPlaying";
+// import SpotifyNowPlaying from "../components/SpotifyNowPlaying";
 import logos from "../data/logos";
 
 // Logo for chrome effect (PNG)
-const logoPath = "/LOGOS/newlogo.png";
+const logoPath = "/LOGOS/newlogo.svg";
 
 // 2025 Images from public/Images/2025 folder - organized in rows of 6
 const images2025 = [
@@ -171,6 +170,8 @@ const portfolioLogos = [
 ];
 
 export default function Home({ theme = "dark" }) {
+  console.log('Home component is rendering');
+  
   const [isPhone, setIsPhone] = useState(false);
   const [isTabletOrLarger, setIsTabletOrLarger] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -242,7 +243,7 @@ export default function Home({ theme = "dark" }) {
     // Animations for both mobile and desktop
     const logoTranslateY = progress * (isPhone ? -100 : -150);
     const logoScale = 1 - progress * (isPhone ? 0.1 : 0.15);
-    const logoOpacity = 1 - progress * 0.3;
+    const logoOpacity = 1 - progress; // Fully fade out the logo
     const shoulderOpacity = Math.max(0, 1 - progress);
     const shoulderRotation = progress * 360;
     
@@ -262,8 +263,8 @@ export default function Home({ theme = "dark" }) {
     }
     
     if (imagesRef.current) {
-      // On mobile, start at opacity 0 then fade to 1 when scrolled
-      const gridOpacity = isPhone ? (hasScrolled ? 1 : 0) : progress;
+      // On mobile, fade in the grid smoothly as you scroll
+      const gridOpacity = progress;
       imagesRef.current.style.opacity = gridOpacity;
       imagesRef.current.style.transform = `translate3d(0, ${isPhone ? 0 : (1 - progress) * 100}px, 0)`;
     }
@@ -271,9 +272,16 @@ export default function Home({ theme = "dark" }) {
 
   // Scroll handler - BOTH MOBILE AND DESKTOP
   useEffect(() => {
+    let lastUpdateTime = 0;
+    const throttleMs = isPhone ? 1000 / 30 : 0; // 30fps on mobile, 60fps on desktop
+    
     const handleScroll = () => {
       scrollYRef.current = window.scrollY;
-      requestAnimationFrame(updateScrollAnimations);
+      const now = Date.now();
+      if (now - lastUpdateTime >= throttleMs) {
+        lastUpdateTime = now;
+        requestAnimationFrame(updateScrollAnimations);
+      }
     };
     
     scrollYRef.current = window.scrollY;
@@ -281,7 +289,7 @@ export default function Home({ theme = "dark" }) {
     
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [updateScrollAnimations]);
+  }, [updateScrollAnimations, isPhone]);
 
   const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
   const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
@@ -290,33 +298,7 @@ export default function Home({ theme = "dark" }) {
 
   return (
     <main className={`min-h-screen flex flex-col overflow-x-hidden relative ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
-      {/* Light mode video background */}
-      {theme === 'light' && (
-        <div className="fixed inset-0 z-0 overflow-hidden">
-          {/* Mobile video (portrait) */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="sm:hidden absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/6707366-hd_1080_1920_30fps.mp4" type="video/mp4" />
-          </video>
-          {/* Tablet/Desktop video (landscape) */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="hidden sm:block absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/854985-hd_1280_720_25fps.mp4" type="video/mp4" />
-          </video>
-          {/* Overlay to ensure content readability */}
-          <div className="absolute inset-0 bg-white/40" />
-        </div>
-      )}
+      {/* Light mode video background removed */}
       
       {/* cl: Left shoulder symbol with liquid chrome metallic effect - HIDDEN */}
       {/* <div 
@@ -366,18 +348,50 @@ export default function Home({ theme = "dark" }) {
               maxWidth: isPhone ? '90vw' : '800px', 
               maxHeight: isPhone ? '80vw' : '800px',
               height: isPhone ? 'auto' : '70vh',
+              willChange: 'transform',
+              backfaceVisibility: 'hidden',
+              transform: 'translateZ(0)',
             }}
           >
             <div className="w-full flex justify-center px-2">
-              <SpotifyNowPlaying theme={theme} />
+              {/* <SpotifyNowPlaying theme={theme} /> */}
             </div>
-            <LiquidLogo logoUrl={logoPath} />
+            {/* Light mode: 1221.webm, Dark mode: animation.webm */}
+            {theme === 'light' ? (
+              <video
+                key="light-video"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto object-contain select-none"
+                style={{ transform: 'scale(1.5)' }}
+                draggable={false}
+              >
+                <source src="/1221.webm" type="video/webm" />
+              </video>
+            ) : (
+              <video
+                key="dark-video"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto object-contain select-none"
+                style={{ transform: 'scale(1.5)' }}
+                draggable={false}
+              >
+                <source src="/animation.webm" type="video/webm" />
+              </video>
+            )}
           </div>
         </div>
 
-        {/* Mobile: Scrolling marquee of 2025 images (before user scrolls) */}
+        {/* Mobile: Scrolling marquee of 2025 images - fades out as you scroll */}
         {isPhone && !hasScrolled && (
-          <div className="w-full overflow-hidden py-4 mt-12">
+          <div 
+            className="w-full overflow-hidden py-4 mt-24 transition-opacity duration-300"
+          >
             <div 
               className="flex gap-6 animate-marquee"
               style={{
@@ -392,6 +406,8 @@ export default function Home({ theme = "dark" }) {
                   alt="" 
                   className="w-12 h-12 object-contain flex-shrink-0"
                   draggable={false}
+                  decoding="async"
+                  fetchpriority="low"
                 />
               ))}
             </div>
@@ -408,7 +424,12 @@ export default function Home({ theme = "dark" }) {
         <div 
           ref={imagesRef}
           className={`relative z-10 px-6 pb-24 ${isPhone ? 'mt-4' : '-mt-[50vh]'}`}
-          style={{ opacity: isPhone && !hasScrolled ? 0 : undefined, willChange: 'transform, opacity' }}
+          style={{ 
+            opacity: isPhone && !hasScrolled ? 0 : undefined, 
+            willChange: 'transform, opacity',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+          }}
         >
           <div className="max-w-7xl mx-auto">
             {/* 6 Column Image Grid - Small with lots of space */}
@@ -441,6 +462,7 @@ export default function Home({ theme = "dark" }) {
                         !isPhone ? 'hover:scale-110 transition-transform duration-500' : ''
                       }`}
                       loading="lazy"
+                      decoding="async"
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}
                       onDragStart={(e) => e.preventDefault()}
@@ -465,6 +487,7 @@ export default function Home({ theme = "dark" }) {
             src={pressedImage.src}
             alt="Preview"
             className="max-w-[80vw] max-h-[80vh] object-contain"
+            decoding="async"
           />
         </div>
       )}
@@ -490,43 +513,43 @@ export default function Home({ theme = "dark" }) {
           <div className="flex flex-col items-center gap-6 sm:gap-12 mb-16 sm:mb-32">
             {/* Row 1: Around, Tribe of God, Terzo, Sleekster, Legacy Drip, Asset 3 */}
             <div className="flex items-center justify-center gap-4 sm:gap-12 md:gap-16">
-              <Link to="/around" className="opacity-80 hover:opacity-100 transition-opacity">
+              <div className="opacity-80">
                 <img src="/LOGOS/around.svg" alt="Around" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
-              </Link>
-              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/tribeofGod.svg" alt="Tribe of God" className="h-4 sm:h-8 w-auto dark:invert" draggable={false} />
-              </Link>
-              <Link to="/terzo" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/Logo 1 in whitw.svg" alt="Terzo" className="h-4 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
-              </Link>
-              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/sleekster.svg" alt="Sleekster" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
-              </Link>
-              <Link to="/legacydrip" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/legacydrip.svg" alt="Legacy Drip" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
-              </Link>
-              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/Asset 3.svg" alt="Asset 3" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
-              </Link>
+              </div>
             </div>
 
             {/* Row 2: William Ru, En Garde, Brand Two, Fly High, Semanu Studios */}
             <div className="flex items-center justify-center gap-4 sm:gap-12 md:gap-16">
-              <Link to="/williamru" className="opacity-80 hover:opacity-100 transition-opacity">
+              <div className="opacity-80">
                 <img src="/LOGOS/William Ru.svg" alt="William Ru" className="h-4 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
-              </Link>
-              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/en garde.svg" alt="En Garde" className="h-6 sm:h-12 w-auto dark:invert" draggable={false} />
-              </Link>
-              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/BRAND-TWO.svg" alt="Brand Two" className="h-6 sm:h-12 w-auto dark:invert" draggable={false} />
-              </Link>
-              <Link to="/flyhigh" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/flyhigh.svg" alt="Fly High" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
-              </Link>
-              <Link to="/work" className="opacity-80 hover:opacity-100 transition-opacity">
+              </div>
+              <div className="opacity-80">
                 <img src="/LOGOS/semanu studios.svg" alt="Semanu Studios" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
-              </Link>
+              </div>
             </div>
           </div>
         </div>

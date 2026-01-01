@@ -31,30 +31,27 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange, onIn
     const runInitialLoader = async () => {
       setVisible(true);
 
-      const NAV_DELAY_MS = 1400;
+      const isMobile = window.innerWidth < 768;
+      const NAV_DELAY_MS = isMobile ? 800 : 1400;
       await new Promise((resolve) => setTimeout(resolve, NAV_DELAY_MS));
 
       // Fade out
-      const FADE_DURATION_MS = 300;
+      const FADE_DURATION_MS = isMobile ? 300 : 500;
       const overlayEl = document.getElementById("nav-loader-overlay");
       if (overlayEl) {
-        overlayEl.style.transition = `opacity ${FADE_DURATION_MS}ms ease, transform ${FADE_DURATION_MS}ms ease`;
-        requestAnimationFrame(() => {
-          overlayEl.style.opacity = "0";
-          overlayEl.style.transform = "scale(0.98)";
-        });
+        overlayEl.style.transition = `opacity ${FADE_DURATION_MS}ms ease-in-out`;
+        overlayEl.style.opacity = "0";
       }
 
       setTimeout(() => {
         if (onVisibleChange) onVisibleChange(false);
-
         setVisible(false);
         if (overlayEl) {
+          overlayEl.style.display = 'none';
+          overlayEl.style.opacity = "";
           overlayEl.style.transition = "";
-          overlayEl.style.opacity = "0";
-          overlayEl.style.transform = "";
         }
-      }, FADE_DURATION_MS + 50);
+      }, FADE_DURATION_MS);
     };
 
     runInitialLoader();
@@ -107,7 +104,8 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange, onIn
         setVisible(true);
 
         // navigate after delay so the logo animation is visible
-        const NAV_DELAY_MS = 1400;
+        const isMobile = window.innerWidth < 768;
+        const NAV_DELAY_MS = isMobile ? 800 : 1400;
         setTimeout(() => {
           if (targetRef.current) navigate(targetRef.current);
         }, NAV_DELAY_MS);
