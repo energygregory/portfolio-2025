@@ -282,8 +282,8 @@ function App() {
         {/* Theme toggle - Now visible on mobile floating nav */}
         <button
           onClick={toggleTheme}
-          className="absolute top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
-          style={{ right: `${iconOffset}px` }}
+          className="absolute top-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+          style={{ right: `${iconOffset}px`, transform: 'translateY(-50%) scale(1.12)' }}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         >
           {theme === "dark" ? (
