@@ -231,14 +231,19 @@ function App() {
 
       {/* NAV BAR (CENTERED LINKS) */}
       <header
-        className={`sticky top-0 z-50 p-3 sm:p-4 border-b flex justify-center items-center app-header ${
-          theme === "dark"
-            ? "border-neutral-800 bg-black"
-            : "border-neutral-300 bg-white"
-        }`}
+        className={`
+          z-50 flex justify-center items-center app-header
+          sm:sticky sm:top-0 sm:p-4 sm:border-b 
+          fixed bottom-4 left-1/2 -translate-x-1/2 w-auto p-2 rounded-full border
+          ${
+            theme === "dark"
+              ? "border-neutral-800 bg-black/80 backdrop-blur-sm"
+              : "border-neutral-300 bg-white/80 backdrop-blur-sm"
+          }
+        `}
       >
-        {/* Top-left clickable logo that always links to home */}
-        <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2">
+        {/* Top-left clickable logo - HIDDEN ON MOBILE FLOATING NAV */}
+        <div className="hidden sm:block absolute left-2 sm:left-4 top-1/2 -translate-y-1/2">
           <Link to="/" aria-label="Home">
             <img
               src="/LOGOS/newlogo.svg"
@@ -248,10 +253,10 @@ function App() {
           </Link>
         </div>
         
-        {/* Theme toggle - top right */}
+        {/* Theme toggle - HIDDEN ON MOBILE FLOATING NAV */}
         <button
           onClick={toggleTheme}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+          className="hidden sm:block absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         >
           {theme === "dark" ? (
@@ -266,7 +271,7 @@ function App() {
         </button>
         
         {/* Show all nav links on all devices */}
-        <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm">
+        <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm px-2">
           <NavLink
             to="/"
             className={({ isActive }) =>
