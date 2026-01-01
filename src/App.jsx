@@ -172,6 +172,8 @@ function App() {
 
   // Slider state to fine-tune the theme-toggle horizontal position (px)
   const [iconOffset, setIconOffset] = useState(-8); // default matches -right-2 (~-8px)
+  // Slider to adjust left padding of the pill (px)
+  const [pillPadding, setPillPadding] = useState(32); // corresponds to px-8
   const [showSlider, setShowSlider] = useState(true);
 
   // Scroll to top on route change
@@ -235,28 +237,47 @@ function App() {
 
       {/* SLIDER (fixed above the pill) - visible while adjusting */}
       <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 ${showSlider ? "" : "hidden"}`} style={{ zIndex: 9999 }}>
-        <div className={`p-3 rounded-md flex items-center gap-3 shadow-lg ${theme === 'dark' ? 'bg-black/80 text-white border border-neutral-800' : 'bg-white/90 text-black border border-neutral-300'}`}>
-          <label className="text-xs font-medium">Adjust icon position</label>
-          <input
-            type="range"
-            min="-40"
-            max="40"
-            value={iconOffset}
-            onChange={(e) => setIconOffset(Number(e.target.value))}
-            className="w-48"
-          />
-          <span className="text-xs w-12 text-center">{iconOffset}px</span>
-          <button
-            onClick={() => setShowSlider(false)}
-            className="ml-2 px-3 py-1 rounded bg-green-600 text-white text-xs"
-          >
-            OK
-          </button>
+        <div className={`p-3 rounded-md flex flex-col sm:flex-row items-center gap-3 shadow-lg ${theme === 'dark' ? 'bg-black/80 text-white border border-neutral-800' : 'bg-white/90 text-black border border-neutral-300'}`}>
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-medium">Icon pos</label>
+            <input
+              type="range"
+              min="-40"
+              max="40"
+              value={iconOffset}
+              onChange={(e) => setIconOffset(Number(e.target.value))}
+              className="w-48"
+            />
+            <span className="text-xs w-12 text-center">{iconOffset}px</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-medium">Pill left</label>
+            <input
+              type="range"
+              min="0"
+              max="80"
+              value={pillPadding}
+              onChange={(e) => setPillPadding(Number(e.target.value))}
+              className="w-48"
+            />
+            <span className="text-xs w-12 text-center">{pillPadding}px</span>
+          </div>
+
+          <div className="flex items-center">
+            <button
+              onClick={() => setShowSlider(false)}
+              className="ml-2 px-3 py-1 rounded bg-green-600 text-white text-xs"
+            >
+              OK
+            </button>
+          </div>
         </div>
       </div>
 
       {/* NAV BAR (CENTERED LINKS) */}
       <header
+        style={{ paddingLeft: `${pillPadding}px` }}
         className={`
           z-50 flex justify-center items-center app-header
           sm:sticky sm:top-0 sm:p-4 sm:border-b
