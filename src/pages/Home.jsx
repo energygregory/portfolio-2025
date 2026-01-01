@@ -458,11 +458,12 @@ export default function Home({ theme = "dark" }) {
                     <img 
                       src={src} 
                       alt=""
-                      className={`max-w-full max-h-full object-contain select-none ${
-                        !isPhone ? 'hover:scale-110 transition-transform duration-500' : ''
+                      className={`max-w-full max-h-full object-contain select-none transition-transform duration-500 ${
+                        !isPhone ? 'hover:scale-110' : ''
                       }`}
                       loading="lazy"
                       decoding="async"
+                      fetchpriority="low"
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}
                       onDragStart={(e) => e.preventDefault()}
