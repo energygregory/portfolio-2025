@@ -172,6 +172,8 @@ function App() {
   };
 
   const [theme, setTheme] = useState(getInitialTheme);
+  // appliedTheme is what we apply to document classes/background — update it after a short delay
+  const [appliedTheme, setAppliedTheme] = useState(theme);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -184,13 +186,43 @@ function App() {
     } catch (e) {
       // ignore
     }
+  }, [appliedTheme]);
+
+  // When `theme` changes (controls video opacity), delay applying the theme classes
+  useEffect(() => {
+    const timer = setTimeout(() => setAppliedTheme(theme), 500); // match video transition duration
+    return () => clearTimeout(timer);
   }, [theme]);
 
-  // Slider state to fine-tune the theme-toggle horizontal position (px)
-  const [iconOffset, setIconOffset] = useState(-8); // default matches -right-2 (~-8px)
-  // Slider to adjust left padding of the pill (px)
-  const [pillPadding, setPillPadding] = useState(32); // corresponds to px-8
-  const [showSlider, setShowSlider] = useState(true);
+  // icon/pill positions — initialize from localStorage so final values persist
+  const getInitialIconOffset = () => {
+    try {
+      const v = window.localStorage.getItem('iconOffset');
+      return v !== null ? Number(v) : -8;
+    } catch (e) {
+      return -8;
+    }
+  };
+  const getInitialPillPadding = () => {
+    try {
+      const v = window.localStorage.getItem('pillPadding');
+      return v !== null ? Number(v) : 32;
+    } catch (e) {
+      return 32;
+    }
+  };
+
+  const [iconOffset, setIconOffset] = useState(getInitialIconOffset);
+  const [pillPadding, setPillPadding] = useState(getInitialPillPadding);
+
+  // Persist iconOffset and pillPadding so final adjustments survive reloads
+  useEffect(() => {
+    try { window.localStorage.setItem('iconOffset', String(iconOffset)); } catch (e) {}
+  }, [iconOffset]);
+
+  useEffect(() => {
+    try { window.localStorage.setItem('pillPadding', String(pillPadding)); } catch (e) {}
+  }, [pillPadding]);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -212,7 +244,8 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "dark") {
+    // Apply visual theme changes based on appliedTheme (delayed)
+    if (appliedTheme === "dark") {
       root.classList.add("dark", "theme-dark");
       root.classList.remove("theme-light");
       root.style.backgroundColor = "#000000";
@@ -230,7 +263,7 @@ function App() {
 
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
+      metaTheme.setAttribute("content", appliedTheme === "dark" ? "#000000" : "#ffffff");
     }
   }, [theme]);
 
@@ -238,11 +271,11 @@ function App() {
     <>
       <div
         id="app-content"
-        className={`min-h-screen relative flex flex-col overflow-x-hidden ${
-          theme === "dark"
-            ? "bg-black text-white theme-dark"
-            : "bg-white text-black theme-light"
-        }`}
+          className={`min-h-screen relative flex flex-col overflow-x-hidden ${
+            appliedTheme === "dark"
+              ? "bg-black text-white theme-dark"
+              : "bg-white text-black theme-light"
+          }`}
       >
       <NavigationLoader theme={theme} onInitialLoad={() => {
         // Remove the initial HTML loader when React's NavigationLoader takes over
@@ -252,44 +285,7 @@ function App() {
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       {/* SLIDER (fixed above the pill) - visible while adjusting */}
-      <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 ${showSlider ? "" : "hidden"}`} style={{ zIndex: 9999 }}>
-        <div className={`p-3 rounded-md flex flex-col sm:flex-row items-center gap-3 shadow-lg ${theme === 'dark' ? 'bg-black/80 text-white border border-neutral-800' : 'bg-white/90 text-black border border-neutral-300'}`}>
-          <div className="flex items-center gap-3">
-            <label className="text-xs font-medium">Icon pos</label>
-            <input
-              type="range"
-              min="-40"
-              max="40"
-              value={iconOffset}
-              onChange={(e) => setIconOffset(Number(e.target.value))}
-              className="w-48"
-            />
-            <span className="text-xs w-12 text-center">{iconOffset}px</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <label className="text-xs font-medium">Pill left</label>
-            <input
-              type="range"
-              min="0"
-              max="80"
-              value={pillPadding}
-              onChange={(e) => setPillPadding(Number(e.target.value))}
-              className="w-48"
-            />
-            <span className="text-xs w-12 text-center">{pillPadding}px</span>
-          </div>
-
-          <div className="flex items-center">
-            <button
-              onClick={() => setShowSlider(false)}
-              className="ml-2 px-3 py-1 rounded bg-green-600 text-white text-xs"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Slider removed — final positions are persisted in localStorage */}
 
       {/* NAV BAR (CENTERED LINKS) */}
       <header
