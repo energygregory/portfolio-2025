@@ -205,6 +205,47 @@ function App() {
   const assetX = 4; // horizontal position (px)
   const assetY = -200; // vertical position (px)
 
+  // Track small-screen state and whether user has scrolled (to hide Asset1)
+  const [isPhone, setIsPhone] = useState(false);
+  const [assetHidden, setAssetHidden] = useState(false);
+
+  useEffect(() => {
+    const phoneMql = window.matchMedia('(max-width: 640px)');
+    const onPhoneChange = (e) => setIsPhone(e.matches);
+    setIsPhone(phoneMql.matches);
+    if (phoneMql.addEventListener) phoneMql.addEventListener('change', onPhoneChange);
+    else phoneMql.addListener(onPhoneChange);
+    return () => {
+      if (phoneMql.removeEventListener) phoneMql.removeEventListener('change', onPhoneChange);
+      else phoneMql.removeListener(onPhoneChange);
+    };
+  }, []);
+
+  // Hide Asset1 when user scrolls on mobile (match Home's threshold)
+  useEffect(() => {
+    let rafId = null;
+    let last = 0;
+    const throttleMs = isPhone ? 1000 / 30 : 0;
+    const handler = () => {
+      const now = Date.now();
+      const doUpdate = () => {
+        setAssetHidden(window.scrollY > 20);
+      };
+      if (now - last >= throttleMs) {
+        last = now;
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(doUpdate);
+      }
+    };
+    window.addEventListener('scroll', handler, { passive: true });
+    // initialize
+    setAssetHidden(window.scrollY > 20);
+    return () => {
+      window.removeEventListener('scroll', handler);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [isPhone]);
+
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -340,12 +381,14 @@ function App() {
         <img
           src="/LOGOS/Asset 1.png"
           alt=""
-          className="block sm:hidden pointer-events-none opacity-30 absolute left-1/2 top-12 -translate-x-1/2 z-20"
+          className="block sm:hidden pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{
             transform: `translateX(calc(-50% + ${assetX}px)) translateY(${assetY}px) scaleX(${assetH * assetScale}) scaleY(${assetV * assetScale})`,
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
+            opacity: assetHidden ? 0 : 0.3,
+            transition: 'opacity 300ms ease',
           }}
         />
 
