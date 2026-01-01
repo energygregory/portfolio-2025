@@ -56,3 +56,13 @@
 .page-transition {
   animation: slideInFromRight 0.5s ease-out;
 }
+
+/* Suppress tap highlight and focus ring for the theme toggle button */
+.theme-toggle-btn {
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle-btn:focus,
+.theme-toggle-btn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}

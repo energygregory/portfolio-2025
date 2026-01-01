@@ -114,6 +114,7 @@ const LegacyDrip = lazy(() => import("./pages/LegacyDrip.jsx"));
 const PriceList = lazy(() => import("./pages/PriceList.jsx"));
 
 import NavigationLoader from "./components/NavigationLoader";
+import Asset1Svg from "./components/Asset1Svg";
 const Footer = lazy(() => import("./components/Footer"));
 const LiquidLogo = lazy(() => import("./components/LiquidLogo"));
 
@@ -246,6 +247,32 @@ function App() {
     };
   }, [isPhone]);
 
+  // Nav pill hide at page bottom, reveal when user scrolls up
+  const [navHidden, setNavHidden] = useState(false);
+  const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
+  useEffect(() => {
+    let raf = null;
+    const onScroll = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const atBottom = window.innerHeight + y >= document.documentElement.scrollHeight - 20;
+        if (atBottom) {
+          setNavHidden(true);
+        } else if (y < lastScrollY.current) {
+          // scrolling up -> show
+          setNavHidden(false);
+        }
+        lastScrollY.current = y;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -287,7 +314,7 @@ function App() {
     if (metaTheme) {
       metaTheme.setAttribute("content", appliedTheme === "dark" ? "#000000" : "#ffffff");
     }
-  }, [theme]);
+  }, [appliedTheme]);
 
   return (
     <>
@@ -315,6 +342,8 @@ function App() {
           z-50 flex justify-center items-center app-header
           sm:sticky sm:top-0 sm:p-4 sm:border-b
           fixed bottom-12 left-1/2 -translate-x-1/2 w-auto py-2 px-8 sm:px-6 rounded-full border
+          transition-transform transition-opacity duration-300 ease-in-out
+          ${navHidden ? 'translate-y-6 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
           ${
             theme === "dark"
               ? "border-neutral-800 bg-black/80 backdrop-blur-sm"
@@ -336,8 +365,8 @@ function App() {
         {/* Theme toggle - Now visible on mobile floating nav */}
         <button
           onClick={toggleTheme}
-          className="absolute top-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
-          style={{ right: `${iconOffset}px`, transform: 'translateY(-50%) scale(1.12)' }}
+          className="theme-toggle-btn absolute top-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 active:ring-0"
+          style={{ right: `${iconOffset}px`, transform: 'translateY(-50%) scale(1.12)', WebkitTapHighlightColor: 'transparent' }}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         >
           {theme === "dark" ? (
@@ -378,17 +407,17 @@ function App() {
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
         {/* Mobile-only decorative Asset1 - behind main content */}
-        <img
-          src="/LOGOS/Asset 1.svg"
-          alt=""
+        <Asset1Svg
+          theme={appliedTheme}
           className="block sm:hidden pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{
             transform: `translateX(calc(-50% + ${assetX}px)) translateY(${assetY}px) scaleX(${assetH * assetScale}) scaleY(${assetV * assetScale})`,
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
-            opacity: assetHidden ? 0 : 0.3,
-            transition: 'opacity 300ms ease',
+            opacity: assetHidden ? 0 : (appliedTheme === 'dark' ? 0.3 : 1),
+            transition: 'opacity 300ms ease, transform 300ms ease',
+            willChange: 'opacity, transform',
           }}
         />
 
