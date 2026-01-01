@@ -234,7 +234,7 @@ function App() {
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       {/* SLIDER (fixed above the pill) - visible while adjusting */}
-      <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-60 ${showSlider ? "" : "hidden"}`}>
+      <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 ${showSlider ? "" : "hidden"}`} style={{ zIndex: 9999 }}>
         <div className={`p-3 rounded-md flex items-center gap-3 shadow-lg ${theme === 'dark' ? 'bg-black/80 text-white border border-neutral-800' : 'bg-white/90 text-black border border-neutral-300'}`}>
           <label className="text-xs font-medium">Adjust icon position</label>
           <input
