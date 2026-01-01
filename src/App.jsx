@@ -214,6 +214,7 @@ function App() {
 
   const [iconOffset, setIconOffset] = useState(getInitialIconOffset);
   const [pillPadding, setPillPadding] = useState(getInitialPillPadding);
+  const [showSlider, setShowSlider] = useState(true);
 
   // Persist iconOffset and pillPadding so final adjustments survive reloads
   useEffect(() => {
@@ -285,7 +286,44 @@ function App() {
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       {/* SLIDER (fixed above the pill) - visible while adjusting */}
-      {/* Slider removed — final positions are persisted in localStorage */}
+      <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 ${showSlider ? "" : "hidden"}`} style={{ zIndex: 9999 }}>
+        <div className={`p-3 rounded-md flex flex-col sm:flex-row items-center gap-3 shadow-lg ${appliedTheme === 'dark' ? 'bg-black/80 text-white border border-neutral-800' : 'bg-white/90 text-black border border-neutral-300'}`}>
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-medium">Icon pos</label>
+            <input
+              type="range"
+              min="-40"
+              max="40"
+              value={iconOffset}
+              onChange={(e) => setIconOffset(Number(e.target.value))}
+              className="w-48"
+            />
+            <span className="text-xs w-12 text-center">{iconOffset}px</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-medium">Pill left</label>
+            <input
+              type="range"
+              min="0"
+              max="80"
+              value={pillPadding}
+              onChange={(e) => setPillPadding(Number(e.target.value))}
+              className="w-48"
+            />
+            <span className="text-xs w-12 text-center">{pillPadding}px</span>
+          </div>
+
+          <div className="flex items-center">
+            <button
+              onClick={() => setShowSlider(false)}
+              className="ml-2 px-3 py-1 rounded bg-green-600 text-white text-xs"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* NAV BAR (CENTERED LINKS) */}
       <header
