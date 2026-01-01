@@ -253,10 +253,10 @@ function App() {
           </Link>
         </div>
         
-        {/* Theme toggle - HIDDEN ON MOBILE FLOATING NAV */}
+        {/* Theme toggle - Now visible on mobile floating nav */}
         <button
           onClick={toggleTheme}
-          className="hidden sm:block absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         >
           {theme === "dark" ? (
@@ -270,12 +270,26 @@ function App() {
           )}
         </button>
         
-        {/* Show all nav links on all devices */}
+        {/* Nav links container */}
         <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm px-2">
+          {/* Home Icon for Mobile */}
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `nav-link inline ${isActive ? "active" : ""}`
+              `nav-link sm:hidden ${isActive ? "active" : ""}`
+            }
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+              <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+            </svg>
+          </NavLink>
+          
+          {/* Text links for desktop */}
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `nav-link hidden sm:inline ${isActive ? "active" : ""}`
             }
             style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
