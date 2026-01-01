@@ -338,7 +338,7 @@ function App() {
         <img
           src="/LOGOS/Asset 1.png"
           alt=""
-          className="block sm:hidden pointer-events-none opacity-30 absolute left-1/2 top-12 -translate-x-1/2 z-0"
+          className="block sm:hidden pointer-events-none opacity-30 absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{
             transform: `translateX(${assetX}px) scaleX(${assetH}) scaleY(${assetV})`,
             width: '140%',
