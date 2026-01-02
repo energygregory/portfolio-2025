@@ -11,55 +11,47 @@ const logoPath = "/LOGOS/newlogo.svg";
 
 // 2025 Images from public/Images/2025 folder - organized in rows of 6
 const images2025 = [
-  // Row 1 - black1, black2, white1, white2 together
   "/Images/2025/black1.png",
   "/Images/2025/black2.png",
   "/Images/2025/white1.png",
   "/Images/2025/white2.png",
   "/Images/2025/black.png",
   "/Images/2025/white.png",
-  // Row 2
   "/Images/2025/1.png",
   "/Images/2025/2.png",
   "/Images/2025/3.png",
   "/Images/2025/4b.png",
   "/Images/2025/4.png",
   "/Images/2025/5.png",
-  // Row 3 - hoodie blue 1, hoodie blue 2, final pants 2, hoodie black 1, hoodie black 2, final pants
   "/Images/2025/hoodie blue 1.png",
   "/Images/2025/hoodie blue 2.png",
   "/Images/2025/final pants 2.png",
   "/Images/2025/hoodie black 1.png",
   "/Images/2025/hoodie black 2.png",
   "/Images/2025/final pants.png",
-  // Row 4
   "/Images/2025/BEANIE 1.png",
   "/Images/2025/grey beanie.png",
   "/Images/2025/RED.png",
   "/Images/2025/RED2b.png",
   "/Images/2025/front.png",
   "/Images/2025/coloured puffer.png",
-  // Row 5
   "/Images/2025/bandana3.png",
   "/Images/2025/bandana4.png",
   "/Images/2025/bandana5.png",
   "/Images/2025/bandana8.png",
   "/Images/2025/t shirt 1.png",
   "/Images/2025/sweapants 1.png",
-  // Row 6 - boxes (using box2a and box3a)
   "/Images/2025/box2a.png",
   "/Images/2025/box3a.png",
   "/Images/2025/gyan front.png",
   "/Images/2025/gyan back.png",
   "/Images/2025/hofa.png",
   "/Images/2025/hofb.png",
-  // Row 7
   "/Images/2025/mockup.png",
   "/Images/2025/zm.png",
   "/Images/2025/zm2.png",
   "/Images/2025/s1.png",
   "/Images/2025/s2.png",
-  // Row 8 - hats and headwear
   "/Images/2025/HAT1.png",
   "/Images/2025/HAT5.png",
   "/Images/2025/HAT6.png",
@@ -67,34 +59,48 @@ const images2025 = [
   "/Images/2025/wrhat2.png",
   "/Images/2025/wrhat3.png",
   "/Images/2025/wrhat4.png",
-  // Row 9 - Around + caps + first WR set
   "/Images/2025/around1.png",
   "/Images/2025/around2.png",
   "/Images/2025/mcap1.png",
   "/Images/2025/mcap2.png",
   "/Images/2025/wr1.png",
   "/Images/2025/wr2.png",
-  // Row 10 - remaining WR looks
   "/Images/2025/wr3.png",
   "/Images/2025/wr4.png",
   "/Images/2025/wr5.png",
   "/Images/2025/wr6.png",
   "/Images/2025/wr7.png",
   "/Images/2025/wr8.png",
-  // Row 11 - cream & brown line
   "/Images/2025/cream front.png",
   "/Images/2025/cream back.png",
   "/Images/2025/cream pants back.png",
   "/Images/2025/brown front.png",
   "/Images/2025/brown back.png",
   "/Images/2025/brown pants back.png",
-  // Row 12 - new color drops
   "/Images/2025/blue1.png",
   "/Images/2025/blue2.png",
   "/Images/2025/green1.png",
   "/Images/2025/green2.png",
   "/Images/2025/red1.png",
   "/Images/2025/red2.png",
+  // NEW images added:
+  "/Images/2025/251.png",
+  "/Images/2025/Layer 0.png",
+  "/Images/2025/white front.png",
+  "/Images/2025/black front.png",
+  "/Images/2025/grey front.png",
+  "/Images/2025/blue copy 2.png",
+  "/Images/2025/blue copy.png",
+  "/Images/2025/mesh1.png",
+  "/Images/2025/mesh2.png",
+  "/Images/2025/red copy 2.png",
+  "/Images/2025/red copy.png",
+  "/Images/2025/t1.png",
+  "/Images/2025/t2.png",
+  "/Images/2025/t3.png",
+  "/Images/2025/t4.png",
+  "/Images/2025/tff.png",
+  "/Images/2025/tfff.png",
 ];
 
 const reducedSizeImages2025 = new Set([
@@ -121,6 +127,23 @@ const slightlyExpandedImages2025 = new Set([
   "/Images/2025/RED2b.png",
   "/Images/2025/around1.png",
   "/Images/2025/around2.png",
+  "/Images/2025/box2a.png",
+  "/Images/2025/box3a.png",
+]);
+
+// Slightly reduced size images
+const slightlyReducedImages2025 = new Set([
+  "/Images/2025/blue copy 2.png",
+  "/Images/2025/red copy 2.png",
+]);
+
+// Uniformly reduced size images
+const uniformReducedImages2025 = new Set([
+  "/Images/2025/251.png",
+  "/Images/2025/Layer 0.png",
+  "/Images/2025/white front.png",
+  "/Images/2025/black front.png",
+  "/Images/2025/grey front.png",
 ]);
 
 // Logos used for the logo-strip — same source as App's list (kept local here for the Home page placement)
@@ -424,13 +447,19 @@ export default function Home({ theme = "dark" }) {
                 const isReduced = reducedSizeImages2025.has(src);
                 const isExpanded = expandedSizeImages2025.has(src);
                 const isSlightlyExpanded = slightlyExpandedImages2025.has(src);
+                const isSlightlyReduced = slightlyReducedImages2025.has(src);
+                const isUniformReduced = uniformReducedImages2025.has(src);
                 const sizeClasses = isExpanded
                   ? 'w-[60px] h-[60px] sm:w-[110px] sm:h-[110px] md:w-[140px] md:h-[140px]'
                   : isSlightlyExpanded
                     ? 'w-[55px] h-[55px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px]'
                     : isReduced
                       ? 'w-[35px] h-[35px] sm:w-[70px] sm:h-[70px] md:w-[80px] md:h-[80px]'
-                      : 'w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px]';
+                      : isSlightlyReduced
+                        ? 'w-[42px] h-[42px] sm:w-[85px] sm:h-[85px] md:w-[100px] md:h-[100px]'
+                        : isUniformReduced
+                          ? 'w-[38px] h-[38px] sm:w-[78px] sm:h-[78px] md:w-[90px] md:h-[90px]'
+                          : 'w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px]';
 
                 return (
                   <div 
@@ -487,7 +516,7 @@ export default function Home({ theme = "dark" }) {
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <h3
-            className="text-center text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400 mb-12"
+            className="text-center text-xs sm:text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400 mb-12"
             style={{
               fontFamily:
                 "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
@@ -499,43 +528,43 @@ export default function Home({ theme = "dark" }) {
           {/* Logo Grid - 2 rows, first row longer, all centered */}
           <div className="flex flex-col items-center gap-6 sm:gap-12 mb-16 sm:mb-32">
             {/* Row 1: Around, Tribe of God, Terzo, Sleekster, Legacy Drip, Asset 3 */}
-            <div className="flex items-center justify-center gap-4 sm:gap-12 md:gap-16">
+            <div className="flex items-center justify-center gap-2 sm:gap-12 md:gap-16">
               <div className="opacity-80">
-                <img src="/LOGOS/around.svg" alt="Around" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/around.svg" alt="Around" className="h-3 sm:h-10 w-auto dark:invert" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/tribeofGod.svg" alt="Tribe of God" className="h-4 sm:h-8 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/tribeofGod.svg" alt="Tribe of God" className="h-2.5 sm:h-8 w-auto dark:invert" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/Logo 1 in whitw.svg" alt="Terzo" className="h-4 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
+                <img src="/LOGOS/Logo 1 in whitw.svg" alt="Terzo" className="h-2.5 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/sleekster.svg" alt="Sleekster" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/sleekster.svg" alt="Sleekster" className="h-2 sm:h-6 w-auto dark:invert" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/legacydrip.svg" alt="Legacy Drip" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/legacydrip.svg" alt="Legacy Drip" className="h-3 sm:h-10 w-auto dark:invert" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/Asset 3.svg" alt="Asset 3" className="h-5 sm:h-10 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/Asset 3.svg" alt="Asset 3" className="h-3 sm:h-10 w-auto dark:invert" draggable={false} />
               </div>
             </div>
 
             {/* Row 2: William Ru, En Garde, Brand Two, Fly High, Semanu Studios */}
             <div className="flex items-center justify-center gap-4 sm:gap-12 md:gap-16">
               <div className="opacity-80">
-                <img src="/LOGOS/William Ru.svg" alt="William Ru" className="h-4 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
+                <img src="/LOGOS/William Ru.svg" alt="William Ru" className="h-2.5 sm:h-8 w-auto invert dark:invert-0" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/en garde.svg" alt="En Garde" className="h-6 sm:h-12 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/en garde.svg" alt="En Garde" className="h-3 sm:h-12 w-auto dark:invert" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/BRAND-TWO.svg" alt="Brand Two" className="h-6 sm:h-12 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/BRAND-TWO.svg" alt="Brand Two" className="h-3 sm:h-12 w-auto dark:invert" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/flyhigh.svg" alt="Fly High" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/flyhigh.svg" alt="Fly High" className="h-2 sm:h-6 w-auto dark:invert" draggable={false} />
               </div>
               <div className="opacity-80">
-                <img src="/LOGOS/semanu studios.svg" alt="Semanu Studios" className="h-3 sm:h-6 w-auto dark:invert" draggable={false} />
+                <img src="/LOGOS/semanu studios.svg" alt="Semanu Studios" className="h-2 sm:h-6 w-auto dark:invert" draggable={false} />
               </div>
             </div>
           </div>
@@ -674,9 +703,9 @@ function HeroLogoSequence({ theme = 'dark' }) {
 
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
-      {/* Render AnimatedLogo starting immediately; style color sets stroke via currentColor */}
+      {/* Render AnimatedLogo always visible, outline-only, correct stroke color */}
       <div style={{ transform: `translateZ(0) scale(${scale})`, transformOrigin: '50% 50%' }}>
-        <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor }} />
+        <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} />
       </div>
     </div>
   );

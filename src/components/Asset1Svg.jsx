@@ -18,16 +18,22 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "" }
     return () => { cancelled = true; };
   }, []);
 
-  // Theme styles: dark = fill #4d4d4d, light = stroke black, no fill
+  // Theme styles: dark = fill white, light = stroke black, no fill
   const darkCss = [
-    'svg path, svg rect, svg circle, svg polygon, svg polyline, svg ellipse {',
-    '  fill: #4d4d4d !important;',
+    '.asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
+    '  fill: #ffffff !important;',
     '  stroke: none !important;',
+    '  opacity: 1 !important;',
+    '}',
+    '@media (max-width: 640px) {',
+    '  .asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
+    '    fill: #4d4d4d !important;',
+    '  }',
     '}',
   ].join('\n');
 
   const lightCss = [
-    'svg path, svg rect, svg circle, svg polygon, svg polyline, svg ellipse {',
+    '.asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
     '  fill: none !important;',
     '  stroke: #000000 !important;',
     '  stroke-width: 0.25px !important;',
@@ -39,7 +45,7 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "" }
   if (!svgMarkup) return null;
 
   return (
-    <div className={className} style={style}>
+    <div className={`asset1-svg-container ${className}`} style={style}>
       <style>{overrideCss}</style>
       <div dangerouslySetInnerHTML={{ __html: svgMarkup }} />
     </div>

@@ -28,6 +28,7 @@ export default defineConfig({
       "ff614dd5ac9f.ngrok-free.app",
       "upset-symbols-rest.loca.lt",
       "unabashed-dayfly-coraline.ngrok-free.dev",
+      "2b87577bcc66.ngrok-free.app",
     ],
   },
 });

@@ -26,18 +26,20 @@ export default function AnimatedLogo({ className = "", start = true, style = {} 
   }, [start]);
 
   return (
-    <div ref={containerRef} className={className} style={style}>
+    <div ref={containerRef} className={className}>
       <svg
         id="animated-logo"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 1497.74 816.53"
         className="w-full h-auto"
+        style={style}
+        stroke="currentColor"
       >
         <defs>
           <style>
             {`
               .cls-1 {
-                fill: none;
+                fill: none !important;
                 stroke: currentColor;
                 stroke-width: 3px;
                 stroke-linecap: round;

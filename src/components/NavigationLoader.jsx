@@ -6,6 +6,9 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange, onIn
   const navigate = useNavigate();
   const location = useLocation();
   const [visible, setVisible] = useState(true); // Start visible to match HTML loader
+  
+  // Stroke color: #4d4d4d for dark mode, black for light mode
+  const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
   const targetRef = useRef(null);
   const navigatingRef = useRef(false);
   const initialLoadDone = useRef(false);
@@ -183,7 +186,7 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange, onIn
             maxWidth: "420px",
           }}
         >
-          <AnimatedLogo />
+          <AnimatedLogo style={{ color: strokeColor }} />
         </div>
       </div>
     </div>
