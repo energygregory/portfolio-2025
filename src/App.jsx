@@ -244,6 +244,13 @@ function App() {
     const n = raw ? Number(raw) : NaN;
     return Number.isNaN(n) ? 1 : n;
   });
+  // Desktop control for hero AnimatedLogo Y position
+  const [desktopHeroY, setDesktopHeroY] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    const raw = window.localStorage.getItem('heroY_desktop');
+    const n = raw ? Number(raw) : NaN;
+    return Number.isNaN(n) ? 0 : n;
+  });
 
   // Track small-screen state and whether user has scrolled (to hide Asset1)
   const [isPhone, setIsPhone] = useState(false);
@@ -295,10 +302,11 @@ function App() {
       window.localStorage.setItem('asset1H_desktop', String(desktopAssetH));
       window.localStorage.setItem('asset1V_desktop', String(desktopAssetV));
       window.localStorage.setItem('heroScale_desktop', String(desktopHeroScale));
+      window.localStorage.setItem('heroY_desktop', String(desktopHeroY));
     } catch (e) {
       // ignore
     }
-  }, [desktopAssetX, desktopAssetY, desktopAssetScale, desktopAssetH, desktopAssetV, desktopHeroScale]);
+  }, [desktopAssetX, desktopAssetY, desktopAssetScale, desktopAssetH, desktopAssetV, desktopHeroScale, desktopHeroY]);
 
   // Nav pill hide at page bottom, reveal when user scrolls up
   const [navHidden, setNavHidden] = useState(false);
@@ -539,6 +547,9 @@ function App() {
               <label className="text-[11px]">Animated Logo Scale ({desktopHeroScale.toFixed(2)})</label>
               <input type="range" min="0.6" max="1.6" step="0.01" value={desktopHeroScale} onChange={(e) => setDesktopHeroScale(Number(e.target.value))} className="w-full" />
 
+              <label className="text-[11px]">Animated Logo Y ({desktopHeroY}px)</label>
+              <input type="range" min="-400" max="400" step="1" value={desktopHeroY} onChange={(e) => setDesktopHeroY(Number(e.target.value))} className="w-full" />
+
               <label className="text-[11px]">X ({desktopAssetX}px)</label>
               <input type="range" min="-240" max="240" step="1" value={desktopAssetX} onChange={(e) => setDesktopAssetX(Number(e.target.value))} className="w-full" />
 
@@ -568,7 +579,7 @@ function App() {
             fallback={<div className="min-h-screen" />}
           >
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} />} />
+              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} heroYDesktop={desktopHeroY} />} />
               <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />

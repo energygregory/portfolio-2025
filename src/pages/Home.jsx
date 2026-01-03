@@ -193,7 +193,7 @@ const portfolioLogos = [
   },
 ];
 
-export default function Home({ theme = "dark", heroScaleDesktop = 1 }) {
+export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDesktop = 0 }) {
   console.log('Home component is rendering');
   
   const [isPhone, setIsPhone] = useState(false);
@@ -389,7 +389,7 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1 }) {
                 assets are identical content in different colours (as noted). */}
             <div className="relative w-full h-auto select-none flex items-center justify-center" style={{ transform: 'scale(1.5)' }}>
               {/* Replace hero videos with loading animation placeholder + outlined logo sequence */}
-              <HeroLogoSequence theme={theme} heroScaleDesktop={heroScaleDesktop} isPhone={isPhone} />
+              <HeroLogoSequence theme={theme} heroScaleDesktop={heroScaleDesktop} heroYDesktop={heroYDesktop} isPhone={isPhone} />
             </div>
           </div>
         </div>
@@ -688,13 +688,13 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1 }) {
 }
 
 // Inline hero sequence: start AnimatedLogo immediately with theme-based stroke
-function HeroLogoSequence({ theme = 'dark', heroScaleDesktop = 1, isPhone = true }) {
+function HeroLogoSequence({ theme = 'dark', heroScaleDesktop = 1, heroYDesktop = 0, isPhone = true }) {
   // Stroke color: #4d4d4d for dark mode, black for light mode
   const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
 
   // Desktop uses the passed-in heroScaleDesktop; mobile uses the previously hard-coded values
   const scale = isPhone ? 0.7 : heroScaleDesktop;
-  const posY = isPhone ? 85 : 0;
+  const posY = isPhone ? 85 : heroYDesktop;
 
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>

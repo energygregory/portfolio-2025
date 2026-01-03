@@ -21,7 +21,7 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "" }
   // Theme styles: dark = fill white, light = stroke black, no fill
   const darkCss = [
     '.asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
-    '  fill: #ffffff !important;',
+    '  fill: #4d4d4d !important;',
     '  stroke: none !important;',
     '  opacity: 1 !important;',
     '}',
