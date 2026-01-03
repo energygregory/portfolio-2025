@@ -452,7 +452,7 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
                 const sizeClasses = isExpanded
                   ? 'w-[60px] h-[60px] sm:w-[110px] sm:h-[110px] md:w-[140px] md:h-[140px]'
                   : isSlightlyExpanded
-                    ? 'w-[55px] h-[55px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px]'
+                    ? (isPhone ? 'w-[62px] h-[62px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px]' : 'w-[55px] h-[55px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px]')
                     : isReduced
                       ? 'w-[35px] h-[35px] sm:w-[70px] sm:h-[70px] md:w-[80px] md:h-[80px]'
                       : isSlightlyReduced
