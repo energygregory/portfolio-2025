@@ -241,9 +241,12 @@ function App() {
   });
   // Toggle for mobile scrolling PNG marquee
   const [showMarquee, setShowMarquee] = useState(true);
+  // Dev Mode: force a specific device for testing (desktop only)
+  const [devMode, setDevMode] = useState(false);
+  const [forcedDevice, setForcedDevice] = useState('iPhone X');
   // Device preset selector (used to hardcode per-device values later)
   const deviceOptions = [
-    'iPhone SE','iPhone XR','iPhone 12 Pro','iPhone 14 Pro Max','Pixel 7','Samsung Galaxy S8+','Samsung Galaxy S20 Ultra','iPad Mini','iPad Air','iPad Pro','Surface Pro 7','Surface Duo','Galaxy Z Fold 5','Asus Zenbook Fold','Samsung Galaxy A51/71','Nest Hub','Nest Hub Max'
+    'iPhone X','iPhone SE','iPhone XR','iPhone 12 Pro','iPhone 14 Pro Max','Pixel 7','Samsung Galaxy S8+','Samsung Galaxy S20 Ultra','iPad Mini','iPad Air','iPad Pro','Surface Pro 7','Surface Duo','Galaxy Z Fold 5','Asus Zenbook Fold','Samsung Galaxy A51/71','Nest Hub','Nest Hub Max'
   ];
   // Auto-detect device on mount
   const [selectedDevice, setSelectedDevice] = useState(() => {
@@ -637,6 +640,16 @@ function App() {
               <div><span className="opacity-70">Detected:</span> <strong>{deviceInfo.name}</strong></div>
               <div><span className="opacity-70">Category:</span> {deviceInfo.category} | <span className="opacity-70">Touch:</span> {deviceInfo.touch ? 'Yes' : 'No'}</div>
             </div>
+            {/* Dev Mode: Force device for testing */}
+            <div className="flex items-center gap-2 mb-3 p-2 bg-yellow-900/30 rounded border border-yellow-700/50">
+              <input type="checkbox" id="devMode" checked={devMode} onChange={(e)=>setDevMode(e.target.checked)} />
+              <label htmlFor="devMode" className="text-[10px] text-yellow-400">Dev Mode</label>
+              {devMode && (
+                <select value={forcedDevice} onChange={(e)=>setForcedDevice(e.target.value)} className="text-[10px] bg-black/60 border border-yellow-700 rounded px-1 py-0.5 text-yellow-400 ml-auto">
+                  {deviceOptions.map(d=> <option key={d} value={d}>{d}</option>)}
+                </select>
+              )}
+            </div>
             <div className="text-sm font-semibold mb-2">Asset1 Controls (desktop)</div>
             <label className="text-xs block opacity-80">X position</label>
             <input type="range" min={-1400} max={1400} step={1} value={desktopAssetX} onChange={(e)=>setDesktopAssetX(Number(e.target.value))} style={{width:'100%'}} />
@@ -676,8 +689,8 @@ function App() {
           </div>
         )}
 
-        {/* Mobile control panel: ONLY shown when device is detected as iPhone X */}
-        {isPhone && deviceInfo.name === 'iPhone X' && (
+        {/* Mobile control panel: ONLY shown when device is detected as iPhone X OR devMode is enabled with iPhone X forced */}
+        {(deviceInfo.name === 'iPhone X' || (devMode && forcedDevice === 'iPhone X')) && (
           <div className="pointer-events-auto fixed left-4 right-4 top-20 z-50 p-4 bg-black/90 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }}>
             <div className="text-sm font-semibold mb-2 text-cyan-400">iPhone X Controls</div>
             {/* Device detection info */}
