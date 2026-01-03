@@ -546,7 +546,7 @@ function App() {
               <input type="range" min="-600" max="200" step="1" value={desktopAssetY} onChange={(e) => setDesktopAssetY(Number(e.target.value))} className="w-full" />
 
               <label className="text-[11px]">Scale ({desktopAssetScale.toFixed(2)})</label>
-              <input type="range" min="0.5" max="1.6" step="0.01" value={desktopAssetScale} onChange={(e) => setDesktopAssetScale(Number(e.target.value))} className="w-full" />
+              <input type="range" min="0.2" max="1.6" step="0.01" value={desktopAssetScale} onChange={(e) => setDesktopAssetScale(Number(e.target.value))} className="w-full" />
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
