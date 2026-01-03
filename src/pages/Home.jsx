@@ -516,7 +516,7 @@ export default function Home({ theme = "dark" }) {
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <h3
-            className="text-center text-xs sm:text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400 mb-12"
+            className="text-center text-[10px] sm:text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400 mb-6 sm:mb-12"
             style={{
               fontFamily:
                 "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
@@ -526,7 +526,7 @@ export default function Home({ theme = "dark" }) {
           </h3>
 
           {/* Logo Grid - 2 rows, first row longer, all centered */}
-          <div className="flex flex-col items-center gap-6 sm:gap-12 mb-16 sm:mb-32">
+          <div className="flex flex-col items-center gap-6 sm:gap-12 mb-8 sm:mb-32">
             {/* Row 1: Around, Tribe of God, Terzo, Sleekster, Legacy Drip, Asset 3 */}
             <div className="flex items-center justify-center gap-2 sm:gap-12 md:gap-16">
               <div className="opacity-80">
@@ -692,19 +692,14 @@ function HeroLogoSequence({ theme = 'dark' }) {
   // Stroke color: #4d4d4d for dark mode, black for light mode
   const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
 
-  const [scale] = useState(() => {
-    try {
-      const v = localStorage.getItem('heroLogoScale');
-      return v ? parseFloat(v) : 1.0;
-    } catch {
-      return 1.0;
-    }
-  });
+  // Hard-coded hero logo transform for mobile per request
+  const scale = 0.7;
+  const posY = 85;
 
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
       {/* Render AnimatedLogo always visible, outline-only, correct stroke color */}
-      <div style={{ transform: `translateZ(0) scale(${scale})`, transformOrigin: '50% 50%' }}>
+      <div style={{ transform: `translateZ(0) translateY(${posY}px) scale(${scale})`, transformOrigin: '50% 50%' }}>
         <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} />
       </div>
     </div>

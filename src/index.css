@@ -342,6 +342,11 @@ body {
   }
 }
 
+/* Slightly increase AnimatedLogo stroke width on mobile when in dark mode */
+.theme-dark #animated-logo .cls-1 {
+  stroke-width: 3.6px !important;
+}
+
 /* Uppercase the navigation links inside the header */
 .app-header a {
   text-transform: uppercase;
