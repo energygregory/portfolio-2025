@@ -199,17 +199,51 @@ function App() {
   const iconOffset = 9;
   const pillPadding = 12;
 
-  // Mobile-only decorative Asset1 - hardcoded per user (make X editable)
-  const assetScale = 0.91; // overall scale
-  const assetH = 1.03; // horizontal stretch (scaleX)
-  const assetV = 0.88; // vertical stretch (scaleY)
-  const [assetX, setAssetX] = useState(() => {
+  // Decorative Asset1 defaults for mobile (hard-coded) and desktop (editable)
+  const mobileAssetScale = 0.91; // overall scale for mobile
+  const mobileAssetH = 1.03; // horizontal stretch (scaleX) mobile
+  const mobileAssetV = 0.88; // vertical stretch (scaleY) mobile
+  const assetX = 1; // mobile horizontal position (px) - hardcoded to 1px per request
+  const assetY = -200; // vertical position (px)
+
+  // Desktop-editable Asset1 controls (persisted)
+  const [desktopAssetX, setDesktopAssetX] = useState(() => {
     if (typeof window === 'undefined') return 4;
-    const raw = window.localStorage.getItem('asset1X');
+    const raw = window.localStorage.getItem('asset1X_desktop');
     const n = raw ? parseInt(raw, 10) : NaN;
     return Number.isNaN(n) ? 4 : n;
-  }); // horizontal position (px)
-  const assetY = -200; // vertical position (px)
+  });
+  const [desktopAssetY, setDesktopAssetY] = useState(() => {
+    if (typeof window === 'undefined') return -200;
+    const raw = window.localStorage.getItem('asset1Y_desktop');
+    const n = raw ? parseInt(raw, 10) : NaN;
+    return Number.isNaN(n) ? -200 : n;
+  });
+  const [desktopAssetScale, setDesktopAssetScale] = useState(() => {
+    if (typeof window === 'undefined') return 0.91;
+    const raw = window.localStorage.getItem('asset1Scale_desktop');
+    const n = raw ? Number(raw) : NaN;
+    return Number.isNaN(n) ? 0.91 : n;
+  });
+  const [desktopAssetH, setDesktopAssetH] = useState(() => {
+    if (typeof window === 'undefined') return 1.03;
+    const raw = window.localStorage.getItem('asset1H_desktop');
+    const n = raw ? Number(raw) : NaN;
+    return Number.isNaN(n) ? 1.03 : n;
+  });
+  const [desktopAssetV, setDesktopAssetV] = useState(() => {
+    if (typeof window === 'undefined') return 0.88;
+    const raw = window.localStorage.getItem('asset1V_desktop');
+    const n = raw ? Number(raw) : NaN;
+    return Number.isNaN(n) ? 0.88 : n;
+  });
+  // Desktop control for hero AnimatedLogo scale
+  const [desktopHeroScale, setDesktopHeroScale] = useState(() => {
+    if (typeof window === 'undefined') return 1;
+    const raw = window.localStorage.getItem('heroScale_desktop');
+    const n = raw ? Number(raw) : NaN;
+    return Number.isNaN(n) ? 1 : n;
+  });
 
   // Track small-screen state and whether user has scrolled (to hide Asset1)
   const [isPhone, setIsPhone] = useState(false);
@@ -255,11 +289,16 @@ function App() {
   // Persist assetX to localStorage so mobile tuning is remembered
   useEffect(() => {
     try {
-      window.localStorage.setItem('asset1X', String(assetX));
+      window.localStorage.setItem('asset1X_desktop', String(desktopAssetX));
+      window.localStorage.setItem('asset1Y_desktop', String(desktopAssetY));
+      window.localStorage.setItem('asset1Scale_desktop', String(desktopAssetScale));
+      window.localStorage.setItem('asset1H_desktop', String(desktopAssetH));
+      window.localStorage.setItem('asset1V_desktop', String(desktopAssetV));
+      window.localStorage.setItem('heroScale_desktop', String(desktopHeroScale));
     } catch (e) {
       // ignore
     }
-  }, [assetX]);
+  }, [desktopAssetX, desktopAssetY, desktopAssetScale, desktopAssetH, desktopAssetV, desktopHeroScale]);
 
   // Nav pill hide at page bottom, reveal when user scrolls up
   const [navHidden, setNavHidden] = useState(false);
@@ -474,12 +513,12 @@ function App() {
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
-        {/* Mobile-only decorative Asset1 - behind main content */}
+        {/* Decorative Asset1 - visible on both; mobile uses hardcoded small values, desktop uses editable state */}
         <Asset1Svg
           theme={appliedTheme}
-          className="block sm:hidden pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 z-20"
+          className="pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{
-            transform: `translateX(calc(-50% + ${assetX}px)) translateY(${assetY}px) scaleX(${assetH * assetScale}) scaleY(${assetV * assetScale})`,
+            transform: `translateX(calc(-50% + ${isPhone ? assetX : desktopAssetX}px)) translateY(${isPhone ? assetY : desktopAssetY}px) scaleX(${(isPhone ? mobileAssetH : desktopAssetH) * (isPhone ? mobileAssetScale : desktopAssetScale)}) scaleY(${(isPhone ? mobileAssetV : desktopAssetV) * (isPhone ? mobileAssetScale : desktopAssetScale)})`,
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
@@ -489,21 +528,37 @@ function App() {
           }}
         />
 
-        {/* Mobile-only X-position slider for Asset1 (mobile only) */}
-        <div className="block sm:hidden fixed bottom-4 left-4 right-4 z-30 flex items-center justify-center pointer-events-auto">
-          <div className="w-full max-w-2xl bg-black/60 dark:bg-white/6 rounded-xl px-4 py-3 flex items-center gap-3">
-            <label className="text-[11px] text-neutral-300 dark:text-neutral-400 shrink-0">Asset X</label>
-            <input
-              aria-label="Asset1 horizontal position"
-              type="range"
-              min="-120"
-              max="120"
-              step="1"
-              value={assetX}
-              onChange={(e) => setAssetX(Number(e.target.value))}
-              className="w-full h-2 accent-neutral-600"
-            />
-            <div className="ml-2 text-[11px] text-neutral-300 dark:text-neutral-400 w-10 text-right">{assetX}px</div>
+        {/* Desktop-only Asset1 controls */}
+        <div className="hidden sm:flex fixed right-4 bottom-4 z-40 pointer-events-auto">
+          <div className="w-[420px] bg-black/60 dark:bg-white/6 rounded-xl p-4 space-y-3 text-sm text-neutral-300">
+            <div className="flex items-center justify-between">
+              <strong className="text-xs">Desktop Controls</strong>
+              <span className="text-xs">Asset X: {desktopAssetX}px</span>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px]">Animated Logo Scale ({desktopHeroScale.toFixed(2)})</label>
+              <input type="range" min="0.6" max="1.6" step="0.01" value={desktopHeroScale} onChange={(e) => setDesktopHeroScale(Number(e.target.value))} className="w-full" />
+
+              <label className="text-[11px]">X ({desktopAssetX}px)</label>
+              <input type="range" min="-240" max="240" step="1" value={desktopAssetX} onChange={(e) => setDesktopAssetX(Number(e.target.value))} className="w-full" />
+
+              <label className="text-[11px]">Y ({desktopAssetY}px)</label>
+              <input type="range" min="-600" max="200" step="1" value={desktopAssetY} onChange={(e) => setDesktopAssetY(Number(e.target.value))} className="w-full" />
+
+              <label className="text-[11px]">Scale ({desktopAssetScale.toFixed(2)})</label>
+              <input type="range" min="0.5" max="1.6" step="0.01" value={desktopAssetScale} onChange={(e) => setDesktopAssetScale(Number(e.target.value))} className="w-full" />
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px]">X Stretch ({desktopAssetH.toFixed(2)})</label>
+                  <input type="range" min="0.5" max="1.6" step="0.01" value={desktopAssetH} onChange={(e) => setDesktopAssetH(Number(e.target.value))} className="w-full" />
+                </div>
+                <div>
+                  <label className="text-[11px]">Y Stretch ({desktopAssetV.toFixed(2)})</label>
+                  <input type="range" min="0.5" max="1.6" step="0.01" value={desktopAssetV} onChange={(e) => setDesktopAssetV(Number(e.target.value))} className="w-full" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -513,7 +568,7 @@ function App() {
             fallback={<div className="min-h-screen" />}
           >
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home theme={theme} />} />
+              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} />} />
               <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />
