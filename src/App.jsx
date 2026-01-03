@@ -689,15 +689,10 @@ function App() {
           </div>
         )}
 
-        {/* Mobile control panel: shown when devMode is enabled (for testing any device) */}
-        {devMode && (
-          <div className="pointer-events-auto fixed left-4 right-4 top-20 z-50 p-4 bg-black/90 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }}>
-            <div className="text-sm font-semibold mb-2 text-cyan-400">{forcedDevice} Controls</div>
-            {/* Device detection info */}
-            <div className="text-[10px] text-cyan-400 bg-cyan-900/30 rounded px-2 py-1 mb-3 border border-cyan-800/50">
-              <div><span className="opacity-70">Testing:</span> <strong>{forcedDevice}</strong></div>
-              <div><span className="opacity-70">Actual:</span> {deviceInfo.name} | <span className="opacity-70">Touch:</span> {deviceInfo.touch ? 'Yes' : 'No'}</div>
-            </div>
+        {/* Mobile control panel: shown on phone-sized viewports for tuning */}
+        {isPhone && (
+          <div className="pointer-events-auto fixed left-4 right-4 top-4 z-50 p-4 bg-black/90 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }}>
+            <div className="text-sm font-semibold mb-2 text-cyan-400">Mobile Controls</div>
 
             <div className="text-xs font-semibold mb-2 text-white/80">Asset1 Controls</div>
             <label className="text-xs block opacity-80">X position</label>
