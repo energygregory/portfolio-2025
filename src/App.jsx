@@ -199,11 +199,16 @@ function App() {
   const iconOffset = 9;
   const pillPadding = 12;
 
-  // Mobile-only decorative Asset1 - hardcoded per user
+  // Mobile-only decorative Asset1 - hardcoded per user (make X editable)
   const assetScale = 0.91; // overall scale
   const assetH = 1.03; // horizontal stretch (scaleX)
   const assetV = 0.88; // vertical stretch (scaleY)
-  const assetX = 4; // horizontal position (px)
+  const [assetX, setAssetX] = useState(() => {
+    if (typeof window === 'undefined') return 4;
+    const raw = window.localStorage.getItem('asset1X');
+    const n = raw ? parseInt(raw, 10) : NaN;
+    return Number.isNaN(n) ? 4 : n;
+  }); // horizontal position (px)
   const assetY = -200; // vertical position (px)
 
   // Track small-screen state and whether user has scrolled (to hide Asset1)
@@ -246,6 +251,15 @@ function App() {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [isPhone]);
+
+  // Persist assetX to localStorage so mobile tuning is remembered
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('asset1X', String(assetX));
+    } catch (e) {
+      // ignore
+    }
+  }, [assetX]);
 
   // Nav pill hide at page bottom, reveal when user scrolls up
   const [navHidden, setNavHidden] = useState(false);
@@ -447,13 +461,13 @@ function App() {
             Home
           </NavLink>
           <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-1.5 h-1.5 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </span>
           <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-1.5 h-1.5 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </span>
           <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-1.5 h-1.5 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </span>
         </nav>
       </header>
@@ -475,7 +489,23 @@ function App() {
           }}
         />
 
-        {/* Mobile-only decorative Asset1 is hardcoded; sliders removed */}
+        {/* Mobile-only X-position slider for Asset1 (mobile only) */}
+        <div className="block sm:hidden fixed bottom-4 left-4 right-4 z-30 flex items-center justify-center pointer-events-auto">
+          <div className="w-full max-w-2xl bg-black/60 dark:bg-white/6 rounded-xl px-4 py-3 flex items-center gap-3">
+            <label className="text-[11px] text-neutral-300 dark:text-neutral-400 shrink-0">Asset X</label>
+            <input
+              aria-label="Asset1 horizontal position"
+              type="range"
+              min="-120"
+              max="120"
+              step="1"
+              value={assetX}
+              onChange={(e) => setAssetX(Number(e.target.value))}
+              className="w-full h-2 accent-neutral-600"
+            />
+            <div className="ml-2 text-[11px] text-neutral-300 dark:text-neutral-400 w-10 text-right">{assetX}px</div>
+          </div>
+        </div>
 
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
