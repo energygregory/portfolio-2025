@@ -209,6 +209,9 @@ function App() {
   const [mobileAssetV, setMobileAssetV] = useState(0.88);
   // Mobile floating nav bar Y position (bottom offset in Tailwind units, default bottom-12 = 48px)
   const [mobileNavY, setMobileNavY] = useState(48);
+  // Mobile AnimatedLogo controls
+  const [mobileHeroScale, setMobileHeroScale] = useState(1);
+  const [mobileHeroY, setMobileHeroY] = useState(0);
   // Control panel scale (for making the slider box smaller/larger)
   const [panelScale, setPanelScale] = useState(1);
 
@@ -289,6 +292,8 @@ function App() {
       mobileAssetH: 1.03,
       mobileAssetV: 1.02,
       mobileNavY: 144,
+      mobileHeroScale: 1,
+      mobileHeroY: 0,
       showMarquee: true,
     },
     // iPad Pro preset - to be filled after user tunes sliders
@@ -323,6 +328,8 @@ function App() {
     if (p.mobileAssetH !== undefined) setMobileAssetH(p.mobileAssetH);
     if (p.mobileAssetV !== undefined) setMobileAssetV(p.mobileAssetV);
     if (p.mobileNavY !== undefined) setMobileNavY(p.mobileNavY);
+    if (p.mobileHeroScale !== undefined) setMobileHeroScale(p.mobileHeroScale);
+    if (p.mobileHeroY !== undefined) setMobileHeroY(p.mobileHeroY);
     // Shared
     if (p.showMarquee !== undefined) setShowMarquee(!!p.showMarquee);
   }, [selectedDevice]);
@@ -742,6 +749,17 @@ function App() {
               <div className="text-[11px] opacity-70 mb-2">{mobileNavY}px</div>
             </div>
 
+            <div className="border-t border-neutral-700 mt-3 pt-3">
+              <div className="text-xs font-semibold mb-2 text-white/80">Animated Logo (home)</div>
+              <label className="text-xs block opacity-80">Scale</label>
+              <input type="range" min={0.1} max={3} step={0.01} value={mobileHeroScale} onChange={(e)=>setMobileHeroScale(Number(e.target.value))} style={{width:'100%'}} />
+              <div className="text-[11px] opacity-70 mb-2">{mobileHeroScale}x</div>
+
+              <label className="text-xs block opacity-80">Y position</label>
+              <input type="range" min={-300} max={300} step={1} value={mobileHeroY} onChange={(e)=>setMobileHeroY(Number(e.target.value))} style={{width:'100%'}} />
+              <div className="text-[11px] opacity-70 mb-2">{mobileHeroY}px</div>
+            </div>
+
             <div className="border-t border-neutral-700 mt-3 pt-3 flex items-center justify-between">
               <label className="text-xs opacity-80">Show scrolling PNGs</label>
               <input type="checkbox" checked={showMarquee} onChange={(e)=>setShowMarquee(e.target.checked)} aria-label="Toggle scrolling PNGs" />
@@ -755,7 +773,7 @@ function App() {
             fallback={<div className="min-h-screen" />}
           >
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} heroYDesktop={desktopHeroY} outlineWidthDesktop={desktopOutlineWidth} outlineWidthMobile={mobileOutlineWidth} animatedLogoOutlineWidthDesktop={desktopAnimatedOutlineWidth} animatedLogoOutlineWidthMobile={mobileAnimatedOutlineWidth} showMarquee={showMarquee} selectedDevice={selectedDevice} />} />
+              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} heroYDesktop={desktopHeroY} heroScaleMobile={mobileHeroScale} heroYMobile={mobileHeroY} outlineWidthDesktop={desktopOutlineWidth} outlineWidthMobile={mobileOutlineWidth} animatedLogoOutlineWidthDesktop={desktopAnimatedOutlineWidth} animatedLogoOutlineWidthMobile={mobileAnimatedOutlineWidth} showMarquee={showMarquee} selectedDevice={selectedDevice} />} />
               <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />
