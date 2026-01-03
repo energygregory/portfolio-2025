@@ -141,6 +141,21 @@ body {
     -webkit-user-select: none;
     user-select: none;
   }
+
+  /* Disable copy/selection highlight on mobile while preserving interactions */
+  html, body, #app-content {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  /* Re-enable selection for interactive controls */
+  input, textarea, select, a, button {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: default !important;
+  }
 }
 
 /* Horizontal logo scrolling bar
@@ -345,7 +360,7 @@ body {
 /* Slightly increase AnimatedLogo stroke width on mobile when in dark mode */
 @media (max-width: 640px) {
   .theme-dark #animated-logo .cls-1 {
-    stroke-width: 4px !important;
+    stroke-width: var(--logo-stroke-width, 4px);
   }
 }
 
@@ -684,9 +699,9 @@ body {
   );
 }
 
-/* Thicken animated logo in footer only in light mode */
+/* Thicken animated logo in footer only in light mode (respect CSS variable) */
 .theme-light footer #animated-logo .cls-1 {
-  stroke-width: 6px !important;
+  stroke-width: var(--logo-stroke-width, 6px);
 }
 
 /* Make all footer text black and bolder in light mode */

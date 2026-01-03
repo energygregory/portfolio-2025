@@ -18,13 +18,13 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "" }
     return () => { cancelled = true; };
   }, []);
 
-  // Theme styles: dark = fill white, light = stroke black, no fill
+    // Theme styles: dark = fill white, light = stroke black, no fill
   const darkCss = [
     // Desktop: outline only in dark mode
     '.asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
     '  fill: none !important;',
     '  stroke: #4d4d4d !important;',
-    '  stroke-width: 1px !important;',
+    '  stroke-width: var(--outline-width, 3px) !important;',
     '  stroke-linecap: round !important;',
     '  stroke-linejoin: round !important;',
     '  opacity: 1 !important;',
@@ -42,13 +42,16 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "" }
     '.asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
     '  fill: none !important;',
     '  stroke: #000000 !important;',
-    '  stroke-width: 1px !important;',
+    '  stroke-width: var(--outline-width, 3px) !important;',
     '  stroke-linecap: round !important;',
     '  stroke-linejoin: round !important;',
     '}',
   ].join('\n');
 
-  const overrideCss = theme === "dark" ? darkCss : lightCss;
+  // Ensure the SVG scales responsively inside its container
+  const responsiveCss = '\n.asset1-svg-container svg { width: 100% !important; height: auto !important; display:block !important;}\n';
+
+  const overrideCss = theme === "dark" ? darkCss + responsiveCss : lightCss + responsiveCss;
 
   if (!svgMarkup) return null;
 

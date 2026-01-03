@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { animate, svg, stagger } from "animejs";
 
-export default function AnimatedLogo({ className = "", start = true, style = {} }) {
+export default function AnimatedLogo({ className = "", start = true, style = {}, strokeWidth = 3 }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function AnimatedLogo({ className = "", start = true, style = {} 
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 1497.74 816.53"
         className="w-full h-auto"
-        style={style}
+        style={{ ...(style || {}), ['--logo-stroke-width']: `${strokeWidth}px` }}
         stroke="currentColor"
       >
         <defs>
@@ -41,7 +41,7 @@ export default function AnimatedLogo({ className = "", start = true, style = {} 
               .cls-1 {
                 fill: none !important;
                 stroke: currentColor;
-                stroke-width: 3px;
+                stroke-width: var(--logo-stroke-width, 3px);
                 stroke-linecap: round;
                 stroke-linejoin: round;
               }
