@@ -209,6 +209,8 @@ function App() {
   const [mobileAssetV, setMobileAssetV] = useState(0.88);
   // Mobile floating nav bar Y position (bottom offset in Tailwind units, default bottom-12 = 48px)
   const [mobileNavY, setMobileNavY] = useState(48);
+  // Control panel scale (for making the slider box smaller/larger)
+  const [panelScale, setPanelScale] = useState(1);
 
   // Desktop-editable Asset1 controls (persisted)
   // Desktop Asset1 and hero values (hard-coded per user request)
@@ -279,14 +281,25 @@ function App() {
       desktopHeroY: 107,
       showMarquee: true,
     },
-    // iPhone X preset - values to be filled after user provides them
+    // iPhone X preset - hardcoded per user screenshot
     'iPhone X': {
       mobileAssetX: 1,
-      mobileAssetY: -200,
+      mobileAssetY: -135,
       mobileAssetScale: 0.91,
       mobileAssetH: 1.03,
-      mobileAssetV: 0.88,
-      mobileNavY: 48,
+      mobileAssetV: 1.02,
+      mobileNavY: 144,
+      showMarquee: true,
+    },
+    // iPad Pro preset - to be filled after user tunes sliders
+    'iPad Pro': {
+      desktopAssetX: 0,
+      desktopAssetY: 0,
+      desktopAssetScale: 1,
+      desktopAssetH: 1,
+      desktopAssetV: 1,
+      desktopHeroScale: 1,
+      desktopHeroY: 0,
       showMarquee: true,
     },
   };
@@ -691,8 +704,15 @@ function App() {
 
         {/* Mobile control panel: shown on phone-sized viewports for tuning */}
         {isPhone && (
-          <div className="pointer-events-auto fixed left-4 right-4 top-4 z-50 p-4 bg-black/90 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }}>
-            <div className="text-sm font-semibold mb-2 text-cyan-400">Mobile Controls</div>
+          <div className="pointer-events-auto fixed left-4 right-4 top-4 z-50 p-4 bg-black/50 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', transform: `scale(${panelScale})`, transformOrigin: 'top left' }}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-semibold text-cyan-400">Mobile Controls</div>
+              <div className="flex items-center gap-2">
+                <label className="text-[10px] opacity-70">Panel</label>
+                <input type="range" min={0.5} max={1} step={0.05} value={panelScale} onChange={(e)=>setPanelScale(Number(e.target.value))} style={{width:'60px'}} />
+                <span className="text-[10px] opacity-70">{panelScale}x</span>
+              </div>
+            </div>
 
             <div className="text-xs font-semibold mb-2 text-white/80">Asset1 Controls</div>
             <label className="text-xs block opacity-80">X position</label>
@@ -718,7 +738,7 @@ function App() {
             <div className="border-t border-neutral-700 mt-3 pt-3">
               <div className="text-xs font-semibold mb-2 text-white/80">Nav Bar</div>
               <label className="text-xs block opacity-80">Y position (bottom offset)</label>
-              <input type="range" min={0} max={150} step={1} value={mobileNavY} onChange={(e)=>setMobileNavY(Number(e.target.value))} style={{width:'100%'}} />
+              <input type="range" min={0} max={300} step={1} value={mobileNavY} onChange={(e)=>setMobileNavY(Number(e.target.value))} style={{width:'100%'}} />
               <div className="text-[11px] opacity-70 mb-2">{mobileNavY}px</div>
             </div>
 
