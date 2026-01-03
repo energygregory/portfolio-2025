@@ -296,15 +296,15 @@ function App() {
       mobileHeroY: 0,
       showMarquee: true,
     },
-    // iPad Pro preset - to be filled after user tunes sliders
+    // iPad Pro preset - hardcoded per user screenshot
     'iPad Pro': {
-      desktopAssetX: 0,
-      desktopAssetY: 0,
-      desktopAssetScale: 1,
-      desktopAssetH: 1,
-      desktopAssetV: 1,
-      desktopHeroScale: 1,
-      desktopHeroY: 0,
+      desktopAssetX: 4,
+      desktopAssetY: -704,
+      desktopAssetScale: 0.67,
+      desktopAssetH: 1.27,
+      desktopAssetV: 0.86,
+      desktopHeroScale: 1.42,
+      desktopHeroY: 147,
       showMarquee: true,
     },
   };
@@ -647,7 +647,8 @@ function App() {
         />
 
         {/* Desktop control panel: Asset1 transform sliders and AnimatedLogo transform sliders */}
-        {!isPhone && (
+        {/* TEMPORARILY DISABLED - change false back to !isPhone to re-enable */}
+        {false && !isPhone && (
           <div className="pointer-events-auto fixed right-4 top-20 z-50 p-4 bg-black/80 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ width: 280 }}>
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm font-semibold">Controls</div>
@@ -710,7 +711,8 @@ function App() {
         )}
 
         {/* Mobile control panel: shown on phone-sized viewports for tuning */}
-        {isPhone && (
+        {/* TEMPORARILY DISABLED - change false back to isPhone to re-enable */}
+        {false && isPhone && (
           <div className="pointer-events-auto fixed left-4 right-4 top-4 z-50 p-4 bg-black/50 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', transform: `scale(${panelScale})`, transformOrigin: 'top left' }}>
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm font-semibold text-cyan-400">Mobile Controls</div>

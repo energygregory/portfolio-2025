@@ -396,8 +396,8 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
 
         {/* Hero logo sequence component (inline below) */}
 
-        {/* Mobile: Scrolling marquee of 2025 images - fades out as you scroll */}
-        {showMarquee && !hasScrolled && (isPhone || (selectedDevice && /iPad|iPhone|Pixel|Galaxy|Surface|Nest/i.test(selectedDevice))) && (
+        {/* Scrolling marquee of 2025 images - fades out as you scroll */}
+        {showMarquee && !hasScrolled && (
           <div 
             className="w-full overflow-hidden py-4 mt-24 transition-opacity duration-300"
           >
