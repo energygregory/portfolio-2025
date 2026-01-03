@@ -201,11 +201,14 @@ function App() {
   const pillPadding = 12;
 
   // Decorative Asset1 defaults for mobile (hard-coded) and desktop (editable)
-  const mobileAssetScale = 0.91; // overall scale for mobile
-  const mobileAssetH = 1.03; // horizontal stretch (scaleX) mobile
-  const mobileAssetV = 0.88; // vertical stretch (scaleY) mobile
-  const assetX = 1; // mobile horizontal position (px) - hardcoded to 1px per request
-  const assetY = -200; // vertical position (px)
+  // These are now state variables for iPhone X tuning
+  const [mobileAssetX, setMobileAssetX] = useState(1);
+  const [mobileAssetY, setMobileAssetY] = useState(-200);
+  const [mobileAssetScale, setMobileAssetScale] = useState(0.91);
+  const [mobileAssetH, setMobileAssetH] = useState(1.03);
+  const [mobileAssetV, setMobileAssetV] = useState(0.88);
+  // Mobile floating nav bar Y position (bottom offset in Tailwind units, default bottom-12 = 48px)
+  const [mobileNavY, setMobileNavY] = useState(48);
 
   // Desktop-editable Asset1 controls (persisted)
   // Desktop Asset1 and hero values (hard-coded per user request)
@@ -273,20 +276,39 @@ function App() {
       desktopHeroY: 107,
       showMarquee: true,
     },
+    // iPhone X preset - values to be filled after user provides them
+    'iPhone X': {
+      mobileAssetX: 1,
+      mobileAssetY: -200,
+      mobileAssetScale: 0.91,
+      mobileAssetH: 1.03,
+      mobileAssetV: 0.88,
+      mobileNavY: 48,
+      showMarquee: true,
+    },
   };
 
   // Apply preset when selectedDevice changes (hardcode for that device)
   useEffect(() => {
     const p = devicePresets[selectedDevice];
     if (!p) return;
-    setDesktopAssetX(p.desktopAssetX);
-    setDesktopAssetY(p.desktopAssetY);
-    setDesktopAssetScale(p.desktopAssetScale);
-    setDesktopAssetH(p.desktopAssetH);
-    setDesktopAssetV(p.desktopAssetV);
-    setDesktopHeroScale(p.desktopHeroScale);
-    setDesktopHeroY(p.desktopHeroY);
-    setShowMarquee(!!p.showMarquee);
+    // Desktop presets
+    if (p.desktopAssetX !== undefined) setDesktopAssetX(p.desktopAssetX);
+    if (p.desktopAssetY !== undefined) setDesktopAssetY(p.desktopAssetY);
+    if (p.desktopAssetScale !== undefined) setDesktopAssetScale(p.desktopAssetScale);
+    if (p.desktopAssetH !== undefined) setDesktopAssetH(p.desktopAssetH);
+    if (p.desktopAssetV !== undefined) setDesktopAssetV(p.desktopAssetV);
+    if (p.desktopHeroScale !== undefined) setDesktopHeroScale(p.desktopHeroScale);
+    if (p.desktopHeroY !== undefined) setDesktopHeroY(p.desktopHeroY);
+    // Mobile presets
+    if (p.mobileAssetX !== undefined) setMobileAssetX(p.mobileAssetX);
+    if (p.mobileAssetY !== undefined) setMobileAssetY(p.mobileAssetY);
+    if (p.mobileAssetScale !== undefined) setMobileAssetScale(p.mobileAssetScale);
+    if (p.mobileAssetH !== undefined) setMobileAssetH(p.mobileAssetH);
+    if (p.mobileAssetV !== undefined) setMobileAssetV(p.mobileAssetV);
+    if (p.mobileNavY !== undefined) setMobileNavY(p.mobileNavY);
+    // Shared
+    if (p.showMarquee !== undefined) setShowMarquee(!!p.showMarquee);
   }, [selectedDevice]);
 
   // Track small-screen state and whether user has scrolled (to hide Asset1)
@@ -527,11 +549,11 @@ function App() {
 
       {/* Mobile: floating pill at bottom */}
       <header
-        style={{ paddingLeft: `${pillPadding}px` }}
+        style={{ paddingLeft: `${pillPadding}px`, bottom: `${mobileNavY}px` }}
         className={`
           sm:hidden
           z-50 flex justify-center items-center app-header
-          fixed bottom-12 left-1/2 -translate-x-1/2 w-auto py-2 px-8 rounded-full border
+          fixed left-1/2 -translate-x-1/2 w-auto py-2 px-8 rounded-full border
           transition-transform transition-opacity duration-300 ease-in-out
           ${navHidden ? 'translate-y-6 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
           ${
@@ -584,12 +606,12 @@ function App() {
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
-        {/* Decorative Asset1 - visible on both; mobile uses hardcoded small values, desktop uses editable state */}
+        {/* Decorative Asset1 - visible on both; mobile uses state values (tunable for iPhone X), desktop uses editable state */}
         <Asset1Svg
           theme={appliedTheme}
           className="pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 z-20"
           style={{
-            transform: `translateX(calc(-50% + ${isPhone ? assetX : desktopAssetX}px)) translateY(${isPhone ? assetY : desktopAssetY}px) scaleX(${(isPhone ? mobileAssetH : desktopAssetH) * (isPhone ? mobileAssetScale : desktopAssetScale)}) scaleY(${(isPhone ? mobileAssetV : desktopAssetV) * (isPhone ? mobileAssetScale : desktopAssetScale)})`,
+            transform: `translateX(calc(-50% + ${isPhone ? mobileAssetX : desktopAssetX}px)) translateY(${isPhone ? mobileAssetY : desktopAssetY}px) scaleX(${(isPhone ? mobileAssetH : desktopAssetH) * (isPhone ? mobileAssetScale : desktopAssetScale)}) scaleY(${(isPhone ? mobileAssetV : desktopAssetV) * (isPhone ? mobileAssetScale : desktopAssetScale)})`,
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
@@ -645,6 +667,51 @@ function App() {
               <label className="text-xs block opacity-80">Y position</label>
               <input type="range" min={-600} max={600} step={1} value={desktopHeroY} onChange={(e)=>setDesktopHeroY(Number(e.target.value))} style={{width:'100%'}} />
               <div className="text-[11px] opacity-70">{desktopHeroY}px</div>
+            </div>
+
+            <div className="border-t border-neutral-700 mt-3 pt-3 flex items-center justify-between">
+              <label className="text-xs opacity-80">Show scrolling PNGs</label>
+              <input type="checkbox" checked={showMarquee} onChange={(e)=>setShowMarquee(e.target.checked)} aria-label="Toggle scrolling PNGs" />
+            </div>
+          </div>
+        )}
+
+        {/* Mobile control panel: ONLY shown when device is detected as iPhone X */}
+        {isPhone && deviceInfo.name === 'iPhone X' && (
+          <div className="pointer-events-auto fixed left-4 right-4 top-20 z-50 p-4 bg-black/90 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }}>
+            <div className="text-sm font-semibold mb-2 text-cyan-400">iPhone X Controls</div>
+            {/* Device detection info */}
+            <div className="text-[10px] text-cyan-400 bg-cyan-900/30 rounded px-2 py-1 mb-3 border border-cyan-800/50">
+              <div><span className="opacity-70">Detected:</span> <strong>{deviceInfo.name}</strong></div>
+              <div><span className="opacity-70">Category:</span> {deviceInfo.category} | <span className="opacity-70">Touch:</span> {deviceInfo.touch ? 'Yes' : 'No'}</div>
+            </div>
+
+            <div className="text-xs font-semibold mb-2 text-white/80">Asset1 Controls</div>
+            <label className="text-xs block opacity-80">X position</label>
+            <input type="range" min={-200} max={200} step={1} value={mobileAssetX} onChange={(e)=>setMobileAssetX(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{mobileAssetX}px</div>
+
+            <label className="text-xs block opacity-80">Y position</label>
+            <input type="range" min={-600} max={200} step={1} value={mobileAssetY} onChange={(e)=>setMobileAssetY(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{mobileAssetY}px</div>
+
+            <label className="text-xs block opacity-80">Scale</label>
+            <input type="range" min={0.1} max={2} step={0.01} value={mobileAssetScale} onChange={(e)=>setMobileAssetScale(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{mobileAssetScale}x</div>
+
+            <label className="text-xs block opacity-80">X stretch</label>
+            <input type="range" min={0.5} max={2} step={0.01} value={mobileAssetH} onChange={(e)=>setMobileAssetH(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{mobileAssetH}x</div>
+
+            <label className="text-xs block opacity-80">Y stretch</label>
+            <input type="range" min={0.5} max={2} step={0.01} value={mobileAssetV} onChange={(e)=>setMobileAssetV(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{mobileAssetV}x</div>
+
+            <div className="border-t border-neutral-700 mt-3 pt-3">
+              <div className="text-xs font-semibold mb-2 text-white/80">Nav Bar</div>
+              <label className="text-xs block opacity-80">Y position (bottom offset)</label>
+              <input type="range" min={0} max={150} step={1} value={mobileNavY} onChange={(e)=>setMobileNavY(Number(e.target.value))} style={{width:'100%'}} />
+              <div className="text-[11px] opacity-70 mb-2">{mobileNavY}px</div>
             </div>
 
             <div className="border-t border-neutral-700 mt-3 pt-3 flex items-center justify-between">
