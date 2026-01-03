@@ -8,10 +8,18 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'liquid-logo': ['./src/components/LiquidLogo.jsx'],
-          'dither': ['./src/components/Dither.jsx'],
-          'ascii-effects': ['./src/components/AsciiEffect.jsx', './src/components/AsciiSceneDark.jsx', './src/components/AsciiSceneLight.jsx'],
-          'animations': ['./src/components/LogoLoop.jsx', './src/components/MultiRowLogoLoop.jsx', './src/components/MetallicPaint.jsx'],
+          "liquid-logo": ["./src/components/LiquidLogo.jsx"],
+          dither: ["./src/components/Dither.jsx"],
+          "ascii-effects": [
+            "./src/components/AsciiEffect.jsx",
+            "./src/components/AsciiSceneDark.jsx",
+            "./src/components/AsciiSceneLight.jsx",
+          ],
+          animations: [
+            "./src/components/LogoLoop.jsx",
+            "./src/components/MultiRowLogoLoop.jsx",
+            "./src/components/MetallicPaint.jsx",
+          ],
         },
       },
     },
@@ -24,6 +32,7 @@ export default defineConfig({
       "happy-moles-cut.loca.lt",
       "36df0344a33f.ngrok-free.app",
       "54a93074926f.ngrok-free.app",
+      "bad276294d51.ngrok-free.app",
       "b6e9448af744.ngrok-free.app",
       "ff614dd5ac9f.ngrok-free.app",
       "upset-symbols-rest.loca.lt",

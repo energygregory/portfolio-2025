@@ -93,6 +93,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
+import { detectDevice, getDeviceCategory, isTouchDevice } from "./utils/detectDevice";
 
 // Disable right-click context menu on images
 if (typeof document !== 'undefined') {
@@ -241,7 +242,25 @@ function App() {
   const deviceOptions = [
     'iPhone SE','iPhone XR','iPhone 12 Pro','iPhone 14 Pro Max','Pixel 7','Samsung Galaxy S8+','Samsung Galaxy S20 Ultra','iPad Mini','iPad Air','iPad Pro','Surface Pro 7','Surface Duo','Galaxy Z Fold 5','Asus Zenbook Fold','Samsung Galaxy A51/71','Nest Hub','Nest Hub Max'
   ];
-  const [selectedDevice, setSelectedDevice] = useState('iPad Air');
+  // Auto-detect device on mount
+  const [selectedDevice, setSelectedDevice] = useState(() => {
+    const detected = detectDevice();
+    console.log('[Device Detection] Detected:', detected, '| Category:', getDeviceCategory(), '| Touch:', isTouchDevice());
+    return detected;
+  });
+  // Store detection info for display in control panel
+  const [deviceInfo, setDeviceInfo] = useState({ name: '', category: '', touch: false });
+  
+  // Run detection on mount and update info
+  useEffect(() => {
+    const detected = detectDevice();
+    const category = getDeviceCategory();
+    const touch = isTouchDevice();
+    setDeviceInfo({ name: detected, category, touch });
+    setSelectedDevice(detected);
+    console.log('[Device Detection] Auto-detected:', detected, '| Category:', category, '| Touch:', touch);
+  }, []);
+
   // Per-device presets (hard-coded transforms/controls). Add more devices as needed.
   const devicePresets = {
     'iPad Air': {
@@ -584,12 +603,17 @@ function App() {
 
         {/* Desktop control panel: Asset1 transform sliders and AnimatedLogo transform sliders */}
         {!isPhone && (
-          <div className="pointer-events-auto fixed right-4 top-20 z-50 p-4 bg-black/80 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ width: 260 }}>
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-sm font-semibold">Controls — {selectedDevice}</div>
+          <div className="pointer-events-auto fixed right-4 top-20 z-50 p-4 bg-black/80 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ width: 280 }}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-semibold">Controls</div>
               <select value={selectedDevice} onChange={(e)=>setSelectedDevice(e.target.value)} className="text-xs bg-black/60 border border-neutral-700 rounded p-1">
                 {deviceOptions.map(d=> <option key={d} value={d}>{d}</option>)}
               </select>
+            </div>
+            {/* Device detection info */}
+            <div className="text-[10px] text-cyan-400 bg-cyan-900/30 rounded px-2 py-1 mb-3 border border-cyan-800/50">
+              <div><span className="opacity-70">Detected:</span> <strong>{deviceInfo.name}</strong></div>
+              <div><span className="opacity-70">Category:</span> {deviceInfo.category} | <span className="opacity-70">Touch:</span> {deviceInfo.touch ? 'Yes' : 'No'}</div>
             </div>
             <div className="text-sm font-semibold mb-2">Asset1 Controls (desktop)</div>
             <label className="text-xs block opacity-80">X position</label>
