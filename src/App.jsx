@@ -207,50 +207,41 @@ function App() {
   const assetY = -200; // vertical position (px)
 
   // Desktop-editable Asset1 controls (persisted)
-  const [desktopAssetX, setDesktopAssetX] = useState(() => {
-    if (typeof window === 'undefined') return 4;
-    const raw = window.localStorage.getItem('asset1X_desktop');
-    const n = raw ? parseInt(raw, 10) : NaN;
-    return Number.isNaN(n) ? 4 : n;
-  });
-  const [desktopAssetY, setDesktopAssetY] = useState(() => {
-    if (typeof window === 'undefined') return -200;
-    const raw = window.localStorage.getItem('asset1Y_desktop');
-    const n = raw ? parseInt(raw, 10) : NaN;
-    return Number.isNaN(n) ? -200 : n;
-  });
-  const [desktopAssetScale, setDesktopAssetScale] = useState(() => {
-    if (typeof window === 'undefined') return 0.91;
-    const raw = window.localStorage.getItem('asset1Scale_desktop');
-    const n = raw ? Number(raw) : NaN;
-    return Number.isNaN(n) ? 0.91 : n;
-  });
-  const [desktopAssetH, setDesktopAssetH] = useState(() => {
-    if (typeof window === 'undefined') return 1.03;
-    const raw = window.localStorage.getItem('asset1H_desktop');
-    const n = raw ? Number(raw) : NaN;
-    return Number.isNaN(n) ? 1.03 : n;
-  });
-  const [desktopAssetV, setDesktopAssetV] = useState(() => {
-    if (typeof window === 'undefined') return 0.88;
-    const raw = window.localStorage.getItem('asset1V_desktop');
-    const n = raw ? Number(raw) : NaN;
-    return Number.isNaN(n) ? 0.88 : n;
-  });
+  // Desktop Asset1 and hero values (hard-coded per user request)
+  const [desktopAssetX, setDesktopAssetX] = useState(4);
+  const [desktopAssetY, setDesktopAssetY] = useState(-1106);
+  const [desktopAssetScale, setDesktopAssetScale] = useState(0.67);
+  const [desktopAssetH, setDesktopAssetH] = useState(1.27);
+  const [desktopAssetV, setDesktopAssetV] = useState(0.96);
   // Desktop control for hero AnimatedLogo scale
-  const [desktopHeroScale, setDesktopHeroScale] = useState(() => {
-    if (typeof window === 'undefined') return 1;
-    const raw = window.localStorage.getItem('heroScale_desktop');
-    const n = raw ? Number(raw) : NaN;
-    return Number.isNaN(n) ? 1 : n;
-  });
+  const [desktopHeroScale, setDesktopHeroScale] = useState(1.6);
   // Desktop control for hero AnimatedLogo Y position
-  const [desktopHeroY, setDesktopHeroY] = useState(() => {
-    if (typeof window === 'undefined') return 0;
-    const raw = window.localStorage.getItem('heroY_desktop');
-    const n = raw ? Number(raw) : NaN;
-    return Number.isNaN(n) ? 0 : n;
+  const [desktopHeroY, setDesktopHeroY] = useState(147);
+  // Outline/stroke width controls (desktop and mobile separate)
+  // Hard-coded desktop outline width per user's screenshot
+  const [desktopOutlineWidth, setDesktopOutlineWidth] = useState(0.5);
+  // Hard-coded desktop animated logo outline width per user's screenshot
+  const [desktopAnimatedOutlineWidth, setDesktopAnimatedOutlineWidth] = useState(1.5);
+  // Mobile animated logo outline width (tunable on mobile)
+  const [mobileAnimatedOutlineWidth, setMobileAnimatedOutlineWidth] = useState(() => {
+    try {
+      const v = window.localStorage.getItem('outline_width_animated_mobile');
+      return v ? Number(v) : 0.5;
+    } catch (e) { return 3; }
   });
+  const [mobileOutlineWidth, setMobileOutlineWidth] = useState(() => {
+    try {
+      const v = window.localStorage.getItem('outline_width_mobile');
+      return v ? Number(v) : 0.5;
+    } catch (e) { return 3; }
+  });
+  // Toggle for mobile scrolling PNG marquee
+  const [showMarquee, setShowMarquee] = useState(true);
+  // Device preset selector (used to hardcode per-device values later)
+  const deviceOptions = [
+    'iPhone SE','iPhone XR','iPhone 12 Pro','iPhone 14 Pro Max','Pixel 7','Samsung Galaxy S8+','Samsung Galaxy S20 Ultra','iPad Mini','iPad Air','iPad Pro','Surface Pro 7','Surface Duo','Galaxy Z Fold 5','Asus Zenbook Fold','Samsung Galaxy A51/71','Nest Hub','Nest Hub Max'
+  ];
+  const [selectedDevice, setSelectedDevice] = useState('iPad Air');
 
   // Track small-screen state and whether user has scrolled (to hide Asset1)
   const [isPhone, setIsPhone] = useState(false);
@@ -303,10 +294,36 @@ function App() {
       window.localStorage.setItem('asset1V_desktop', String(desktopAssetV));
       window.localStorage.setItem('heroScale_desktop', String(desktopHeroScale));
       window.localStorage.setItem('heroY_desktop', String(desktopHeroY));
+      window.localStorage.setItem('outline_width_desktop', String(desktopOutlineWidth));
+      window.localStorage.setItem('outline_width_mobile', String(mobileOutlineWidth));
+      window.localStorage.setItem('outline_width_animated_desktop', String(desktopAnimatedOutlineWidth));
+      window.localStorage.setItem('outline_width_animated_mobile', String(mobileAnimatedOutlineWidth));
     } catch (e) {
       // ignore
     }
   }, [desktopAssetX, desktopAssetY, desktopAssetScale, desktopAssetH, desktopAssetV, desktopHeroScale, desktopHeroY]);
+
+  // Persist outline widths when they change
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('outline_width_desktop', String(desktopOutlineWidth));
+    } catch (e) {}
+  }, [desktopOutlineWidth]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('outline_width_mobile', String(mobileOutlineWidth));
+    } catch (e) {}
+  }, [mobileOutlineWidth]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('outline_width_animated_desktop', String(desktopAnimatedOutlineWidth));
+    } catch (e) {}
+  }, [desktopAnimatedOutlineWidth]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('outline_width_animated_mobile', String(mobileAnimatedOutlineWidth));
+    } catch (e) {}
+  }, [mobileAnimatedOutlineWidth]);
 
   // Nav pill hide at page bottom, reveal when user scrolls up
   const [navHidden, setNavHidden] = useState(false);
@@ -533,45 +550,58 @@ function App() {
             opacity: assetHidden ? 0 : 1,
             transition: 'opacity 300ms ease, transform 300ms ease',
             willChange: 'opacity, transform',
+            // expose outline width variable for Asset1
+            ['--outline-width']: `${isPhone ? mobileOutlineWidth : desktopOutlineWidth}px`,
           }}
         />
 
-        {/* Desktop-only Asset1 controls */}
-        <div className="hidden sm:flex fixed right-4 bottom-4 z-40 pointer-events-auto">
-          <div className="w-[420px] bg-black/60 dark:bg-white/6 rounded-xl p-4 space-y-3 text-sm text-neutral-300">
-            <div className="flex items-center justify-between">
-              <strong className="text-xs">Desktop Controls</strong>
-              <span className="text-xs">Asset X: {desktopAssetX}px</span>
+        {/* Desktop control panel: Asset1 transform sliders and AnimatedLogo transform sliders */}
+        {!isPhone && (
+          <div className="pointer-events-auto fixed right-4 top-20 z-50 p-4 bg-black/80 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ width: 260 }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-semibold">Controls — {selectedDevice}</div>
+              <select value={selectedDevice} onChange={(e)=>setSelectedDevice(e.target.value)} className="text-xs bg-black/60 border border-neutral-700 rounded p-1">
+                {deviceOptions.map(d=> <option key={d} value={d}>{d}</option>)}
+              </select>
             </div>
-            <div className="space-y-2">
-              <label className="text-[11px]">Animated Logo Scale ({desktopHeroScale.toFixed(2)})</label>
-              <input type="range" min="0.6" max="1.6" step="0.01" value={desktopHeroScale} onChange={(e) => setDesktopHeroScale(Number(e.target.value))} className="w-full" />
+            <div className="text-sm font-semibold mb-2">Asset1 Controls (desktop)</div>
+            <label className="text-xs block opacity-80">X position</label>
+            <input type="range" min={-1400} max={1400} step={1} value={desktopAssetX} onChange={(e)=>setDesktopAssetX(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{desktopAssetX}px</div>
 
-              <label className="text-[11px]">Animated Logo Y ({desktopHeroY}px)</label>
-              <input type="range" min="-400" max="400" step="1" value={desktopHeroY} onChange={(e) => setDesktopHeroY(Number(e.target.value))} className="w-full" />
+            <label className="text-xs block opacity-80">Y position</label>
+            <input type="range" min={-2000} max={2000} step={1} value={desktopAssetY} onChange={(e)=>setDesktopAssetY(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{desktopAssetY}px</div>
 
-              <label className="text-[11px]">X ({desktopAssetX}px)</label>
-              <input type="range" min="-240" max="240" step="1" value={desktopAssetX} onChange={(e) => setDesktopAssetX(Number(e.target.value))} className="w-full" />
+            <label className="text-xs block opacity-80">Scale</label>
+            <input type="range" min={0.1} max={2} step={0.01} value={desktopAssetScale} onChange={(e)=>setDesktopAssetScale(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{desktopAssetScale}x</div>
 
-              <label className="text-[11px]">Y ({desktopAssetY}px)</label>
-              <input type="range" min="-1200" max="200" step="1" value={desktopAssetY} onChange={(e) => setDesktopAssetY(Number(e.target.value))} className="w-full" />
+            <label className="text-xs block opacity-80">X stretch</label>
+            <input type="range" min={0.5} max={2} step={0.01} value={desktopAssetH} onChange={(e)=>setDesktopAssetH(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{desktopAssetH}x</div>
 
-              <label className="text-[11px]">Scale ({desktopAssetScale.toFixed(2)})</label>
-              <input type="range" min="0.2" max="1.6" step="0.01" value={desktopAssetScale} onChange={(e) => setDesktopAssetScale(Number(e.target.value))} className="w-full" />
+            <label className="text-xs block opacity-80">Y stretch</label>
+            <input type="range" min={0.5} max={2} step={0.01} value={desktopAssetV} onChange={(e)=>setDesktopAssetV(Number(e.target.value))} style={{width:'100%'}} />
+            <div className="text-[11px] opacity-70 mb-2">{desktopAssetV}x</div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[11px]">X Stretch ({desktopAssetH.toFixed(2)})</label>
-                  <input type="range" min="0.5" max="1.6" step="0.01" value={desktopAssetH} onChange={(e) => setDesktopAssetH(Number(e.target.value))} className="w-full" />
-                </div>
-                <div>
-                  <label className="text-[11px]">Y Stretch ({desktopAssetV.toFixed(2)})</label>
-                  <input type="range" min="0.5" max="1.6" step="0.01" value={desktopAssetV} onChange={(e) => setDesktopAssetV(Number(e.target.value))} className="w-full" />
-                </div>
-              </div>
+            <div className="border-t border-neutral-700 mt-3 pt-3">
+              <div className="text-sm font-semibold mb-2">Animated Logo (home)</div>
+              <label className="text-xs block opacity-80">Scale</label>
+              <input type="range" min={0.1} max={3} step={0.01} value={desktopHeroScale} onChange={(e)=>setDesktopHeroScale(Number(e.target.value))} style={{width:'100%'}} />
+              <div className="text-[11px] opacity-70 mb-2">{desktopHeroScale}x</div>
+
+              <label className="text-xs block opacity-80">Y position</label>
+              <input type="range" min={-600} max={600} step={1} value={desktopHeroY} onChange={(e)=>setDesktopHeroY(Number(e.target.value))} style={{width:'100%'}} />
+              <div className="text-[11px] opacity-70">{desktopHeroY}px</div>
+            </div>
+
+            <div className="border-t border-neutral-700 mt-3 pt-3 flex items-center justify-between">
+              <label className="text-xs opacity-80">Show scrolling PNGs</label>
+              <input type="checkbox" checked={showMarquee} onChange={(e)=>setShowMarquee(e.target.checked)} aria-label="Toggle scrolling PNGs" />
             </div>
           </div>
-        </div>
+        )}
 
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
@@ -579,7 +609,7 @@ function App() {
             fallback={<div className="min-h-screen" />}
           >
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} heroYDesktop={desktopHeroY} />} />
+              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} heroYDesktop={desktopHeroY} outlineWidthDesktop={desktopOutlineWidth} outlineWidthMobile={mobileOutlineWidth} animatedLogoOutlineWidthDesktop={desktopAnimatedOutlineWidth} animatedLogoOutlineWidthMobile={mobileAnimatedOutlineWidth} showMarquee={showMarquee} selectedDevice={selectedDevice} />} />
               <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />

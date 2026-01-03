@@ -193,7 +193,7 @@ const portfolioLogos = [
   },
 ];
 
-export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDesktop = 0 }) {
+export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDesktop = 0, outlineWidthDesktop = 3, outlineWidthMobile = 3, animatedLogoOutlineWidthDesktop = 3, animatedLogoOutlineWidthMobile = 3, showMarquee = true, selectedDevice = '' }) {
   console.log('Home component is rendering');
   
   const [isPhone, setIsPhone] = useState(false);
@@ -389,7 +389,7 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
                 assets are identical content in different colours (as noted). */}
             <div className="relative w-full h-auto select-none flex items-center justify-center" style={{ transform: 'scale(1.5)' }}>
               {/* Replace hero videos with loading animation placeholder + outlined logo sequence */}
-              <HeroLogoSequence theme={theme} heroScaleDesktop={heroScaleDesktop} heroYDesktop={heroYDesktop} isPhone={isPhone} />
+              <HeroLogoSequence theme={theme} heroScaleDesktop={heroScaleDesktop} heroYDesktop={heroYDesktop} isPhone={isPhone} outlineWidthDesktop={outlineWidthDesktop} outlineWidthMobile={outlineWidthMobile} />
             </div>
           </div>
         </div>
@@ -397,7 +397,7 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
         {/* Hero logo sequence component (inline below) */}
 
         {/* Mobile: Scrolling marquee of 2025 images - fades out as you scroll */}
-        {isPhone && !hasScrolled && (
+        {showMarquee && !hasScrolled && (isPhone || (selectedDevice && /iPad|iPhone|Pixel|Galaxy|Surface|Nest/i.test(selectedDevice))) && (
           <div 
             className="w-full overflow-hidden py-4 mt-24 transition-opacity duration-300"
           >
@@ -688,7 +688,7 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
 }
 
 // Inline hero sequence: start AnimatedLogo immediately with theme-based stroke
-function HeroLogoSequence({ theme = 'dark', heroScaleDesktop = 1, heroYDesktop = 0, isPhone = true }) {
+function HeroLogoSequence({ theme = 'dark', heroScaleDesktop = 1, heroYDesktop = 0, isPhone = true, outlineWidthDesktop = 3, outlineWidthMobile = 3, animatedLogoOutlineWidthDesktop = 3, animatedLogoOutlineWidthMobile = 3 }) {
   // Stroke color: #4d4d4d for dark mode, black for light mode
   const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
 
@@ -700,7 +700,7 @@ function HeroLogoSequence({ theme = 'dark', heroScaleDesktop = 1, heroYDesktop =
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
       {/* Render AnimatedLogo always visible, outline-only, correct stroke color */}
       <div style={{ transform: `translateZ(0) translateY(${posY}px) scale(${scale})`, transformOrigin: '50% 50%' }}>
-        <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} />
+        <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} strokeWidth={isPhone ? animatedLogoOutlineWidthMobile : animatedLogoOutlineWidthDesktop} />
       </div>
     </div>
   );
