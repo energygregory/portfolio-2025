@@ -242,6 +242,33 @@ function App() {
     'iPhone SE','iPhone XR','iPhone 12 Pro','iPhone 14 Pro Max','Pixel 7','Samsung Galaxy S8+','Samsung Galaxy S20 Ultra','iPad Mini','iPad Air','iPad Pro','Surface Pro 7','Surface Duo','Galaxy Z Fold 5','Asus Zenbook Fold','Samsung Galaxy A51/71','Nest Hub','Nest Hub Max'
   ];
   const [selectedDevice, setSelectedDevice] = useState('iPad Air');
+  // Per-device presets (hard-coded transforms/controls). Add more devices as needed.
+  const devicePresets = {
+    'iPad Air': {
+      desktopAssetX: 4,
+      desktopAssetY: -505,
+      desktopAssetScale: 0.67,
+      desktopAssetH: 1.27,
+      desktopAssetV: 0.96,
+      desktopHeroScale: 1.05,
+      desktopHeroY: 107,
+      showMarquee: true,
+    },
+  };
+
+  // Apply preset when selectedDevice changes (hardcode for that device)
+  useEffect(() => {
+    const p = devicePresets[selectedDevice];
+    if (!p) return;
+    setDesktopAssetX(p.desktopAssetX);
+    setDesktopAssetY(p.desktopAssetY);
+    setDesktopAssetScale(p.desktopAssetScale);
+    setDesktopAssetH(p.desktopAssetH);
+    setDesktopAssetV(p.desktopAssetV);
+    setDesktopHeroScale(p.desktopHeroScale);
+    setDesktopHeroY(p.desktopHeroY);
+    setShowMarquee(!!p.showMarquee);
+  }, [selectedDevice]);
 
   // Track small-screen state and whether user has scrolled (to hide Asset1)
   const [isPhone, setIsPhone] = useState(false);
