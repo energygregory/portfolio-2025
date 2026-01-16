@@ -366,6 +366,7 @@ function App() {
     const updateDimensions = () => {
       const { w, h } = getViewportDimensions();
       const newDims = `${w}x${h}`;
+      console.log('Screen dimensions:', newDims, 'UserAgent:', navigator.userAgent);
       setScreenDimensions(newDims);
     };
     
@@ -555,7 +556,7 @@ function App() {
       {/* Now Playing - Top Center */}
       <div
         style={{
-          position: 'fixed',
+          position: 'absolute',
           top: '16px',
           left: '50%',
           opacity: assetHidden ? 0 : 1,
