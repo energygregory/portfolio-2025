@@ -134,7 +134,7 @@ const DEVICE_CONFIGS = {
     navY: 166,
     widgetScale: 0.8,
     widgetY: 0,
-    assetOutlineThickness: 2,
+    assetOutlineThickness: 0.8,
   },
   // iPhone 14 Pro (393x852) - LOCKED IN
   "393x852": {
@@ -148,7 +148,7 @@ const DEVICE_CONFIGS = {
     navY: 133,
     widgetScale: 0.8,
     widgetY: 0,
-    assetOutlineThickness: 2,
+    assetOutlineThickness: 0.8,
   },
   // iPhone 16 Plus (430x932) - LOCKED IN
   "430x932": {
@@ -162,7 +162,7 @@ const DEVICE_CONFIGS = {
     navY: 209,
     widgetScale: 0.85,
     widgetY: 0,
-    assetOutlineThickness: 2,
+    assetOutlineThickness: 0.8,
   },
   // iPhone XR (414x896) - LOCKED IN
   "414x896": {
@@ -176,7 +176,7 @@ const DEVICE_CONFIGS = {
     navY: 123,
     widgetScale: 0.8,
     widgetY: 0,
-    assetOutlineThickness: 2,
+    assetOutlineThickness: 0.8,
   },
   // iPhone 13 Pro Max (428x926) - LOCKED IN
   "428x926": {
@@ -190,7 +190,7 @@ const DEVICE_CONFIGS = {
     navY: 202,
     widgetScale: 0.85,
     widgetY: 0,
-    assetOutlineThickness: 2,
+    assetOutlineThickness: 0.8,
   },
   // iPad (768x1024)
   "768x1024": {
@@ -203,7 +203,7 @@ const DEVICE_CONFIGS = {
     assetV: 1.17,
     widgetScale: 1,
     widgetY: 0,
-    assetOutlineThickness: 3,
+    assetOutlineThickness: 0.8,
   },
   // Default fallback for desktop
   desktop: {
@@ -216,7 +216,7 @@ const DEVICE_CONFIGS = {
     assetV: 0.96,
     widgetScale: 1,
     widgetY: 0,
-    assetOutlineThickness: 4,
+    assetOutlineThickness: 0.8,
   },
   // Default fallback for mobile
   mobile: {
