@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function Asset1Svg({ theme = "dark", style = {}, className = "" }) {
+export default function Asset1Svg({ theme = "dark", style = {}, className = "", outlineThickness = 3 }) {
   const [svgMarkup, setSvgMarkup] = useState(null);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "" }
   if (!svgMarkup) return null;
 
   return (
-    <div className={`asset1-svg-container ${className}`} style={style}>
+    <div className={`asset1-svg-container ${className}`} style={{ ...style, '--outline-width': `${outlineThickness}px` }}>
       <style>{overrideCss}</style>
       <div dangerouslySetInnerHTML={{ __html: svgMarkup }} />
     </div>

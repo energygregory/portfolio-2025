@@ -135,6 +135,7 @@ const DEVICE_CONFIGS = {
     navY: 166,
     widgetScale: 0.8,
     widgetY: 0,
+    assetOutlineThickness: 2,
   },
   // iPhone 17 (393x852) - LOCKED IN
   "393x852": {
@@ -148,6 +149,7 @@ const DEVICE_CONFIGS = {
     navY: 133,
     widgetScale: 0.8,
     widgetY: 0,
+    assetOutlineThickness: 2,
   },
   // iPhone 16 Plus (430x932) - LOCKED IN
   "430x932": {
@@ -161,6 +163,7 @@ const DEVICE_CONFIGS = {
     navY: 209,
     widgetScale: 0.85,
     widgetY: 0,
+    assetOutlineThickness: 2,
   },
   // iPhone XR (414x896) - LOCKED IN
   "414x896": {
@@ -174,6 +177,7 @@ const DEVICE_CONFIGS = {
     navY: 123,
     widgetScale: 0.8,
     widgetY: 0,
+    assetOutlineThickness: 2,
   },
   // iPhone 13 Pro Max (428x926) - LOCKED IN
   "428x926": {
@@ -187,6 +191,7 @@ const DEVICE_CONFIGS = {
     navY: 202,
     widgetScale: 0.85,
     widgetY: 0,
+    assetOutlineThickness: 2,
   },
   // iPad (768x1024)
   "768x1024": {
@@ -199,6 +204,7 @@ const DEVICE_CONFIGS = {
     assetV: 1.17,
     widgetScale: 1,
     widgetY: 0,
+    assetOutlineThickness: 3,
   },
   // Default fallback for desktop
   desktop: {
@@ -211,6 +217,7 @@ const DEVICE_CONFIGS = {
     assetV: 0.96,
     widgetScale: 1,
     widgetY: 0,
+    assetOutlineThickness: 4,
   },
   // Default fallback for mobile
   mobile: {
@@ -695,6 +702,7 @@ function App() {
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
         <Asset1Svg
           theme={appliedTheme}
+          outlineThickness={liveConfig.assetOutlineThickness}
           className={`pointer-events-none absolute left-1/2 top-12 z-20`}
           style={{
             transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
@@ -762,6 +770,13 @@ function App() {
             <label>Y stretch: </label>
             <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
             <span>{liveConfig.assetV}</span>
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
+          <div>
+            <label>Outline thickness (light mode): </label>
+            <input type="range" min="1" max="10" step="0.5" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
+            <span>{liveConfig.assetOutlineThickness}</span>
           </div>
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Nav Bar</div>

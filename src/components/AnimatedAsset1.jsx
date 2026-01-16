@@ -1,43 +1,51 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, svg, stagger } from "animejs";
 
-export default function AnimatedAsset1({ className = "", style = {} }) {
+export default function AnimatedAsset1({ className = "", style = {}, theme = 'dark', outlineThickness = 1 }) {
   const containerRef = useRef(null);
+  const [originalSvg, setOriginalSvg] = useState(null);
   const [svgContent, setSvgContent] = useState(null);
 
-  // Fetch the SVG content
+  // Fetch the SVG content once
   useEffect(() => {
     fetch("/LOGOS/Asset 1.svg")
       .then((res) => res.text())
       .then((text) => {
-        // Parse the SVG and modify paths for stroke animation
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, "image/svg+xml");
-        const svgEl = doc.querySelector("svg");
-        
-        if (svgEl) {
-          // Set viewBox and class
-          svgEl.setAttribute("class", "w-full h-full");
-          svgEl.setAttribute("preserveAspectRatio", "xMidYMid slice");
-          
-          // Modify all paths for stroke animation
-          const paths = svgEl.querySelectorAll("path");
-          paths.forEach((path) => {
-            // Get original fill color or use white
-            const originalFill = path.getAttribute("fill") || "#fff";
-            // Remove fill, add stroke
-            path.setAttribute("fill", "none");
-            path.setAttribute("stroke", originalFill === "none" ? "#fff" : originalFill);
-            path.setAttribute("stroke-width", "1");
-            path.setAttribute("stroke-linecap", "round");
-            path.setAttribute("stroke-linejoin", "round");
-          });
-          
-          setSvgContent(svgEl.outerHTML);
-        }
+        setOriginalSvg(text);
       })
       .catch((err) => console.error("Failed to load Asset 1.svg:", err));
   }, []);
+
+  // Modify SVG based on theme and outlineThickness
+  useEffect(() => {
+    if (!originalSvg) return;
+
+    // Parse the SVG and modify paths for stroke animation
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(originalSvg, "image/svg+xml");
+    const svgEl = doc.querySelector("svg");
+    
+    if (svgEl) {
+      // Set viewBox and class
+      svgEl.setAttribute("class", "w-full h-full");
+      svgEl.setAttribute("preserveAspectRatio", "xMidYMid slice");
+      
+      // Modify all paths for stroke animation
+      const paths = svgEl.querySelectorAll("path");
+      paths.forEach((path) => {
+        // Get original fill color or use white
+        const originalFill = path.getAttribute("fill") || "#fff";
+        // Remove fill, add stroke
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", originalFill === "none" ? "#fff" : originalFill);
+        path.setAttribute("stroke-width", theme === 'light' ? outlineThickness : "1");
+        path.setAttribute("stroke-linecap", "round");
+        path.setAttribute("stroke-linejoin", "round");
+      });
+      
+      setSvgContent(svgEl.outerHTML);
+    }
+  }, [originalSvg, theme, outlineThickness]);
 
   // Animate after SVG is loaded
   useEffect(() => {
