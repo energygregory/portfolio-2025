@@ -123,8 +123,8 @@ const LiquidLogo = lazy(() => import("./components/LiquidLogo"));
 // Device-specific configurations (hardcoded per user's adjustments)
 // Key format: "widthxheight" for precise matching
 const DEVICE_CONFIGS = {
-  // iPhone 12 Pro (390x844) - LOCKED IN
-  "390x844": {
+  // iPhone 12 Pro
+  "iPhone 12 Pro": {
     heroScale: 0.69,
     heroY: 79,
     animatedOutlineWidth: 5,
@@ -137,8 +137,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone 17 (393x852) - LOCKED IN
-  "393x852": {
+  // iPhone 14 Pro
+  "iPhone 14 Pro": {
     heroScale: 0.65,
     heroY: 79,
     animatedOutlineWidth: 5,
@@ -151,8 +151,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone 16 Plus (430x932) - LOCKED IN
-  "430x932": {
+  // iPhone 16 Plus
+  "iPhone 16 Plus": {
     heroScale: 0.68,
     heroY: 77,
     animatedOutlineWidth: 5,
@@ -165,8 +165,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone XR (414x896) - LOCKED IN
-  "414x896": {
+  // iPhone XR
+  "iPhone XR": {
     heroScale: 0.65,
     heroY: 57,
     animatedOutlineWidth: 5,
@@ -179,8 +179,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone 13 Pro Max (428x926) - LOCKED IN
-  "428x926": {
+  // iPhone 13 Pro Max
+  "iPhone 13 Pro Max": {
     heroScale: 0.66,
     heroY: 84,
     animatedOutlineWidth: 5,
@@ -193,8 +193,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPad (768x1024)
-  "768x1024": {
+  // iPad Pro
+  "iPad Pro": {
     heroScale: 1.05,
     heroY: 75,
     animatedOutlineWidth: 3.2,
@@ -231,28 +231,20 @@ const DEVICE_CONFIGS = {
   },
 };
 
-// Helper to get config based on screen dimensions
-const getDeviceConfig = (dims) => {
-  // On first render or in SSR, dims might not be ready.
-  if (!dims || dims === '?x?') {
+// Helper to get config based on detected device
+const getDeviceConfig = (device) => {
+  // On first render or in SSR, device might not be ready.
+  if (!device || device === 'unknown') {
     return DEVICE_CONFIGS.desktop; // Default to desktop
   }
 
-  // Check for an exact match first (e.g., "390x844")
-  if (DEVICE_CONFIGS[dims]) {
-    return DEVICE_CONFIGS[dims];
+  // Check for an exact match first (e.g., "iPhone 14 Pro")
+  if (DEVICE_CONFIGS[device]) {
+    return DEVICE_CONFIGS[device];
   }
 
-  // If no exact match, fallback to category based on width
-  const width = parseInt(dims.split('x')[0]);
-  if (isNaN(width)) {
-    return DEVICE_CONFIGS.desktop; // Safety fallback
-  }
-
-  if (width <= 640) return DEVICE_CONFIGS.mobile;
-  // Use iPad config as the default for tablets
-  if (width <= 1024) return DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile; 
-  
+  // Fallback to mobile for iPhones, desktop for others
+  if (device.includes('iPhone')) return DEVICE_CONFIGS.mobile;
   return DEVICE_CONFIGS.desktop;
 };
 
@@ -347,34 +339,32 @@ function App() {
   const pillPadding = 12;
 
   // Screen dimensions state - updated on resize/viewport change
-  const [screenDimensions, setScreenDimensions] = useState(() => {
-    if (typeof window === 'undefined') return '?x?';
-    const { w, h } = getViewportDimensions();
-    return `${w}x${h}`;
+  const [deviceName, setDeviceName] = useState(() => {
+    if (typeof window === 'undefined') return 'unknown';
+    return detectDevice();
   });
 
-  // Get device config based on current screen dimensions
-  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(screenDimensions));
+  // Get device config based on detected device
+  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(deviceName));
 
-  // Update the config whenever screen dimensions change
+  // Update the config whenever device changes
   useEffect(() => {
-    setCurrentConfig(getDeviceConfig(screenDimensions));
-  }, [screenDimensions]);
+    setCurrentConfig(getDeviceConfig(deviceName));
+  }, [deviceName]);
 
-  // Update screen dimensions when viewport changes
+  // Update device detection
   useEffect(() => {
-    const updateDimensions = () => {
-      const { w, h } = getViewportDimensions();
-      const newDims = `${w}x${h}`;
-      console.log('Screen dimensions:', newDims, 'UserAgent:', navigator.userAgent);
-      setScreenDimensions(newDims);
+    const updateDevice = () => {
+      const newDevice = detectDevice();
+      console.log('Detected device:', newDevice, 'Screen dimensions:', window.innerWidth + 'x' + window.innerHeight, 'UserAgent:', navigator.userAgent);
+      setDeviceName(newDevice);
     };
     
-    window.addEventListener('resize', updateDimensions);
-    const interval = setInterval(updateDimensions, 500);
+    window.addEventListener('resize', updateDevice);
+    const interval = setInterval(updateDevice, 500);
     
     return () => {
-      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener('resize', updateDevice);
       clearInterval(interval);
     };
   }, []);
@@ -733,7 +723,7 @@ function App() {
           flexDirection: 'column',
           gap: '5px'
         }}>
-          <div style={{fontWeight: 'bold'}}>Screen: {screenDimensions}</div>
+          <div style={{fontWeight: 'bold'}}>Device: {deviceName}</div>
           <div style={{fontWeight: 'bold'}}>Animated Logo</div>
           <div>
             <label>Scale: </label>
