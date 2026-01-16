@@ -93,7 +93,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
-import { deviceDetect } from 'react-device-detect';
 
 // Disable right-click context menu on images
 if (typeof document !== 'undefined') {
@@ -123,8 +122,8 @@ const LiquidLogo = lazy(() => import("./components/LiquidLogo"));
 // Device-specific configurations (hardcoded per user's adjustments)
 // Key format: "widthxheight" for precise matching
 const DEVICE_CONFIGS = {
-  // iPhone 12 Pro
-  "iPhone 12 Pro": {
+  // iPhone 12 Pro (390x844) - LOCKED IN
+  "390x844": {
     heroScale: 0.69,
     heroY: 79,
     animatedOutlineWidth: 5,
@@ -137,8 +136,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone 14 Pro
-  "iPhone 14 Pro": {
+  // iPhone 14 Pro (393x852) - LOCKED IN
+  "393x852": {
     heroScale: 0.65,
     heroY: 79,
     animatedOutlineWidth: 5,
@@ -151,8 +150,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone 16 Plus
-  "iPhone 16 Plus": {
+  // iPhone 16 Plus (430x932) - LOCKED IN
+  "430x932": {
     heroScale: 0.68,
     heroY: 77,
     animatedOutlineWidth: 5,
@@ -165,8 +164,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone XR
-  "iPhone XR": {
+  // iPhone XR (414x896) - LOCKED IN
+  "414x896": {
     heroScale: 0.65,
     heroY: 57,
     animatedOutlineWidth: 5,
@@ -179,8 +178,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPhone 13 Pro Max
-  "iPhone 13 Pro Max": {
+  // iPhone 13 Pro Max (428x926) - LOCKED IN
+  "428x926": {
     heroScale: 0.66,
     heroY: 84,
     animatedOutlineWidth: 5,
@@ -193,8 +192,8 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 2,
   },
-  // iPad Pro
-  "iPad Pro": {
+  // iPad (768x1024)
+  "768x1024": {
     heroScale: 1.05,
     heroY: 75,
     animatedOutlineWidth: 3.2,
@@ -231,29 +230,47 @@ const DEVICE_CONFIGS = {
   },
 };
 
-// Helper to get config based on detected device
-const getDeviceConfig = (device) => {
-  // On first render or in SSR, device might not be ready.
-  if (!device || device === 'unknown') {
+// Helper to get config based on screen dimensions
+const getDeviceConfig = (dims) => {
+  // On first render or in SSR, dims might not be ready.
+  if (!dims || dims === '?x?') {
     return DEVICE_CONFIGS.desktop; // Default to desktop
   }
 
-  // Check for an exact match first (e.g., "iPhone 14 Pro")
-  if (DEVICE_CONFIGS[device]) {
-    return DEVICE_CONFIGS[device];
+  // Check for an exact match first (e.g., "390x844")
+  if (DEVICE_CONFIGS[dims]) {
+    return DEVICE_CONFIGS[dims];
   }
 
-  // Fallback to mobile for iPhones, desktop for others
-  if (device.includes('iPhone')) return DEVICE_CONFIGS.mobile;
+  // If no exact match, fallback to category based on width
+  const width = parseInt(dims.split('x')[0]);
+  if (isNaN(width)) {
+    return DEVICE_CONFIGS.desktop; // Safety fallback
+  }
+
+  if (width <= 640) return DEVICE_CONFIGS.mobile;
+  // Use iPad config as the default for tablets
+  if (width <= 1024) return DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile; 
+  
   return DEVICE_CONFIGS.desktop;
 };
 
 // Get current viewport dimensions (respects responsive testing tools)
 const getViewportDimensions = () => {
-  if (typeof window === 'undefined') return { w: 0, h: 0 };
+  if (typeof window === 'undefined') return { w: 1920, h: 1080 };
+
+  // Use visualViewport for more accurate mobile detection
+  if (window.visualViewport) {
+    return {
+      w: Math.round(window.visualViewport.width),
+      h: Math.round(window.visualViewport.height)
+    };
+  }
+
+  // Fallback to inner dimensions
   return {
-    w: document.documentElement.clientWidth || window.innerWidth,
-    h: document.documentElement.clientHeight || window.innerHeight,
+    w: window.innerWidth,
+    h: window.innerHeight
   };
 };
 
@@ -339,32 +356,34 @@ function App() {
   const pillPadding = 12;
 
   // Screen dimensions state - updated on resize/viewport change
-  const [deviceName, setDeviceName] = useState(() => {
-    if (typeof window === 'undefined') return 'unknown';
-    return detectDevice();
+  const [screenDimensions, setScreenDimensions] = useState(() => {
+    if (typeof window === 'undefined') return '?x?';
+    const { w, h } = getViewportDimensions();
+    return `${w}x${h}`;
   });
 
-  // Get device config based on detected device
-  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(deviceName));
+  // Get device config based on current screen dimensions
+  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(screenDimensions));
 
-  // Update the config whenever device changes
+  // Update the config whenever screen dimensions change
   useEffect(() => {
-    setCurrentConfig(getDeviceConfig(deviceName));
-  }, [deviceName]);
+    setCurrentConfig(getDeviceConfig(screenDimensions));
+  }, [screenDimensions]);
 
-  // Update device detection
+  // Update screen dimensions when viewport changes
   useEffect(() => {
-    const updateDevice = () => {
-      const newDevice = detectDevice();
-      console.log('Detected device:', newDevice, 'Screen dimensions:', window.innerWidth + 'x' + window.innerHeight, 'UserAgent:', navigator.userAgent);
-      setDeviceName(newDevice);
+    const updateDimensions = () => {
+      const { w, h } = getViewportDimensions();
+      const newDims = `${w}x${h}`;
+      console.log('Screen dimensions:', newDims, 'UserAgent:', navigator.userAgent);
+      setScreenDimensions(newDims);
     };
     
-    window.addEventListener('resize', updateDevice);
-    const interval = setInterval(updateDevice, 500);
+    window.addEventListener('resize', updateDimensions);
+    const interval = setInterval(updateDimensions, 500);
     
     return () => {
-      window.removeEventListener('resize', updateDevice);
+      window.removeEventListener('resize', updateDimensions);
       clearInterval(interval);
     };
   }, []);
@@ -723,7 +742,7 @@ function App() {
           flexDirection: 'column',
           gap: '5px'
         }}>
-          <div style={{fontWeight: 'bold'}}>Device: {deviceName}</div>
+          <div style={{fontWeight: 'bold'}}>Screen: {screenDimensions}</div>
           <div style={{fontWeight: 'bold'}}>Animated Logo</div>
           <div>
             <label>Scale: </label>
