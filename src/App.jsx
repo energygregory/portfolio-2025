@@ -93,7 +93,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
-import { detectDevice, getDeviceCategory, isTouchDevice } from "./utils/detectDevice";
+import { deviceDetect } from 'react-device-detect';
 
 // Disable right-click context menu on images
 if (typeof document !== 'undefined') {

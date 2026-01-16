@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const SpotifyNowPlaying = ({ theme = 'dark' }) => {
   const [musicData, setMusicData] = useState(null);
+  const [lastMusicData, setLastMusicData] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ const SpotifyNowPlaying = ({ theme = 'dark' }) => {
         const imageSrc = (track.image?.[2]?.['#text']) || 'https://via.placeholder.com/64?text=Music';
 
         setMusicData({ isPlaying, songName, artistName, url, imageSrc });
+        setLastMusicData({ isPlaying, songName, artistName, url, imageSrc });
         setError(null);
       } catch (err) {
         setError(err.message);
@@ -32,9 +34,12 @@ const SpotifyNowPlaying = ({ theme = 'dark' }) => {
     return () => clearInterval(interval);
   }, []);
 
-  if (error || !musicData) return null;
+  if (error && !lastMusicData) return null;
 
-  const { isPlaying, songName, artistName, url, imageSrc } = musicData;
+  const displayData = musicData || lastMusicData;
+  if (!displayData) return null;
+
+  const { isPlaying, songName, artistName, url, imageSrc } = displayData;
   const textColor = theme === 'dark' ? '#ffffff' : '#000000';
   const subTextColor = theme === 'dark' ? '#888' : '#666';
 
