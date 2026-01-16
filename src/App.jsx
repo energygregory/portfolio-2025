@@ -551,9 +551,9 @@ function App() {
           opacity: assetHidden ? 0 : 1,
           transition: 'opacity 300ms ease',
           willChange: 'opacity',
-          transform: `translateY(${liveConfig.widgetY}px) scale(${liveConfig.widgetScale})`,
+          transform: `translateX(-50%) translateY(${liveConfig.widgetY}px) scale(${liveConfig.widgetScale})`,
         }}
-        className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none sm:pointer-events-auto"
+        className="absolute top-4 left-1/2 z-50 pointer-events-none sm:pointer-events-auto"
       >
         <Suspense fallback={null}>
           <SpotifyNowPlaying theme={appliedTheme} />
