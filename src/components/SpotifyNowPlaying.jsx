@@ -2,6 +2,71 @@ import React, { useState, useEffect } from 'react';
 
 const SpotifyNowPlaying = ({ theme = 'dark' }) => {
   // --- CONFIGURATION ---
+  const USERNAME = 'energygregory';
+  const API_KEY = 'bd904e0fd30a90a8b49f857b9b01b900';
+  // ---------------------
+
+  const [musicData, setMusicData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadMusic() {
+      try {
+        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`;
+        const response = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
+        if (!response.ok) throw new Error('API Error');
+
+        const data = await response.json();
+        const track = data?.recenttracks?.track?.[0];
+        if (!track) throw new Error('No track data found');
+
+        const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+        const songName = track.name;
+        const artistName = track.artist['#text'];
+        const link = track.url;
+        const imageSrc = (track.image?.[2]?.['#text']) || 'https://via.placeholder.com/64?text=Music';
+
+        setMusicData({ isPlaying, songName, artistName, link, imageSrc });
+        setError(null);
+      } catch (err) {
+        console.error('Music widget failed to load:', err);
+        setError(err.message);
+      }
+    }
+
+    loadMusic();
+    const interval = setInterval(loadMusic, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fail silently: if error or loading, render nothing
+  if (error || !musicData) return null;
+
+  const { isPlaying, songName, artistName, link, imageSrc } = musicData;
+  const textColor = theme === 'dark' ? '#ffffff' : '#000000';
+  const subTextColor = theme === 'dark' ? '#888' : '#666';
+
+  return (
+    <div id="music-container" style={{ fontFamily: 'sans-serif', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <img id="music-art" src={imageSrc} alt="Album Art" style={{ width: 50, height: 50, borderRadius: 4 }} />
+      <div>
+        <div id="music-status" style={{ fontSize: 10, color: isPlaying ? '#1DB954' : subTextColor, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 'bold' }}>
+          {isPlaying ? 'Now Playing' : 'Recently Played'}
+        </div>
+        <a id="music-link" href={link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: textColor, fontWeight: 'bold' }}>
+          <span id="music-song">{songName}</span>
+        </a>
+        <div id="music-artist" style={{ fontSize: 12, color: subTextColor }}>{artistName}</div>
+      </div>
+    </div>
+  );
+};
+
+export default SpotifyNowPlaying;
+import React, { useState, useEffect } from 'react';
+
+const SpotifyNowPlaying = ({ theme = 'dark' }) => {
+  // --- CONFIGURATION ---
   const USERNAME = "energygregory";
   const API_KEY = "bd904e0fd30a90a8b49f857b9b01b900";
   // ---------------------
