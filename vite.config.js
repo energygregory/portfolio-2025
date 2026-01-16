@@ -1,12 +1,32 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import viteImagemin from "vite-plugin-imagemin";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Compress images during build for faster loading
+    viteImagemin({
+      gifsicle: { optimizationLevel: 7, interlaced: false },
+      optipng: { optimizationLevel: 7 },
+      mozjpeg: { quality: 80 },
+      pngquant: { quality: [0.7, 0.9], speed: 4 },
+      svgo: {
+        plugins: [
+          { name: "removeViewBox", active: false },
+          { name: "removeEmptyAttrs", active: false },
+        ],
+      },
+    }),
+  ],
   build: {
+    // Enable asset inlining for small images (< 10kb become base64)
+    assetsInlineLimit: 10240,
     rollupOptions: {
       output: {
+        // Hash assets for optimal caching
+        assetFileNames: "assets/[name]-[hash][extname]",
         manualChunks: {
           "liquid-logo": ["./src/components/LiquidLogo.jsx"],
           dither: ["./src/components/Dither.jsx"],
@@ -25,6 +45,8 @@ export default defineConfig({
     },
   },
   server: {
+    // Expose to local network (access via your IP on same WiFi)
+    host: true,
     // Allow connections from specific public tunnel hosts used for testing.
     // You can add more hostnames here if needed.
     allowedHosts: [
@@ -39,6 +61,8 @@ export default defineConfig({
       "upset-symbols-rest.loca.lt",
       "unabashed-dayfly-coraline.ngrok-free.dev",
       "2b87577bcc66.ngrok-free.app",
+      "064f6a546f44.ngrok-free.app",
+      "https://thick-bananas-deny.loca.lt",
     ],
   },
 });

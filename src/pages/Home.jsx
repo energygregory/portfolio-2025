@@ -6,6 +6,48 @@ import AnimatedLogo from "../components/AnimatedLogo";
 // import SpotifyNowPlaying from "../components/SpotifyNowPlaying";
 import logos from "../data/logos";
 
+// Fast-loading image component with intersection observer
+const FastImage = React.memo(({ src, alt, className, style, onContextMenu, onDragStart, isPhone }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px', threshold: 0.01 }
+    );
+    
+    if (imgRef.current) observer.observe(imgRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={imgRef} className="relative w-full h-full">
+      {isInView && (
+        <img 
+          src={src} 
+          alt={alt}
+          className={`${className} transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+          style={style}
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+          draggable={false}
+          onContextMenu={onContextMenu}
+          onDragStart={onDragStart}
+          onLoad={() => setIsLoaded(true)}
+        />
+      )}
+    </div>
+  );
+});
+
 // Logo for chrome effect (PNG)
 const logoPath = "/LOGOS/newlogo.svg";
 
@@ -193,11 +235,22 @@ const portfolioLogos = [
   },
 ];
 
-export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDesktop = 0, heroScaleMobile = 1, heroYMobile = 0, outlineWidthDesktop = 3, outlineWidthMobile = 3, animatedLogoOutlineWidthDesktop = 3, animatedLogoOutlineWidthMobile = 3, showMarquee = true, selectedDevice = '' }) {
+export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8, showMarquee = true, selectedDevice = '' }) {
   console.log('Home component is rendering');
   
-  const [isPhone, setIsPhone] = useState(false);
-  const [isTabletOrLarger, setIsTabletOrLarger] = useState(false);
+  // Initialize with actual media query values to avoid stale state
+  const [isPhone, setIsPhone] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 640px)').matches;
+  });
+  const [isTabletOrLarger, setIsTabletOrLarger] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(min-width: 641px)').matches;
+  });
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 1024px)').matches;
+  });
   const [hasScrolled, setHasScrolled] = useState(false);
   const logoContainerRef = useRef(null);
   const clRef = useRef(null);
@@ -206,30 +259,58 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
   const imagesRef = useRef(null);
   const scrollYRef = useRef(0);
 
+  // Preload remaining images after initial render for fast scrolling
+  useEffect(() => {
+    // Use requestIdleCallback or setTimeout to preload without blocking
+    const preloadImages = () => {
+      images2025.slice(6).forEach((src, idx) => {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.as = 'image';
+        link.href = src;
+        document.head.appendChild(link);
+      });
+    };
+    
+    // Delay preloading to not compete with critical resources
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(preloadImages, { timeout: 2000 });
+    } else {
+      setTimeout(preloadImages, 1000);
+    }
+  }, []);
+
   useEffect(() => {
     const phoneMql = window.matchMedia("(max-width: 640px)");
     const tabletMql = window.matchMedia("(min-width: 641px)");
+    const mobileOrTabletMql = window.matchMedia("(max-width: 1024px)");
     
     const onPhoneChange = (e) => setIsPhone(e.matches);
     const onTabletChange = (e) => setIsTabletOrLarger(e.matches);
+    const onMobileOrTabletChange = (e) => setIsMobileOrTablet(e.matches);
     
     setIsPhone(phoneMql.matches);
     setIsTabletOrLarger(tabletMql.matches);
+    setIsMobileOrTablet(mobileOrTabletMql.matches);
     
     if (phoneMql.addEventListener) {
       phoneMql.addEventListener("change", onPhoneChange);
       tabletMql.addEventListener("change", onTabletChange);
+      mobileOrTabletMql.addEventListener("change", onMobileOrTabletChange);
     } else {
       phoneMql.addListener(onPhoneChange);
       tabletMql.addListener(onTabletChange);
+      mobileOrTabletMql.addListener(onMobileOrTabletChange);
     }
     return () => {
       if (phoneMql.removeEventListener) {
         phoneMql.removeEventListener("change", onPhoneChange);
         tabletMql.removeEventListener("change", onTabletChange);
+        mobileOrTabletMql.removeEventListener("change", onMobileOrTabletChange);
       } else {
         phoneMql.removeListener(onPhoneChange);
         tabletMql.removeListener(onTabletChange);
+        mobileOrTabletMql.removeListener(onMobileOrTabletChange);
       }
     };
   }, []);
@@ -259,10 +340,8 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
     const maxScroll = isPhone ? 400 : 600;
     const progress = Math.min(scrollY / maxScroll, 1);
     
-    // Track if user has scrolled (for mobile marquee)
-    if (isPhone) {
-      setHasScrolled(scrollY > 20);
-    }
+    // Track if user has scrolled (for marquee on all devices)
+    setHasScrolled(scrollY > 20);
     
     // Ease the progress for much smoother motion (easeOutCubic)
     const eased = 1 - Math.pow(1 - progress, 3);
@@ -389,7 +468,7 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
                 assets are identical content in different colours (as noted). */}
             <div className="relative w-full h-auto select-none flex items-center justify-center" style={{ transform: 'scale(1.5)' }}>
               {/* Replace hero videos with loading animation placeholder + outlined logo sequence */}
-              <HeroLogoSequence theme={theme} heroScaleDesktop={heroScaleDesktop} heroYDesktop={heroYDesktop} heroScaleMobile={heroScaleMobile} heroYMobile={heroYMobile} isPhone={isPhone} outlineWidthDesktop={outlineWidthDesktop} outlineWidthMobile={outlineWidthMobile} animatedLogoOutlineWidthDesktop={animatedLogoOutlineWidthDesktop} animatedLogoOutlineWidthMobile={animatedLogoOutlineWidthMobile} />
+              <HeroLogoSequence theme={theme} heroScale={heroScale} heroY={heroY} animatedOutlineWidth={animatedOutlineWidth} />
             </div>
           </div>
         </div>
@@ -476,9 +555,9 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
                       className={`max-w-full max-h-full object-contain select-none transition-transform duration-500 ${
                         !isPhone ? 'hover:scale-110' : ''
                       }`}
-                      loading="lazy"
+                      loading={idx < 18 ? "eager" : "lazy"}
                       decoding="async"
-                      fetchpriority="low"
+                      fetchpriority={idx < 12 ? "high" : "low"}
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}
                       onDragStart={(e) => e.preventDefault()}
@@ -688,19 +767,15 @@ export default function Home({ theme = "dark", heroScaleDesktop = 1, heroYDeskto
 }
 
 // Inline hero sequence: start AnimatedLogo immediately with theme-based stroke
-function HeroLogoSequence({ theme = 'dark', heroScaleDesktop = 1, heroYDesktop = 0, heroScaleMobile = 1, heroYMobile = 0, isPhone = true, outlineWidthDesktop = 3, outlineWidthMobile = 3, animatedLogoOutlineWidthDesktop = 3, animatedLogoOutlineWidthMobile = 3 }) {
+function HeroLogoSequence({ theme = 'dark', heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8 }) {
   // Stroke color: #4d4d4d for dark mode, black for light mode
   const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
-
-  // Desktop uses the passed-in heroScaleDesktop; mobile uses heroScaleMobile
-  const scale = isPhone ? heroScaleMobile : heroScaleDesktop;
-  const posY = isPhone ? heroYMobile : heroYDesktop;
 
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
       {/* Render AnimatedLogo always visible, outline-only, correct stroke color */}
-      <div style={{ transform: `translateZ(0) translateY(${posY}px) scale(${scale})`, transformOrigin: '50% 50%' }}>
-        <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} strokeWidth={isPhone ? animatedLogoOutlineWidthMobile : animatedLogoOutlineWidthDesktop} />
+      <div style={{ transform: `translateZ(0) translateY(${heroY}px) scale(${heroScale})`, transformOrigin: '50% 50%' }}>
+        <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} strokeWidth={animatedOutlineWidth} />
       </div>
     </div>
   );

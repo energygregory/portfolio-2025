@@ -119,6 +119,108 @@ import Asset1Svg from "./components/Asset1Svg";
 const Footer = lazy(() => import("./components/Footer"));
 const LiquidLogo = lazy(() => import("./components/LiquidLogo"));
 
+// Device-specific configurations (hardcoded per user's adjustments)
+// Key format: "widthxheight" for precise matching
+const DEVICE_CONFIGS = {
+  // iPhone 12 Pro (390x844) - LOCKED IN
+  "390x844": {
+    heroScale: 0.69,
+    heroY: 79,
+    animatedOutlineWidth: 5,
+    assetX: 0,
+    assetY: -128,
+    assetH: 0.93,
+    assetV: 1,
+    navY: 166,
+  },
+  // iPhone 17 (393x852) - LOCKED IN
+  "393x852": {
+    heroScale: 0.65,
+    heroY: 79,
+    animatedOutlineWidth: 5,
+    assetX: 0,
+    assetY: -127,
+    assetH: 0.96,
+    assetV: 1,
+    navY: 133,
+  },
+  // iPhone 16 Plus (430x932) - LOCKED IN
+  "430x932": {
+    heroScale: 0.68,
+    heroY: 77,
+    animatedOutlineWidth: 5,
+    assetX: 3,
+    assetY: -135,
+    assetH: 0.94,
+    assetV: 1,
+    navY: 209,
+  },
+  // iPad (768x1024)
+  "768x1024": {
+    heroScale: 1.05,
+    heroY: 75,
+    animatedOutlineWidth: 3.2,
+    assetX: 0,
+    assetY: -704,
+    assetH: 1.36,
+    assetV: 1.17,
+  },
+  // Default fallback for desktop
+  desktop: {
+    heroScale: 1.6,
+    heroY: 147,
+    animatedOutlineWidth: 1.5,
+    assetX: 0,
+    assetY: -1106,
+    assetH: 1.27,
+    assetV: 0.96,
+  },
+  // Default fallback for mobile
+  mobile: {
+    heroScale: 1,
+    heroY: 0,
+    animatedOutlineWidth: 3.8,
+    assetX: 0,
+    assetY: -200,
+    assetH: 1.03,
+    assetV: 0.88,
+  },
+};
+
+// Helper to get config based on screen dimensions
+const getDeviceConfig = (dims) => {
+  // On first render or in SSR, dims might not be ready.
+  if (!dims || dims === '?x?') {
+    return DEVICE_CONFIGS.desktop; // Default to desktop
+  }
+
+  // Check for an exact match first (e.g., "390x844")
+  if (DEVICE_CONFIGS[dims]) {
+    return DEVICE_CONFIGS[dims];
+  }
+
+  // If no exact match, fallback to category based on width
+  const width = parseInt(dims.split('x')[0]);
+  if (isNaN(width)) {
+    return DEVICE_CONFIGS.desktop; // Safety fallback
+  }
+
+  if (width <= 640) return DEVICE_CONFIGS.mobile;
+  // Use iPad config as the default for tablets
+  if (width <= 1024) return DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile; 
+  
+  return DEVICE_CONFIGS.desktop;
+};
+
+// Get current viewport dimensions (respects responsive testing tools)
+const getViewportDimensions = () => {
+  if (typeof window === 'undefined') return { w: 0, h: 0 };
+  return {
+    w: document.documentElement.clientWidth || window.innerWidth,
+    h: document.documentElement.clientHeight || window.innerHeight,
+  };
+};
+
 // Use the actual files in public/LOGOS (filenames used as-is).
 const portfolioLogos = [
   {
@@ -200,153 +302,99 @@ function App() {
   const iconOffset = 9;
   const pillPadding = 12;
 
-  // Decorative Asset1 defaults for mobile (hard-coded) and desktop (editable)
-  // These are now state variables for iPhone X tuning
-  const [mobileAssetX, setMobileAssetX] = useState(1);
-  const [mobileAssetY, setMobileAssetY] = useState(-200);
-  const [mobileAssetScale, setMobileAssetScale] = useState(0.91);
-  const [mobileAssetH, setMobileAssetH] = useState(1.03);
-  const [mobileAssetV, setMobileAssetV] = useState(0.88);
-  // Mobile floating nav bar Y position (bottom offset in Tailwind units, default bottom-12 = 48px)
-  const [mobileNavY, setMobileNavY] = useState(48);
-  // Mobile AnimatedLogo controls
-  const [mobileHeroScale, setMobileHeroScale] = useState(1);
-  const [mobileHeroY, setMobileHeroY] = useState(0);
-  // Control panel scale (for making the slider box smaller/larger)
-  const [panelScale, setPanelScale] = useState(1);
+  // Screen dimensions state - updated on resize/viewport change
+  const [screenDimensions, setScreenDimensions] = useState(() => {
+    if (typeof window === 'undefined') return '?x?';
+    const { w, h } = getViewportDimensions();
+    return `${w}x${h}`;
+  });
 
-  // Desktop-editable Asset1 controls (persisted)
-  // Desktop Asset1 and hero values (hard-coded per user request)
-  const [desktopAssetX, setDesktopAssetX] = useState(4);
-  const [desktopAssetY, setDesktopAssetY] = useState(-1106);
-  const [desktopAssetScale, setDesktopAssetScale] = useState(0.67);
-  const [desktopAssetH, setDesktopAssetH] = useState(1.27);
-  const [desktopAssetV, setDesktopAssetV] = useState(0.96);
-  // Desktop control for hero AnimatedLogo scale
-  const [desktopHeroScale, setDesktopHeroScale] = useState(1.6);
-  // Desktop control for hero AnimatedLogo Y position
-  const [desktopHeroY, setDesktopHeroY] = useState(147);
-  // Outline/stroke width controls (desktop and mobile separate)
-  // Hard-coded desktop outline width per user's screenshot
-  const [desktopOutlineWidth, setDesktopOutlineWidth] = useState(0.5);
-  // Hard-coded desktop animated logo outline width per user's screenshot
-  const [desktopAnimatedOutlineWidth, setDesktopAnimatedOutlineWidth] = useState(1.5);
-  // Mobile animated logo outline width (tunable on mobile)
-  const [mobileAnimatedOutlineWidth, setMobileAnimatedOutlineWidth] = useState(() => {
-    try {
-      const v = window.localStorage.getItem('outline_width_animated_mobile');
-      return v ? Number(v) : 0.5;
-    } catch (e) { return 3; }
-  });
-  const [mobileOutlineWidth, setMobileOutlineWidth] = useState(() => {
-    try {
-      const v = window.localStorage.getItem('outline_width_mobile');
-      return v ? Number(v) : 0.5;
-    } catch (e) { return 3; }
-  });
-  // Toggle for mobile scrolling PNG marquee
-  const [showMarquee, setShowMarquee] = useState(true);
-  // Dev Mode: force a specific device for testing (desktop only)
-  const [devMode, setDevMode] = useState(false);
-  const [forcedDevice, setForcedDevice] = useState('iPhone X');
-  // Device preset selector (used to hardcode per-device values later)
-  const deviceOptions = [
-    'iPhone X','iPhone SE','iPhone XR','iPhone 12 Pro','iPhone 14 Pro Max','Pixel 7','Samsung Galaxy S8+','Samsung Galaxy S20 Ultra','iPad Mini','iPad Air','iPad Pro','Surface Pro 7','Surface Duo','Galaxy Z Fold 5','Asus Zenbook Fold','Samsung Galaxy A51/71','Nest Hub','Nest Hub Max'
-  ];
-  // Auto-detect device on mount
-  const [selectedDevice, setSelectedDevice] = useState(() => {
-    const detected = detectDevice();
-    console.log('[Device Detection] Detected:', detected, '| Category:', getDeviceCategory(), '| Touch:', isTouchDevice());
-    return detected;
-  });
-  // Store detection info for display in control panel
-  const [deviceInfo, setDeviceInfo] = useState({ name: '', category: '', touch: false });
-  
-  // Run detection on mount and update info
+  // Get device config based on current screen dimensions
+  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(screenDimensions));
+
+  // Update the config whenever screen dimensions change
   useEffect(() => {
-    const detected = detectDevice();
-    const category = getDeviceCategory();
-    const touch = isTouchDevice();
-    setDeviceInfo({ name: detected, category, touch });
-    setSelectedDevice(detected);
-    console.log('[Device Detection] Auto-detected:', detected, '| Category:', category, '| Touch:', touch);
+    setCurrentConfig(getDeviceConfig(screenDimensions));
+  }, [screenDimensions]);
+
+  // Update screen dimensions when viewport changes
+  useEffect(() => {
+    const updateDimensions = () => {
+      const { w, h } = getViewportDimensions();
+      const newDims = `${w}x${h}`;
+      setScreenDimensions(newDims);
+    };
+    
+    window.addEventListener('resize', updateDimensions);
+    const interval = setInterval(updateDimensions, 500);
+    
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+      clearInterval(interval);
+    };
   }, []);
 
-  // Per-device presets (hard-coded transforms/controls). Add more devices as needed.
-  const devicePresets = {
-    'iPad Air': {
-      desktopAssetX: 4,
-      desktopAssetY: -505,
-      desktopAssetScale: 0.67,
-      desktopAssetH: 1.27,
-      desktopAssetV: 0.96,
-      desktopHeroScale: 1.05,
-      desktopHeroY: 107,
-      showMarquee: true,
-    },
-    // iPhone X preset - hardcoded per user screenshot
-    'iPhone X': {
-      mobileAssetX: 1,
-      mobileAssetY: -135,
-      mobileAssetScale: 0.91,
-      mobileAssetH: 1.03,
-      mobileAssetV: 1.02,
-      mobileNavY: 144,
-      mobileHeroScale: 1,
-      mobileHeroY: 0,
-      showMarquee: true,
-    },
-    // iPad Pro preset - hardcoded per user screenshot
-    'iPad Pro': {
-      desktopAssetX: 4,
-      desktopAssetY: -704,
-      desktopAssetScale: 0.67,
-      desktopAssetH: 1.27,
-      desktopAssetV: 0.86,
-      desktopHeroScale: 1.42,
-      desktopHeroY: 147,
-      showMarquee: true,
-    },
+  const [liveConfig, setLiveConfig] = useState(currentConfig);
+
+  useEffect(() => {
+    setLiveConfig(currentConfig);
+  }, [currentConfig]);
+
+  const handleConfigChange = (key, value) => {
+    setLiveConfig(prev => ({ ...prev, [key]: value }));
   };
 
-  // Apply preset when selectedDevice changes (hardcode for that device)
-  useEffect(() => {
-    const p = devicePresets[selectedDevice];
-    if (!p) return;
-    // Desktop presets
-    if (p.desktopAssetX !== undefined) setDesktopAssetX(p.desktopAssetX);
-    if (p.desktopAssetY !== undefined) setDesktopAssetY(p.desktopAssetY);
-    if (p.desktopAssetScale !== undefined) setDesktopAssetScale(p.desktopAssetScale);
-    if (p.desktopAssetH !== undefined) setDesktopAssetH(p.desktopAssetH);
-    if (p.desktopAssetV !== undefined) setDesktopAssetV(p.desktopAssetV);
-    if (p.desktopHeroScale !== undefined) setDesktopHeroScale(p.desktopHeroScale);
-    if (p.desktopHeroY !== undefined) setDesktopHeroY(p.desktopHeroY);
-    // Mobile presets
-    if (p.mobileAssetX !== undefined) setMobileAssetX(p.mobileAssetX);
-    if (p.mobileAssetY !== undefined) setMobileAssetY(p.mobileAssetY);
-    if (p.mobileAssetScale !== undefined) setMobileAssetScale(p.mobileAssetScale);
-    if (p.mobileAssetH !== undefined) setMobileAssetH(p.mobileAssetH);
-    if (p.mobileAssetV !== undefined) setMobileAssetV(p.mobileAssetV);
-    if (p.mobileNavY !== undefined) setMobileNavY(p.mobileNavY);
-    if (p.mobileHeroScale !== undefined) setMobileHeroScale(p.mobileHeroScale);
-    if (p.mobileHeroY !== undefined) setMobileHeroY(p.mobileHeroY);
-    // Shared
-    if (p.showMarquee !== undefined) setShowMarquee(!!p.showMarquee);
-  }, [selectedDevice]);
+  // Toggle for mobile scrolling PNG marquee
+  const [showMarquee, setShowMarquee] = useState(true);
 
   // Track small-screen state and whether user has scrolled (to hide Asset1)
-  const [isPhone, setIsPhone] = useState(false);
+  // Initialize with actual media query values to avoid stale state
+  const [isPhone, setIsPhone] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 640px)').matches;
+  });
+  const [isTablet, setIsTablet] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
+  });
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 1024px)').matches;
+  });
   const [assetHidden, setAssetHidden] = useState(false);
 
   useEffect(() => {
     const phoneMql = window.matchMedia('(max-width: 640px)');
+    const tabletMql = window.matchMedia('(min-width: 641px) and (max-width: 1024px)');
+    const mobileOrTabletMql = window.matchMedia('(max-width: 1024px)');
+    
     const onPhoneChange = (e) => setIsPhone(e.matches);
+    const onTabletChange = (e) => setIsTablet(e.matches);
+    const onMobileOrTabletChange = (e) => setIsMobileOrTablet(e.matches);
+    
     setIsPhone(phoneMql.matches);
-    if (phoneMql.addEventListener) phoneMql.addEventListener('change', onPhoneChange);
-    else phoneMql.addListener(onPhoneChange);
+    setIsTablet(tabletMql.matches);
+    setIsMobileOrTablet(mobileOrTabletMql.matches);
+    
+    if (phoneMql.addEventListener) {
+      phoneMql.addEventListener('change', onPhoneChange);
+      tabletMql.addEventListener('change', onTabletChange);
+      mobileOrTabletMql.addEventListener('change', onMobileOrTabletChange);
+    } else {
+      phoneMql.addListener(onPhoneChange);
+      tabletMql.addListener(onTabletChange);
+      mobileOrTabletMql.addListener(onMobileOrTabletChange);
+    }
     return () => {
-      if (phoneMql.removeEventListener) phoneMql.removeEventListener('change', onPhoneChange);
-      else phoneMql.removeListener(onPhoneChange);
+      if (phoneMql.removeEventListener) {
+        phoneMql.removeEventListener('change', onPhoneChange);
+        tabletMql.removeEventListener('change', onTabletChange);
+        mobileOrTabletMql.removeEventListener('change', onMobileOrTabletChange);
+      } else {
+        phoneMql.removeListener(onPhoneChange);
+        tabletMql.removeListener(onTabletChange);
+        mobileOrTabletMql.removeListener(onMobileOrTabletChange);
+      }
     };
   }, []);
 
@@ -374,47 +422,6 @@ function App() {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [isPhone]);
-
-  // Persist assetX to localStorage so mobile tuning is remembered
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('asset1X_desktop', String(desktopAssetX));
-      window.localStorage.setItem('asset1Y_desktop', String(desktopAssetY));
-      window.localStorage.setItem('asset1Scale_desktop', String(desktopAssetScale));
-      window.localStorage.setItem('asset1H_desktop', String(desktopAssetH));
-      window.localStorage.setItem('asset1V_desktop', String(desktopAssetV));
-      window.localStorage.setItem('heroScale_desktop', String(desktopHeroScale));
-      window.localStorage.setItem('heroY_desktop', String(desktopHeroY));
-      window.localStorage.setItem('outline_width_desktop', String(desktopOutlineWidth));
-      window.localStorage.setItem('outline_width_mobile', String(mobileOutlineWidth));
-      window.localStorage.setItem('outline_width_animated_desktop', String(desktopAnimatedOutlineWidth));
-      window.localStorage.setItem('outline_width_animated_mobile', String(mobileAnimatedOutlineWidth));
-    } catch (e) {
-      // ignore
-    }
-  }, [desktopAssetX, desktopAssetY, desktopAssetScale, desktopAssetH, desktopAssetV, desktopHeroScale, desktopHeroY]);
-
-  // Persist outline widths when they change
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('outline_width_desktop', String(desktopOutlineWidth));
-    } catch (e) {}
-  }, [desktopOutlineWidth]);
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('outline_width_mobile', String(mobileOutlineWidth));
-    } catch (e) {}
-  }, [mobileOutlineWidth]);
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('outline_width_animated_desktop', String(desktopAnimatedOutlineWidth));
-    } catch (e) {}
-  }, [desktopAnimatedOutlineWidth]);
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('outline_width_animated_mobile', String(mobileAnimatedOutlineWidth));
-    } catch (e) {}
-  }, [mobileAnimatedOutlineWidth]);
 
   // Nav pill hide at page bottom, reveal when user scrolls up
   const [navHidden, setNavHidden] = useState(false);
@@ -572,7 +579,7 @@ function App() {
 
       {/* Mobile: floating pill at bottom */}
       <header
-        style={{ paddingLeft: `${pillPadding}px`, bottom: `${mobileNavY}px` }}
+          style={{ paddingLeft: `${pillPadding}px`, bottom: `${liveConfig.navY ?? 48}px` }}
         className={`
           sm:hidden
           z-50 flex justify-center items-center app-header
@@ -629,153 +636,99 @@ function App() {
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
-        {/* Decorative Asset1 - visible on both; mobile uses state values (tunable for iPhone X), desktop uses editable state */}
         <Asset1Svg
           theme={appliedTheme}
-          className="pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 z-20"
+          className={`pointer-events-none absolute left-1/2 top-12 z-20`}
           style={{
-            transform: `translateX(calc(-50% + ${isPhone ? mobileAssetX : desktopAssetX}px)) translateY(${isPhone ? mobileAssetY : desktopAssetY}px) scaleX(${(isPhone ? mobileAssetH : desktopAssetH) * (isPhone ? mobileAssetScale : desktopAssetScale)}) scaleY(${(isPhone ? mobileAssetV : desktopAssetV) * (isPhone ? mobileAssetScale : desktopAssetScale)})`,
+            transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
             width: '140%',
             maxWidth: 'none',
             height: 'auto',
             opacity: assetHidden ? 0 : 1,
             transition: 'opacity 300ms ease, transform 300ms ease',
             willChange: 'opacity, transform',
-            // expose outline width variable for Asset1
-            ['--outline-width']: `${isPhone ? mobileOutlineWidth : desktopOutlineWidth}px`,
           }}
         />
 
-        {/* Desktop control panel: Asset1 transform sliders and AnimatedLogo transform sliders */}
-        {/* TEMPORARILY DISABLED - change false back to !isPhone to re-enable */}
-        {false && !isPhone && (
-          <div className="pointer-events-auto fixed right-4 top-20 z-50 p-4 bg-black/80 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ width: 280 }}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-semibold">Controls</div>
-              <select value={selectedDevice} onChange={(e)=>setSelectedDevice(e.target.value)} className="text-xs bg-black/60 border border-neutral-700 rounded p-1">
-                {deviceOptions.map(d=> <option key={d} value={d}>{d}</option>)}
-              </select>
-            </div>
-            {/* Device detection info */}
-            <div className="text-[10px] text-cyan-400 bg-cyan-900/30 rounded px-2 py-1 mb-3 border border-cyan-800/50">
-              <div><span className="opacity-70">Detected:</span> <strong>{deviceInfo.name}</strong></div>
-              <div><span className="opacity-70">Category:</span> {deviceInfo.category} | <span className="opacity-70">Touch:</span> {deviceInfo.touch ? 'Yes' : 'No'}</div>
-            </div>
-            {/* Dev Mode: Force device for testing */}
-            <div className="flex items-center gap-2 mb-3 p-2 bg-yellow-900/30 rounded border border-yellow-700/50">
-              <input type="checkbox" id="devMode" checked={devMode} onChange={(e)=>setDevMode(e.target.checked)} />
-              <label htmlFor="devMode" className="text-[10px] text-yellow-400">Dev Mode</label>
-              {devMode && (
-                <select value={forcedDevice} onChange={(e)=>setForcedDevice(e.target.value)} className="text-[10px] bg-black/60 border border-yellow-700 rounded px-1 py-0.5 text-yellow-400 ml-auto">
-                  {deviceOptions.map(d=> <option key={d} value={d}>{d}</option>)}
-                </select>
-              )}
-            </div>
-            <div className="text-sm font-semibold mb-2">Asset1 Controls (desktop)</div>
-            <label className="text-xs block opacity-80">X position</label>
-            <input type="range" min={-1400} max={1400} step={1} value={desktopAssetX} onChange={(e)=>setDesktopAssetX(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{desktopAssetX}px</div>
-
-            <label className="text-xs block opacity-80">Y position</label>
-            <input type="range" min={-2000} max={2000} step={1} value={desktopAssetY} onChange={(e)=>setDesktopAssetY(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{desktopAssetY}px</div>
-
-            <label className="text-xs block opacity-80">Scale</label>
-            <input type="range" min={0.1} max={2} step={0.01} value={desktopAssetScale} onChange={(e)=>setDesktopAssetScale(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{desktopAssetScale}x</div>
-
-            <label className="text-xs block opacity-80">X stretch</label>
-            <input type="range" min={0.5} max={2} step={0.01} value={desktopAssetH} onChange={(e)=>setDesktopAssetH(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{desktopAssetH}x</div>
-
-            <label className="text-xs block opacity-80">Y stretch</label>
-            <input type="range" min={0.5} max={2} step={0.01} value={desktopAssetV} onChange={(e)=>setDesktopAssetV(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{desktopAssetV}x</div>
-
-            <div className="border-t border-neutral-700 mt-3 pt-3">
-              <div className="text-sm font-semibold mb-2">Animated Logo (home)</div>
-              <label className="text-xs block opacity-80">Scale</label>
-              <input type="range" min={0.1} max={3} step={0.01} value={desktopHeroScale} onChange={(e)=>setDesktopHeroScale(Number(e.target.value))} style={{width:'100%'}} />
-              <div className="text-[11px] opacity-70 mb-2">{desktopHeroScale}x</div>
-
-              <label className="text-xs block opacity-80">Y position</label>
-              <input type="range" min={-600} max={600} step={1} value={desktopHeroY} onChange={(e)=>setDesktopHeroY(Number(e.target.value))} style={{width:'100%'}} />
-              <div className="text-[11px] opacity-70">{desktopHeroY}px</div>
-            </div>
-
-            <div className="border-t border-neutral-700 mt-3 pt-3 flex items-center justify-between">
-              <label className="text-xs opacity-80">Show scrolling PNGs</label>
-              <input type="checkbox" checked={showMarquee} onChange={(e)=>setShowMarquee(e.target.checked)} aria-label="Toggle scrolling PNGs" />
-            </div>
+        {/* Control Panel */}
+        <div style={{
+          position: 'fixed',
+          bottom: '100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '8px',
+          zIndex: 1000,
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '5px'
+        }}>
+          <div style={{fontWeight: 'bold'}}>Screen: {screenDimensions}</div>
+          <div style={{fontWeight: 'bold'}}>Animated Logo</div>
+          <div>
+            <label>Scale: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.heroScale} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} />
+            <span>{liveConfig.heroScale}</span>
           </div>
-        )}
-
-        {/* Mobile control panel: shown on phone-sized viewports for tuning */}
-        {/* TEMPORARILY DISABLED - change false back to isPhone to re-enable */}
-        {false && isPhone && (
-          <div className="pointer-events-auto fixed left-4 right-4 top-4 z-50 p-4 bg-black/50 text-white rounded-md border border-neutral-800 backdrop-blur-sm" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', transform: `scale(${panelScale})`, transformOrigin: 'top left' }}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-semibold text-cyan-400">Mobile Controls</div>
-              <div className="flex items-center gap-2">
-                <label className="text-[10px] opacity-70">Panel</label>
-                <input type="range" min={0.5} max={1} step={0.05} value={panelScale} onChange={(e)=>setPanelScale(Number(e.target.value))} style={{width:'60px'}} />
-                <span className="text-[10px] opacity-70">{panelScale}x</span>
-              </div>
-            </div>
-
-            <div className="text-xs font-semibold mb-2 text-white/80">Asset1 Controls</div>
-            <label className="text-xs block opacity-80">X position</label>
-            <input type="range" min={-200} max={200} step={1} value={mobileAssetX} onChange={(e)=>setMobileAssetX(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{mobileAssetX}px</div>
-
-            <label className="text-xs block opacity-80">Y position</label>
-            <input type="range" min={-600} max={200} step={1} value={mobileAssetY} onChange={(e)=>setMobileAssetY(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{mobileAssetY}px</div>
-
-            <label className="text-xs block opacity-80">Scale</label>
-            <input type="range" min={0.1} max={2} step={0.01} value={mobileAssetScale} onChange={(e)=>setMobileAssetScale(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{mobileAssetScale}x</div>
-
-            <label className="text-xs block opacity-80">X stretch</label>
-            <input type="range" min={0.5} max={2} step={0.01} value={mobileAssetH} onChange={(e)=>setMobileAssetH(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{mobileAssetH}x</div>
-
-            <label className="text-xs block opacity-80">Y stretch</label>
-            <input type="range" min={0.5} max={2} step={0.01} value={mobileAssetV} onChange={(e)=>setMobileAssetV(Number(e.target.value))} style={{width:'100%'}} />
-            <div className="text-[11px] opacity-70 mb-2">{mobileAssetV}x</div>
-
-            <div className="border-t border-neutral-700 mt-3 pt-3">
-              <div className="text-xs font-semibold mb-2 text-white/80">Nav Bar</div>
-              <label className="text-xs block opacity-80">Y position (bottom offset)</label>
-              <input type="range" min={0} max={300} step={1} value={mobileNavY} onChange={(e)=>setMobileNavY(Number(e.target.value))} style={{width:'100%'}} />
-              <div className="text-[11px] opacity-70 mb-2">{mobileNavY}px</div>
-            </div>
-
-            <div className="border-t border-neutral-700 mt-3 pt-3">
-              <div className="text-xs font-semibold mb-2 text-white/80">Animated Logo (home)</div>
-              <label className="text-xs block opacity-80">Scale</label>
-              <input type="range" min={0.1} max={3} step={0.01} value={mobileHeroScale} onChange={(e)=>setMobileHeroScale(Number(e.target.value))} style={{width:'100%'}} />
-              <div className="text-[11px] opacity-70 mb-2">{mobileHeroScale}x</div>
-
-              <label className="text-xs block opacity-80">Y position</label>
-              <input type="range" min={-300} max={300} step={1} value={mobileHeroY} onChange={(e)=>setMobileHeroY(Number(e.target.value))} style={{width:'100%'}} />
-              <div className="text-[11px] opacity-70 mb-2">{mobileHeroY}px</div>
-            </div>
-
-            <div className="border-t border-neutral-700 mt-3 pt-3 flex items-center justify-between">
-              <label className="text-xs opacity-80">Show scrolling PNGs</label>
-              <input type="checkbox" checked={showMarquee} onChange={(e)=>setShowMarquee(e.target.checked)} aria-label="Toggle scrolling PNGs" />
-            </div>
+          <div>
+            <label>Thickness: </label>
+            <input type="range" min="0.5" max="5" step="0.1" value={liveConfig.animatedOutlineWidth} onChange={(e) => handleConfigChange('animatedOutlineWidth', parseFloat(e.target.value))} />
+            <span>{liveConfig.animatedOutlineWidth}</span>
           </div>
-        )}
+          <div>
+            <label>Y pos: </label>
+            <input type="range" min="-200" max="300" step="1" value={liveConfig.heroY} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} />
+            <span>{liveConfig.heroY}</span>
+          </div>
 
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
+          <div>
+            <label>X pos: </label>
+            <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
+            <span>{liveConfig.assetX}</span>
+          </div>
+          <div>
+            <label>Y pos: </label>
+            <input type="range" min="-1200" max="0" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
+            <span>{liveConfig.assetY}</span>
+          </div>
+          <div>
+            <label>X stretch: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.assetH} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} />
+            <span>{liveConfig.assetH}</span>
+          </div>
+          <div>
+            <label>Y stretch: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
+            <span>{liveConfig.assetV}</span>
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Nav Bar</div>
+           <div>
+            <label>Y pos: </label>
+            <input type="range" min="0" max="300" step="1" value={liveConfig.navY} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} />
+            <span>{liveConfig.navY}</span>
+          </div>
+          <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
+        </div>
+        
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home theme={theme} heroScaleDesktop={desktopHeroScale} heroYDesktop={desktopHeroY} heroScaleMobile={mobileHeroScale} heroYMobile={mobileHeroY} outlineWidthDesktop={desktopOutlineWidth} outlineWidthMobile={mobileOutlineWidth} animatedLogoOutlineWidthDesktop={desktopAnimatedOutlineWidth} animatedLogoOutlineWidthMobile={mobileAnimatedOutlineWidth} showMarquee={showMarquee} selectedDevice={selectedDevice} />} />
+              <Route path="/" element={<Home 
+                theme={theme} 
+                heroScale={liveConfig.heroScale ?? 1} 
+                heroY={liveConfig.heroY ?? 0} 
+                animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
+                showMarquee={showMarquee}
+              />} />
               <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />
