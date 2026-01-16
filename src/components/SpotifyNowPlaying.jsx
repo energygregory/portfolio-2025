@@ -1,62 +1,70 @@
 import React, { useState, useEffect } from 'react';
 
-const SpotifyNowPlaying = ({ theme = 'dark' }) => {
-  // --- CONFIGURATION ---
-  const USERNAME = 'energygregory';
-  const API_KEY = 'bd904e0fd30a90a8b49f857b9b01b900';
-  // ---------------------
+const SpotifyNowPlaying = () => {
+  const [track, setTrack] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [musicData, setMusicData] = useState(null);
-  const [error, setError] = useState(null);
+  // --- REPLACED WITH REAL DETAILS ---
+  const USERNAME = "energygregory";
+  const API_KEY = "bd904e0fd30a90a8b49f857b9b01b900";
+  // ----------------------------------
 
   useEffect(() => {
-    async function loadMusic() {
+    const fetchMusic = async () => {
       try {
-        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`;
-        const response = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
-        if (!response.ok) throw new Error('API Error');
-
+        const response = await fetch(
+          `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`
+        );
         const data = await response.json();
-        const track = data?.recenttracks?.track?.[0];
-        if (!track) throw new Error('No track data found');
+        const recentTrack = data.recenttracks.track[0];
 
-        const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
-        const songName = track.name;
-        const artistName = track.artist['#text'];
-        const link = track.url;
-        const imageSrc = (track.image?.[2]?.['#text']) || 'https://via.placeholder.com/64?text=Music';
-
-        setMusicData({ isPlaying, songName, artistName, link, imageSrc });
-        setError(null);
-      } catch (err) {
-        console.error('Music widget failed to load:', err);
-        setError(err.message);
+        setTrack({
+          name: recentTrack.name,
+          artist: recentTrack.artist['#text'],
+          image: recentTrack.image[2]['#text'] || 'https://via.placeholder.com/64',
+          url: recentTrack.url,
+          isPlaying: recentTrack['@attr'] && recentTrack['@attr'].nowplaying === 'true'
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching music:", error);
+        setLoading(false);
       }
-    }
+    };
 
-    loadMusic();
-    const interval = setInterval(loadMusic, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    fetchMusic();
+  }, [USERNAME, API_KEY]);
 
-  // Fail silently: if error or loading, render nothing
-  if (error || !musicData) return null;
-
-  const { isPlaying, songName, artistName, link, imageSrc } = musicData;
-  const textColor = theme === 'dark' ? '#ffffff' : '#000000';
-  const subTextColor = theme === 'dark' ? '#888' : '#666';
+  if (loading || !track) return null;
 
   return (
-    <div id="music-container" style={{ fontFamily: 'sans-serif', display: 'flex', alignItems: 'center', gap: 10 }}>
-      <img id="music-art" src={imageSrc} alt="Album Art" style={{ width: 50, height: 50, borderRadius: 4 }} />
-      <div>
-        <div id="music-status" style={{ fontSize: 10, color: isPlaying ? '#1DB954' : subTextColor, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 'bold' }}>
-          {isPlaying ? 'Now Playing' : 'Recently Played'}
-        </div>
-        <a id="music-link" href={link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: textColor, fontWeight: 'bold' }}>
-          <span id="music-song">{songName}</span>
+    <div className="spotify-widget" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'sans-serif' }}>
+      <img 
+        src={track.image} 
+        alt={track.name} 
+        style={{ width: '50px', height: '50px', borderRadius: '4px' }} 
+      />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span style={{ 
+            fontSize: '10px', 
+            fontWeight: 'bold', 
+            textTransform: 'uppercase', 
+            letterSpacing: '1px',
+            color: track.isPlaying ? '#1DB954' : '#888' 
+        }}>
+          {track.isPlaying ? 'Now Playing' : 'Last Played'}
+        </span>
+        <a 
+          href={track.url} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold', fontSize: '14px' }}
+        >
+          {track.name}
         </a>
-        <div id="music-artist" style={{ fontSize: 12, color: subTextColor }}>{artistName}</div>
+        <span style={{ fontSize: '12px', color: '#666' }}>
+          {track.artist}
+        </span>
       </div>
     </div>
   );
