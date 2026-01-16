@@ -134,6 +134,7 @@ const DEVICE_CONFIGS = {
     assetV: 1,
     navY: 166,
     widgetScale: 0.8,
+    widgetY: 0,
   },
   // iPhone 17 (393x852) - LOCKED IN
   "393x852": {
@@ -146,6 +147,7 @@ const DEVICE_CONFIGS = {
     assetV: 1,
     navY: 133,
     widgetScale: 0.8,
+    widgetY: 0,
   },
   // iPhone 16 Plus (430x932) - LOCKED IN
   "430x932": {
@@ -158,6 +160,7 @@ const DEVICE_CONFIGS = {
     assetV: 1,
     navY: 209,
     widgetScale: 0.85,
+    widgetY: 0,
   },
   // iPhone XR (414x896) - LOCKED IN
   "414x896": {
@@ -170,6 +173,7 @@ const DEVICE_CONFIGS = {
     assetV: 0.98,
     navY: 123,
     widgetScale: 0.8,
+    widgetY: 0,
   },
   // iPhone 13 Pro Max (428x926) - LOCKED IN
   "428x926": {
@@ -182,6 +186,7 @@ const DEVICE_CONFIGS = {
     assetV: 0.98,
     navY: 202,
     widgetScale: 0.85,
+    widgetY: 0,
   },
   // iPad (768x1024)
   "768x1024": {
@@ -193,6 +198,7 @@ const DEVICE_CONFIGS = {
     assetH: 1.36,
     assetV: 1.17,
     widgetScale: 1,
+    widgetY: 0,
   },
   // Default fallback for desktop
   desktop: {
@@ -204,6 +210,7 @@ const DEVICE_CONFIGS = {
     assetH: 1.27,
     assetV: 0.96,
     widgetScale: 1,
+    widgetY: 0,
   },
   // Default fallback for mobile
   mobile: {
@@ -544,7 +551,7 @@ function App() {
           opacity: assetHidden ? 0 : 1,
           transition: 'opacity 300ms ease',
           willChange: 'opacity',
-          transform: `scale(${liveConfig.widgetScale})`,
+          transform: `translateY(${liveConfig.widgetY}px) scale(${liveConfig.widgetScale})`,
         }}
         className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none sm:pointer-events-auto"
       >
@@ -765,6 +772,11 @@ function App() {
             <label>Scale: </label>
             <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} />
             <span>{liveConfig.widgetScale}</span>
+          </div>
+          <div>
+            <label>Y pos: </label>
+            <input type="range" min="-50" max="100" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
+            <span>{liveConfig.widgetY}</span>
           </div>
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
         </div>
