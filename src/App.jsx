@@ -116,6 +116,7 @@ const PriceList = lazy(() => import("./pages/PriceList.jsx"));
 
 import NavigationLoader from "./components/NavigationLoader";
 import Asset1Svg from "./components/Asset1Svg";
+const SpotifyNowPlaying = lazy(() => import("./components/SpotifyNowPlaying"));
 const Footer = lazy(() => import("./components/Footer"));
 const LiquidLogo = lazy(() => import("./components/LiquidLogo"));
 
@@ -132,6 +133,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.93,
     assetV: 1,
     navY: 166,
+    widgetScale: 0.8,
   },
   // iPhone 17 (393x852) - LOCKED IN
   "393x852": {
@@ -143,6 +145,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.96,
     assetV: 1,
     navY: 133,
+    widgetScale: 0.8,
   },
   // iPhone 16 Plus (430x932) - LOCKED IN
   "430x932": {
@@ -154,6 +157,31 @@ const DEVICE_CONFIGS = {
     assetH: 0.94,
     assetV: 1,
     navY: 209,
+    widgetScale: 0.85,
+  },
+  // iPhone XR (414x896) - LOCKED IN
+  "414x896": {
+    heroScale: 0.65,
+    heroY: 57,
+    animatedOutlineWidth: 5,
+    assetX: 0,
+    assetY: -140,
+    assetH: 0.91,
+    assetV: 0.98,
+    navY: 123,
+    widgetScale: 0.8,
+  },
+  // iPhone 13 Pro Max (428x926) - LOCKED IN
+  "428x926": {
+    heroScale: 0.66,
+    heroY: 84,
+    animatedOutlineWidth: 5,
+    assetX: -6,
+    assetY: -137,
+    assetH: 0.93,
+    assetV: 0.98,
+    navY: 202,
+    widgetScale: 0.85,
   },
   // iPad (768x1024)
   "768x1024": {
@@ -164,6 +192,7 @@ const DEVICE_CONFIGS = {
     assetY: -704,
     assetH: 1.36,
     assetV: 1.17,
+    widgetScale: 1,
   },
   // Default fallback for desktop
   desktop: {
@@ -174,6 +203,7 @@ const DEVICE_CONFIGS = {
     assetY: -1106,
     assetH: 1.27,
     assetV: 0.96,
+    widgetScale: 1,
   },
   // Default fallback for mobile
   mobile: {
@@ -507,6 +537,22 @@ function App() {
         const initialLoader = document.getElementById('initial-loader');
         if (initialLoader) initialLoader.remove();
       }} />
+      
+      {/* Now Playing - Top Center */}
+      <div
+        style={{
+          opacity: assetHidden ? 0 : 1,
+          transition: 'opacity 300ms ease',
+          willChange: 'opacity',
+          transform: `scale(${liveConfig.widgetScale})`,
+        }}
+        className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none sm:pointer-events-auto"
+      >
+        <Suspense fallback={null}>
+          <SpotifyNowPlaying theme={appliedTheme} />
+        </Suspense>
+      </div>
+
       {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
 
       
@@ -712,6 +758,13 @@ function App() {
             <label>Y pos: </label>
             <input type="range" min="0" max="300" step="1" value={liveConfig.navY} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} />
             <span>{liveConfig.navY}</span>
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Now Playing Widget</div>
+          <div>
+            <label>Scale: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} />
+            <span>{liveConfig.widgetScale}</span>
           </div>
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
         </div>
