@@ -548,12 +548,16 @@ function App() {
       {/* Now Playing - Top Center */}
       <div
         style={{
+          position: 'fixed',
+          top: '16px',
+          left: '50%',
           opacity: assetHidden ? 0 : 1,
           transition: 'opacity 300ms ease',
           willChange: 'opacity',
           transform: `translateX(-50%) translateY(${liveConfig.widgetY}px) scale(${liveConfig.widgetScale})`,
+          zIndex: 50,
+          pointerEvents: 'none',
         }}
-        className="absolute top-4 left-1/2 z-50 pointer-events-none sm:pointer-events-auto"
       >
         <Suspense fallback={null}>
           <SpotifyNowPlaying theme={appliedTheme} />

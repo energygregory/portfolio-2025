@@ -39,8 +39,8 @@ const SpotifyNowPlaying = ({ theme = 'dark' }) => {
   const subTextColor = theme === 'dark' ? '#888' : '#666';
 
   return (
-    <div id="music-container" style={{ fontFamily: 'sans-serif', display: 'flex', alignItems: 'center', gap: 10 }}>
-      <img id="music-art" src={imageSrc} alt="Album Art" style={{ width: 50, height: 50, borderRadius: 4 }} />
+    <div id="music-container" style={{ fontFamily: 'sans-serif', display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }}>
+      <img id="music-art" src={imageSrc} alt="Album Art" style={{ width: 50, height: 50, borderRadius: 4, flexShrink: 0 }} crossOrigin="anonymous" />
       <div>
         <div id="music-status" style={{ fontSize: 10, color: isPlaying ? '#1DB954' : subTextColor, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 'bold' }}>
           {isPlaying ? 'Now Playing' : 'Recently Played'}
