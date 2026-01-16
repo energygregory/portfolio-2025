@@ -1,132 +1,103 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useState, useEffect } from 'react';
 
-const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
-const POLL_INTERVAL_MS = 20_000;
+const SpotifyNowPlaying = ({ theme = 'dark' }) => {
+  // --- CONFIGURATION ---
+  const USERNAME = "energygregory";
+  const API_KEY = "bd904e0fd30a90a8b49f857b9b01b900";
+  // ---------------------
 
-const getEnvVar = (key) => {
-  const value = import.meta.env[key];
-  if (!value || typeof value !== "string") return "";
-  return value.trim();
-};
-
-const extractArtwork = (images = []) => {
-  if (!Array.isArray(images) || !images.length) return null;
-  const reversed = [...images].reverse();
-  const withSrc = reversed.find((img) => typeof img?.["#text"] === "string" && img["#text"].trim());
-  return withSrc ? withSrc["#text"].trim() : null;
-};
-
-const mapTrack = (entry) => {
-  if (!entry) return null;
-  const name = entry?.name?.trim();
-  const artistValue = entry?.artist?.["#text"] ?? entry?.artist;
-  const artist = typeof artistValue === "string" ? artistValue.trim() : "";
-  const albumValue = entry?.album?.["#text"] ?? entry?.album;
-  const album = typeof albumValue === "string" ? albumValue.trim() : "";
-  const nowPlaying = entry?.["@attr"]?.nowplaying === "true";
-
-  return {
-    title: name || "Unknown track",
-    artist: artist || "Unknown artist",
-    album,
-    songUrl: entry?.url || "https://open.spotify.com",
-    artwork: extractArtwork(entry?.image),
-    isPlaying: nowPlaying,
-  };
-};
-
-const buildRequestUrl = (username, apiKey) => {
-  if (!username || !apiKey) return null;
-  const params = new URLSearchParams({
-    method: "user.getrecenttracks",
-    user: username,
-    api_key: apiKey,
-    limit: "1",
-    format: "json",
-  });
-  return `${LASTFM_ENDPOINT}?${params.toString()}`;
-};
-
-export default function SpotifyNowPlaying({ theme = "dark" }) {
-  const username = useMemo(() => getEnvVar("VITE_LASTFM_USERNAME"), []);
-  const apiKey = useMemo(() => getEnvVar("VITE_LASTFM_API_KEY"), []);
-  const canFetch = Boolean(username && apiKey);
-
-  const requestUrl = useMemo(() => buildRequestUrl(username, apiKey), [username, apiKey]);
-
-  const [track, setTrack] = useState(null);
+  const [musicData, setMusicData] = useState(null);
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const mountedRef = useRef(false);
 
   useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
+    async function loadMusic() {
+      try {
+        const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`);
+        if (!response.ok) throw new Error('API Error');
+
+        const data = await response.json();
+        const track = data?.recenttracks?.track?.[0];
+        if (!track) throw new Error('No track data found');
+
+        const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+        const songName = track.name;
+        const artistName = track.artist['#text'];
+        const url = track.url;
+        const imageSrc = (track.image?.[2]?.['#text']) || 'https://via.placeholder.com/64?text=Music';
+
+        setMusicData({ isPlaying, songName, artistName, url, imageSrc });
+        setError(null);
+      } catch (err) {
+        console.error('Music widget failed to load:', err);
+        setError(err.message);
+      }
+    }
+
+    loadMusic();
+    const interval = setInterval(loadMusic, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchTrack = useCallback(async () => {
-    if (!requestUrl) {
-      if (mountedRef.current) {
-        setIsLoading(false);
-      }
-      return;
-    }
+  // Fail silently: if error or loading, render nothing
+  if (error || !musicData) return null;
 
-    try {
-      if (!mountedRef.current) return;
-      setError(null);
-      const response = await fetch(requestUrl, { headers: { "cache-control": "no-cache" } });
-      if (!response.ok) {
-        throw new Error(`Last.fm responded with ${response.status}`);
-      }
-      const payload = await response.json();
-      const latest = payload?.recenttracks?.track?.[0];
-      if (!mountedRef.current) return;
-      setTrack(mapTrack(latest));
-    } catch (err) {
-      if (!mountedRef.current) return;
-      setError("Unable to reach Last.fm right now");
-    } finally {
-      if (!mountedRef.current) return;
-      setIsLoading(false);
-    }
-  }, [requestUrl]);
+  const { isPlaying, songName, artistName, url, imageSrc } = musicData;
+  const textColor = theme === 'dark' ? '#ffffff' : '#000000';
+  const subTextColor = theme === 'dark' ? '#888' : '#666';
+
+  return (
+    <div id="music-container" style={{ fontFamily: 'sans-serif', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <img id="music-art" src={imageSrc} alt="Album Art" style={{ width: 50, height: 50, borderRadius: 4 }} />
+      <div>
+        <div id="music-status" style={{ fontSize: 10, color: isPlaying ? '#1DB954' : subTextColor, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 'bold' }}>
+          {isPlaying ? 'Now Playing' : 'Recently Played'}
+        </div>
+        <a id="music-link" href={url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: textColor, fontWeight: 'bold' }}>
+          <span id="music-song">{songName}</span>
+        </a>
+        <div id="music-artist" style={{ fontSize: 12, color: subTextColor }}>{artistName}</div>
+      </div>
+    </div>
+  );
+};
+
+export default SpotifyNowPlaying;
+import React, { useState, useEffect } from 'react';
+
+const SpotifyNowPlaying = ({ theme = 'dark' }) => {
+  // --- CONFIGURATION ---
+  const USERNAME = "energygregory";
+  const API_KEY = "bd904e0fd30a90a8b49f857b9b01b900";
+  // ---------------------
+
+  const [musicData, setMusicData] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!canFetch) return undefined;
-    let intervalId;
+    async function loadMusic() {
+      try {
+        const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`);
+        
+        if (!response.ok) throw new Error('API Error');
 
-    const run = async () => {
-      await fetchTrack();
-    };
+        const data = await response.json();
+        
+        if (!data.recenttracks || !data.recenttracks.track || data.recenttracks.track.length === 0) {
+          throw new Error('No track data found');
+        }
 
-    run();
+        const track = data.recenttracks.track[0];
 
-    intervalId = window.setInterval(() => {
-      run();
-    }, POLL_INTERVAL_MS);
+        const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+        const songName = track.name;
+        const artistName = track.artist['#text'];
+        const url = track.url;
+        const imageSrc = track.image[2]['#text'] || 'https://via.placeholder.com/64?text=Music';
 
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [canFetch, fetchTrack]);
-
-  if (!canFetch || !requestUrl) {
-    return null;
-  }
-
-  const pillTheme =
-    theme === "light"
-      ? "bg-white/80 text-black border-black/10"
-      : "bg-black/70 text-white border-white/10";
-
-  const iconTheme = theme === "light" ? "bg-black text-white" : "bg-white text-black";
-
-  const statusText = (() => {
-    if (isLoading) return "Connecting";
-    if (track?.isPlaying) return "Now Playing";
+        setMusicData({
+          isPlaying,
+          songName,
+          export default SpotifyNowPlaying;
     if (track) return "Recently Played";
     if (error) return "Status";
     return "Idle";
