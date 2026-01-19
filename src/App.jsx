@@ -119,6 +119,9 @@ const SpotifyNowPlaying = lazy(() => import("./components/SpotifyNowPlaying"));
 const Footer = lazy(() => import("./components/Footer"));
 const LiquidLogo = lazy(() => import("./components/LiquidLogo"));
 
+// HARDCODED ASSET THICKNESS - DO NOT CHANGE THIS DYNAMICALLY
+const HARDCODED_ASSET_THICKNESS = 0.8;
+
 // Device-specific configurations (hardcoded per user's adjustments)
 // Key format: "widthxheight" for precise matching
 const DEVICE_CONFIGS = {
@@ -561,29 +564,6 @@ function App() {
         const initialLoader = document.getElementById('initial-loader');
         if (initialLoader) initialLoader.remove();
       }} />
-      
-      {/* Now Playing - Top Center */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '16px',
-          left: '50%',
-          opacity: assetHidden ? 0 : 1,
-          transition: 'opacity 300ms ease',
-          willChange: 'opacity',
-          transform: `translateX(-50%) translateY(${liveConfig.widgetY}px) scale(${liveConfig.widgetScale})`,
-          zIndex: 50,
-          pointerEvents: 'none',
-        }}
-      >
-        <Suspense fallback={null}>
-          <SpotifyNowPlaying theme={appliedTheme} />
-        </Suspense>
-      </div>
-
-      {/* Logo loop moved to Home page per layout change (was previously at top-level). */}
-
-      
 
       {/* NAV BAR (CENTERED LINKS) */}
       {/* Desktop: sticky bar at top, full width */}
@@ -708,11 +688,33 @@ function App() {
         </nav>
       </header>
 
+      {/* Now Playing Widget - Inside hero logo area, before Asset1 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: Math.max(80, liveConfig.widgetY || 80) + 'px',
+          left: '50%',
+          opacity: assetHidden ? 0 : 1,
+          transition: 'opacity 300ms ease',
+          willChange: 'opacity',
+          transform: `translateX(-50%) scale(${liveConfig.widgetScale})`,
+          zIndex: 50,
+          pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Suspense fallback={null}>
+          <SpotifyNowPlaying theme={appliedTheme} />
+        </Suspense>
+      </div>
+
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
         <Asset1Svg
           theme={appliedTheme}
-          outlineThickness={liveConfig.assetOutlineThickness}
+          outlineThickness={HARDCODED_ASSET_THICKNESS}
           className={`pointer-events-none absolute left-1/2 top-12 z-20`}
           style={{
             transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
@@ -725,8 +727,8 @@ function App() {
           }}
         />
 
-        {/* Control Panel */}
-        <div style={{
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER */}
+      <div style={{
           position: 'fixed',
           bottom: '100px',
           left: '50%',

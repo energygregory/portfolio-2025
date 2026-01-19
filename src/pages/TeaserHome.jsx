@@ -57,7 +57,7 @@ export default function TeaserHome() {
         </div>
 
         <section className="w-full mb-12">
-          <MultiRowLogoLoop
+          {/* <MultiRowLogoLoop
               logos={logos}
               rows={3}
               /* slower speed and much tighter vertical spacing between rows */
@@ -65,7 +65,7 @@ export default function TeaserHome() {
               logoHeight={36}
               gap={140}
               rowGap={4}
-            />
+            /> */}
         </section>
       </div>
 

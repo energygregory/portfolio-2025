@@ -4,4 +4,6 @@
   position: relative;
   display: block;
   touch-action: none;
+  image-rendering: crisp-edges;
 }
+

@@ -416,9 +416,10 @@ export default function ChromeLogo({ logoUrl, className = '' }) {
       ref={canvasRef} 
       className={className}
       style={{ 
-        width: '100%', 
-        height: '100%',
         display: 'block',
+        width: '100%',
+        height: '100%',
+        imageRendering: 'crisp-edges',
       }} 
     />
   );

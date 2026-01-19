@@ -520,6 +520,19 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
           }}
         >
           <div className="max-w-7xl mx-auto">
+            {/* TAP ON HOLD TO PREVIEW */}
+            <div className="w-full mb-6 sm:mb-12 text-center">
+              <h3
+                className="text-center text-[10px] sm:text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400"
+                style={{
+                  fontFamily:
+                    "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
+                  fontWeight: 400,
+                }}
+              >
+                T A P &nbsp; O N &nbsp; H O L D &nbsp; T O &nbsp; P R E V I E W
+              </h3>
+            </div>
             {/* 6 Column Image Grid - Small with lots of space */}
             <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 gap-12 sm:gap-16 md:gap-20">
               {images2025.map((src, idx) => {

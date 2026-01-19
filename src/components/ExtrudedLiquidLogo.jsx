@@ -26,6 +26,7 @@ export default function ExtrudedLiquidLogo({ logoUrl, scrollProgress = 0 }) {
       antialias: true, 
       alpha: true,
     });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
     containerRef.current.appendChild(renderer.domElement);
@@ -88,6 +89,7 @@ export default function ExtrudedLiquidLogo({ logoUrl, scrollProgress = 0 }) {
       const h = containerRef.current.clientHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(w, h);
     };
     window.addEventListener('resize', handleResize);
