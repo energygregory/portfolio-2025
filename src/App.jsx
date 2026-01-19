@@ -94,14 +94,14 @@ import {
 } from "react-router-dom";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
 
-// Disable right-click context menu on images
-if (typeof document !== 'undefined') {
-  document.addEventListener('contextmenu', (e) => {
-    if (e.target.tagName === 'IMG') {
-      e.preventDefault();
-    }
-  });
-}
+// Disable right-click context menu on images (removed for security - ineffective and annoying)
+// if (typeof document !== 'undefined') {
+//   document.addEventListener('contextmenu', (e) => {
+//     if (e.target.tagName === 'IMG') {
+//       e.preventDefault();
+//     }
+//   });
+// }
 import Home from "./pages/Home.jsx";
 const Work = lazy(() => import("./pages/Work.jsx"));
 const About = lazy(() => import("./pages/About.jsx"));

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import DOMPurify from 'dompurify';
 
 export default function Asset1Svg({ theme = "dark", style = {}, className = "", outlineThickness = 3 }) {
   const [svgMarkup, setSvgMarkup] = useState(null);
@@ -58,7 +59,7 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "", 
   return (
     <div className={`asset1-svg-container ${className}`} style={{ ...style, '--outline-width': `${outlineThickness}px` }}>
       <style>{overrideCss}</style>
-      <div dangerouslySetInnerHTML={{ __html: svgMarkup }} />
+      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(svgMarkup, { USE_PROFILES: { svg: true, svgFilters: true } }) }} />
     </div>
   );
 }

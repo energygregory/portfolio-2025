@@ -4,11 +4,16 @@ const SpotifyNowPlaying = ({ theme = 'dark' }) => {
   const [musicData, setMusicData] = useState(null);
   const [lastMusicData, setLastMusicData] = useState(null);
   const [error, setError] = useState(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
 
   useEffect(() => {
     async function loadMusic() {
+      const now = Date.now();
+      if (now - lastFetchTime < 30000) return; // Rate limit to 30 seconds
+      setLastFetchTime(now);
+
       try {
-        const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=energygregory&api_key=bd904e0fd30a90a8b49f857b9b01b900&format=json&limit=1`);
+        const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${import.meta.env.VITE_LASTFM_USERNAME}&api_key=${import.meta.env.VITE_LASTFM_API_KEY}&format=json&limit=1`);
         if (!response.ok) throw new Error('API Error');
 
         const data = await response.json();
@@ -32,7 +37,7 @@ const SpotifyNowPlaying = ({ theme = 'dark' }) => {
     loadMusic();
     const interval = setInterval(loadMusic, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [lastFetchTime]);
 
   if (error && !lastMusicData) return null;
 
