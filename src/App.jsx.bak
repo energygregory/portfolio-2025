@@ -704,6 +704,92 @@ function App() {
           }}
         />
 
+      {/* DEBUG PANEL - REMOVED - DARK MODE ONLY */}
+      {false && (
+          position: 'fixed',
+          bottom: '100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '8px',
+          zIndex: 1000,
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '5px'
+        }}>
+          <div style={{fontWeight: 'bold'}}>Screen: {screenDimensions}</div>
+          <div style={{fontWeight: 'bold'}}>Animated Logo</div>
+          <div>
+            <label>Scale: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.heroScale} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} />
+            <span>{liveConfig.heroScale}</span>
+          </div>
+          <div>
+            <label>Thickness: </label>
+            <input type="range" min="0.5" max="5" step="0.1" value={liveConfig.animatedOutlineWidth} onChange={(e) => handleConfigChange('animatedOutlineWidth', parseFloat(e.target.value))} />
+            <span>{liveConfig.animatedOutlineWidth}</span>
+          </div>
+          <div>
+            <label>Y pos: </label>
+            <input type="range" min="-200" max="300" step="1" value={liveConfig.heroY} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} />
+            <span>{liveConfig.heroY}</span>
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
+          <div>
+            <label>X pos: </label>
+            <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
+            <span>{liveConfig.assetX}</span>
+          </div>
+          <div>
+            <label>Y pos: </label>
+            <input type="range" min="-1200" max="0" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
+            <span>{liveConfig.assetY}</span>
+          </div>
+          <div>
+            <label>X stretch: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.assetH} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} />
+            <span>{liveConfig.assetH}</span>
+          </div>
+          <div>
+            <label>Y stretch: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
+            <span>{liveConfig.assetV}</span>
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
+          <div>
+            <label>Outline thickness (light mode): </label>
+            <input type="range" min="1" max="10" step="0.5" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
+            <span>{liveConfig.assetOutlineThickness}</span>
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Nav Bar</div>
+           <div>
+            <label>Y pos: </label>
+            <input type="range" min="0" max="300" step="1" value={liveConfig.navY} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} />
+            <span>{liveConfig.navY}</span>
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Now Playing Widget</div>
+          <div>
+            <label>Scale: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} />
+            <span>{liveConfig.widgetScale}</span>
+          </div>
+          <div>
+            <label>Y pos: </label>
+            <input type="range" min="-50" max="100" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
+            <span>{liveConfig.widgetY}</span>
+          </div>
+          <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
+        </div>
+      )}
+        
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
           <Suspense
