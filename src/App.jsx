@@ -135,22 +135,36 @@ const DEVICE_CONFIGS = {
     assetH: 0.93,
     assetV: 1,
     navY: 166,
-    widgetScale: 0.8,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
-  // iPhone 14 Pro (393x852) - LOCKED IN
+  // iPhone 14 Pro (393x852) - LOCKED IN from screenshot
   "393x852": {
-    heroScale: 0.65,
-    heroY: 79,
-    animatedOutlineWidth: 5,
+    heroScale: 0.72,
+    heroY: 68,
+    animatedOutlineWidth: 4.4,
     assetX: 0,
-    assetY: -127,
-    assetH: 0.96,
-    assetV: 1,
-    navY: 133,
-    widgetScale: 0.8,
-    widgetY: 0,
+    assetY: -200,
+    assetH: 1.03,
+    assetV: 0.88,
+    navY: 79,
+    widgetScale: 0.66,
+    widgetY: 90,
+    assetOutlineThickness: 0.8,
+  },
+  // Specific match for user's screenshot dimensions
+  "462x775": {
+    heroScale: 0.72,
+    heroY: 68,
+    animatedOutlineWidth: 4.4,
+    assetX: 0,
+    assetY: -200,
+    assetH: 1.03,
+    assetV: 0.88,
+    navY: 79,
+    widgetScale: 0.66,
+    widgetY: 90,
     assetOutlineThickness: 0.8,
   },
   // iPhone 16 Plus (430x932) - LOCKED IN
@@ -163,7 +177,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.94,
     assetV: 1,
     navY: 209,
-    widgetScale: 0.85,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
@@ -177,7 +191,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.91,
     assetV: 0.98,
     navY: 123,
-    widgetScale: 0.8,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
@@ -191,7 +205,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.93,
     assetV: 0.98,
     navY: 202,
-    widgetScale: 0.85,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
@@ -204,7 +218,7 @@ const DEVICE_CONFIGS = {
     assetY: -704,
     assetH: 1.36,
     assetV: 1.17,
-    widgetScale: 1,
+    widgetScale: 0.7,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
@@ -217,19 +231,23 @@ const DEVICE_CONFIGS = {
     assetY: -1106,
     assetH: 1.27,
     assetV: 0.96,
-    widgetScale: 1,
+    widgetScale: 0.7,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
   // Default fallback for mobile
   mobile: {
-    heroScale: 1,
-    heroY: 0,
-    animatedOutlineWidth: 3.8,
+    heroScale: 0.72,
+    heroY: 68,
+    animatedOutlineWidth: 4.4,
     assetX: 0,
     assetY: -200,
     assetH: 1.03,
     assetV: 0.88,
+    navY: 79,
+    widgetScale: 0.66,
+    widgetY: 90,
+    assetOutlineThickness: 0.8,
   },
 };
 
@@ -693,11 +711,15 @@ function App() {
         style={{
           position: 'absolute',
           top: Math.max(80, liveConfig.widgetY || 80) + 'px',
-          left: '50%',
+          left: 0,
+          right: 0,
+          margin: '0 auto',
+          width: '100%',
           opacity: assetHidden ? 0 : 1,
           transition: 'opacity 300ms ease',
           willChange: 'opacity',
-          transform: `translateX(-50%) scale(${liveConfig.widgetScale})`,
+          transform: `scale(${liveConfig.widgetScale})`,
+          transformOrigin: 'center',
           zIndex: 50,
           pointerEvents: 'none',
           display: 'flex',
@@ -727,8 +749,8 @@ function App() {
           }}
         />
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER */}
-      <div style={{
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - HIDDEN AS REQUESTED */}
+      {/* <div style={{
           position: 'fixed',
           bottom: '100px',
           left: '50%',
@@ -801,16 +823,16 @@ function App() {
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Now Playing Widget</div>
           <div>
             <label>Scale: </label>
-            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} />
+            <input type="range" min="0.2" max="2" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} />
             <span>{liveConfig.widgetScale}</span>
           </div>
           <div>
             <label>Y pos: </label>
-            <input type="range" min="-50" max="100" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
+            <input type="range" min="-200" max="200" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
             <span>{liveConfig.widgetY}</span>
           </div>
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
-        </div>
+        </div> */}
         
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
