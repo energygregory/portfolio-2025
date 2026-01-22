@@ -350,8 +350,8 @@ function App() {
   };
 
   const [theme, setTheme] = useState(getInitialTheme);
-  // appliedTheme is what we apply to document classes/background — update it after a short delay
-  const [appliedTheme, setAppliedTheme] = useState(theme);
+  // appliedTheme is what we apply to document classes/background — update it INSTANTLY now
+  // const [appliedTheme, setAppliedTheme] = useState(theme);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -364,13 +364,14 @@ function App() {
     } catch (e) {
       // ignore
     }
-  }, [appliedTheme]);
+  }, [theme]);
 
-  // When `theme` changes (controls video opacity), delay applying the theme classes
-  useEffect(() => {
+  // When `theme` changes -> INSTANT apply
+  // Removed the 500ms delay that caused the "white box" desync issue
+  /* useEffect(() => {
     const timer = setTimeout(() => setAppliedTheme(theme), 500); // match video transition duration
     return () => clearTimeout(timer);
-  }, [theme]);
+  }, [theme]); */
 
   // icon/pill positions — hardcoded per user request
   const iconOffset = 9;
@@ -544,8 +545,8 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    // Apply visual theme changes based on appliedTheme (delayed)
-    if (appliedTheme === "dark") {
+    // Apply visual theme changes based on theme (INSTANT)
+    if (theme === "dark") {
       root.classList.add("dark", "theme-dark");
       root.classList.remove("theme-light");
       root.style.backgroundColor = "#000000";
@@ -563,16 +564,16 @@ function App() {
 
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", appliedTheme === "dark" ? "#000000" : "#ffffff");
+      metaTheme.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
     }
-  }, [appliedTheme]);
+  }, [theme]);
 
   return (
     <>
       <div
         id="app-content"
           className={`min-h-screen relative flex flex-col overflow-x-hidden ${
-            appliedTheme === "dark"
+            theme === "dark"
               ? "bg-black text-white theme-dark"
               : "bg-white text-black theme-light"
           }`}
@@ -728,14 +729,14 @@ function App() {
         }}
       >
         <Suspense fallback={null}>
-          <SpotifyNowPlaying theme={appliedTheme} />
+          <SpotifyNowPlaying theme={theme} />
         </Suspense>
       </div>
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
         <Asset1Svg
-          theme={appliedTheme}
+          theme={theme}
           outlineThickness={HARDCODED_ASSET_THICKNESS}
           className={`pointer-events-none absolute left-1/2 top-12 z-20`}
           style={{
