@@ -59,7 +59,7 @@ export default defineConfig({
       "b6e9448af744.ngrok-free.app",
       "ff614dd5ac9f.ngrok-free.app",
       "upset-symbols-rest.loca.lt",
-      "unabashed-dayfly-coraline.ngrok-free.dev",
+      "eda110df46647c.lhr.life",
       "2b87577bcc66.ngrok-free.app",
       "064f6a546f44.ngrok-free.app",
       "https://thick-bananas-deny.loca.lt",

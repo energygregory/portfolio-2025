@@ -476,9 +476,22 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         {/* Hero logo sequence component (inline below) */}
 
         {/* Scrolling marquee of 2025 images - fades out as you scroll */}
-        {showMarquee && !hasScrolled && (
+        {showMarquee && (
           <div 
-            className="w-full overflow-hidden py-4 mt-24 transition-opacity duration-300"
+            className={`w-full overflow-hidden py-4 mt-24 transition-opacity duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${hasScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            onClick={() => {
+              // Smooth scroll to the images grid with offset
+              if (imagesRef.current) {
+                const yOffset = -20; // Slight offset to ensure "TAP ON HOLD..." is nicely positioned at top
+                const element = imagesRef.current;
+                const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+                
+                window.scrollTo({
+                  top: y,
+                  behavior: 'smooth'
+                });
+              }
+            }}
           >
             <div 
               className="flex gap-6 animate-marquee"

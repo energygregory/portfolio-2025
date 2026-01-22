@@ -750,8 +750,8 @@ function App() {
           }}
         />
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER - HIDDEN AS REQUESTED */}
-      {/* <div style={{
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER */}
+      <div style={{
           position: 'fixed',
           bottom: '100px',
           left: '50%',
@@ -833,7 +833,7 @@ function App() {
             <span>{liveConfig.widgetY}</span>
           </div>
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
-        </div> */}
+        </div>
         
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
