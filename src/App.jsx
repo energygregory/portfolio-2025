@@ -112,6 +112,7 @@ const Around = lazy(() => import("./pages/Around.jsx"));
 const FlyHigh = lazy(() => import("./pages/FlyHigh.jsx"));
 const LegacyDrip = lazy(() => import("./pages/LegacyDrip.jsx"));
 const PriceList = lazy(() => import("./pages/PriceList.jsx"));
+const Admin = lazy(() => import("./pages/Admin.jsx"));
 
 import NavigationLoader from "./components/NavigationLoader";
 import Asset1Svg from "./components/Asset1Svg";
@@ -222,6 +223,20 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
+  // Tablet Landscape (generic for ~1000px-1366px widths)
+  // Adjusted Y to ensure visibility on 10.9-12.9 inch screens in landscape
+  "tabletLandscape": {
+    heroScale: 1.25,
+    heroY: 100,
+    animatedOutlineWidth: 2.2,
+    assetX: 0,
+    assetY: -550, 
+    assetH: 1.3,
+    assetV: 1.05,
+    widgetScale: 0.75,
+    widgetY: 0,
+    assetOutlineThickness: 0.8,
+  },
   // Default fallback for desktop
   desktop: {
     heroScale: 1.6,
@@ -270,8 +285,10 @@ const getDeviceConfig = (dims) => {
   }
 
   if (width <= 640) return DEVICE_CONFIGS.mobile;
-  // Use iPad config as the default for tablets
-  if (width <= 1024) return DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile; 
+  // Use Tablet Portrait config for widths up to ~850px (covers iPad 10.9" portrait 820px, iPad Air portrait)
+  if (width <= 850) return DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile;
+  // Use Tablet Landscape config for larger tablets
+  if (width <= 1366) return DEVICE_CONFIGS.tabletLandscape || DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile; 
   
   return DEVICE_CONFIGS.desktop;
 };
@@ -638,15 +655,33 @@ function App() {
           >
             Home
           </NavLink>
-          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+          <NavLink
+            to="/work"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
             Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-          </span>
-          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
             About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-          </span>
-          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
             Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-          </span>
+          </NavLink>
         </nav>
       </header>
 
@@ -695,43 +730,63 @@ function App() {
           >
             Home
           </NavLink>
-          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+          <NavLink
+            to="/work"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
             Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-          </span>
-          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
             About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-          </span>
-          <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
             Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-          </span>
+          </NavLink>
         </nav>
       </header>
 
       {/* Now Playing Widget - Inside hero logo area, before Asset1 */}
-      <div
-        style={{
-          position: 'absolute',
-          top: Math.max(80, liveConfig.widgetY || 80) + 'px',
-          left: 0,
-          right: 0,
-          margin: '0 auto',
-          width: '100%',
-          opacity: assetHidden ? 0 : 1,
-          transition: 'opacity 300ms ease',
-          willChange: 'opacity',
-          transform: `scale(${liveConfig.widgetScale})`,
-          transformOrigin: 'center',
-          zIndex: 50,
-          pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Suspense fallback={null}>
-          <SpotifyNowPlaying theme={theme} />
-        </Suspense>
-      </div>
+      {location.pathname === '/' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: Math.max(80, liveConfig.widgetY || 80) + 'px',
+            left: 0,
+            right: 0,
+            margin: '0 auto',
+            width: '100%',
+            opacity: assetHidden ? 0 : 1,
+            transition: 'opacity 300ms ease',
+            willChange: 'opacity',
+            transform: `scale(${liveConfig.widgetScale})`,
+            transformOrigin: 'center',
+            zIndex: 50,
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Suspense fallback={null}>
+            <SpotifyNowPlaying theme={theme} />
+          </Suspense>
+        </div>
+      )}
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
@@ -750,8 +805,8 @@ function App() {
           }}
         />
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER */}
-      <div style={{
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - HIDDEN AS REQUESTED */}
+      {/* <div style={{
           position: 'fixed',
           bottom: '100px',
           left: '50%',
@@ -833,7 +888,7 @@ function App() {
             <span>{liveConfig.widgetY}</span>
           </div>
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
-        </div>
+        </div> */}
         
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
@@ -857,6 +912,7 @@ function App() {
               <Route path="/williamru" element={<WilliamRu />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/pricelist" element={<PriceList />} />
+              <Route path="/admin" element={<Admin theme={theme} />} />
             </Routes>
           </Suspense>
         </main>

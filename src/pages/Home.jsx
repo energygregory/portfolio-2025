@@ -63,8 +63,6 @@ const images2025 = [
   "/Images/2025/2.png",
   "/Images/2025/3.png",
   "/Images/2025/4b.png",
-  "/Images/2025/4.png",
-  "/Images/2025/5.png",
   "/Images/2025/hoodie blue 1.png",
   "/Images/2025/hoodie blue 2.png",
   "/Images/2025/final pants 2.png",
@@ -125,6 +123,8 @@ const images2025 = [
   "/Images/2025/green2.png",
   "/Images/2025/red1.png",
   "/Images/2025/red2.png",
+  "/Images/2025/grey1.png",
+  "/Images/2025/grey2.png",
   // NEW images added:
   "/Images/2025/251.png",
   "/Images/2025/Layer 0.png",
@@ -249,8 +249,18 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
   });
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return window.matchMedia('(max-width: 1024px)').matches;
+    return window.matchMedia('(max-width: 1366px)').matches;
   });
+
+  // Listener for screen resize/orientation change to update isMobileOrTablet
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mql = window.matchMedia('(max-width: 1366px)');
+    const handler = (e) => setIsMobileOrTablet(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
   const [hasScrolled, setHasScrolled] = useState(false);
   const logoContainerRef = useRef(null);
   const clRef = useRef(null);
@@ -320,7 +330,8 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
 
   // Touch handlers for press-and-hold - capture touch position for centered popup
   const handleTouchStart = useCallback((idx, src, e) => {
-    if (isPhone) {
+    // Enabled for both phone and tablet
+    if (isMobileOrTablet) {
       const touch = e.touches[0];
       setPressedImage({
         src,
@@ -328,7 +339,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         y: touch.clientY,
       });
     }
-  }, [isPhone]);
+  }, [isMobileOrTablet]);
 
   const handleTouchEnd = useCallback(() => {
     setPressedImage(null);
@@ -534,18 +545,20 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         >
           <div className="max-w-7xl mx-auto">
             {/* TAP ON HOLD TO PREVIEW */}
-            <div className="w-full mb-6 sm:mb-12 text-center">
-              <h3
-                className="text-center text-[10px] sm:text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400"
-                style={{
-                  fontFamily:
-                    "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
-                  fontWeight: 400,
-                }}
-              >
-                T A P &nbsp; O N &nbsp; H O L D &nbsp; T O &nbsp; P R E V I E W
-              </h3>
-            </div>
+            {isMobileOrTablet && (
+              <div className="w-full mb-6 sm:mb-12 text-center">
+                <h3
+                  className="text-center text-[10px] sm:text-sm tracking-[0.15em] text-neutral-600 dark:text-neutral-400 whitespace-nowrap"
+                  style={{
+                    fontFamily:
+                      "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
+                    fontWeight: 400,
+                  }}
+                >
+                  TAP AND HOLD TO PREVIEW
+                </h3>
+              </div>
+            )}
             {/* 6 Column Image Grid - Small with lots of space */}
             <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 gap-12 sm:gap-16 md:gap-20">
               {images2025.map((src, idx) => {
