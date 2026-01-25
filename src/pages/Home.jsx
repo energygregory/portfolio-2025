@@ -143,6 +143,13 @@ const images2025 = [
   "/Images/2025/t4.png",
   "/Images/2025/tff.png",
   "/Images/2025/tfff.png",
+  "/Images/2025/BLUECAMO.png",
+  "/Images/2025/GREENCAMO.png",
+  "/Images/2025/GREYCAMO.png",
+  "/Images/2025/flowerback.png",
+  "/Images/2025/flowerfront.png",
+  "/Images/2025/black baseball.png",
+  "/Images/2025/white baseball.png",
 ];
 
 const reducedSizeImages2025 = new Set([
@@ -293,7 +300,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
   useEffect(() => {
     const phoneMql = window.matchMedia("(max-width: 640px)");
     const tabletMql = window.matchMedia("(min-width: 641px)");
-    const mobileOrTabletMql = window.matchMedia("(max-width: 1024px)");
+    const mobileOrTabletMql = window.matchMedia("(max-width: 1366px)");
     
     const onPhoneChange = (e) => setIsPhone(e.matches);
     const onTabletChange = (e) => setIsTabletOrLarger(e.matches);
@@ -348,7 +355,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
   // MOBILE & DESKTOP: Scroll-based animations
   const updateScrollAnimations = useCallback(() => {
     const scrollY = scrollYRef.current;
-    const maxScroll = isPhone ? 400 : 600;
+    const maxScroll = isMobileOrTablet ? 400 : 600;
     const progress = Math.min(scrollY / maxScroll, 1);
     
     // Track if user has scrolled (for marquee on all devices)
@@ -358,8 +365,8 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
     const eased = 1 - Math.pow(1 - progress, 3);
 
     // Animations for both mobile and desktop (use eased values)
-    const logoTranslateY = eased * (isPhone ? -100 : -150);
-    const logoScale = 1 - eased * (isPhone ? 0.1 : 0.15);
+    const logoTranslateY = eased * (isMobileOrTablet ? -100 : -150);
+    const logoScale = 1 - eased * (isMobileOrTablet ? 0.1 : 0.15);
     const logoOpacity = 1 - eased; // Fully fade out the logo
     const shoulderOpacity = Math.max(0, 1 - eased);
     const shoulderRotation = eased * 360;
@@ -383,14 +390,14 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
       // On mobile, fade in the grid smoothly as you scroll
       const gridOpacity = progress;
       imagesRef.current.style.opacity = gridOpacity;
-      imagesRef.current.style.transform = `translate3d(0, ${isPhone ? 0 : (1 - progress) * 100}px, 0)`;
+      imagesRef.current.style.transform = `translate3d(0, ${isMobileOrTablet ? 0 : (1 - progress) * 100}px, 0)`;
     }
-  }, [isPhone, hasScrolled]);
+  }, [isMobileOrTablet, hasScrolled]);
 
   // Scroll handler - BOTH MOBILE AND DESKTOP
   useEffect(() => {
     let lastUpdateTime = 0;
-    const throttleMs = isPhone ? 1000 / 30 : 0; // 30fps on mobile, 60fps on desktop
+    const throttleMs = isMobileOrTablet ? 1000 / 30 : 0; // 30fps on mobile, 60fps on desktop
     
     const handleScroll = () => {
       scrollYRef.current = window.scrollY;
@@ -406,12 +413,12 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
     
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [updateScrollAnimations, isPhone]);
+  }, [updateScrollAnimations, isMobileOrTablet]);
 
-  const logoSpeed = useMemo(() => (isPhone ? 22 : 40), [isPhone]);
-  const logoRowGap = useMemo(() => (isPhone ? 14 : 4), [isPhone]);
-  const logoGap = useMemo(() => (isPhone ? 40 : 80), [isPhone]);
-  const logoHeight = useMemo(() => (isPhone ? 22 : 28), [isPhone]);
+  const logoSpeed = useMemo(() => (isMobileOrTablet ? 22 : 40), [isMobileOrTablet]);
+  const logoRowGap = useMemo(() => (isMobileOrTablet ? 14 : 4), [isMobileOrTablet]);
+  const logoGap = useMemo(() => (isMobileOrTablet ? 40 : 80), [isMobileOrTablet]);
+  const logoHeight = useMemo(() => (isMobileOrTablet ? 22 : 28), [isMobileOrTablet]);
 
   return (
     <main className={`min-h-screen flex flex-col overflow-x-hidden relative ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
@@ -422,10 +429,10 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         ref={clRef}
         className="fixed z-[100] pointer-events-none"
         style={{
-          top: isPhone ? '5vh' : '-10vh',
-          left: isPhone ? '-15vw' : '0',
-          width: isPhone ? '50vw' : '35vw',
-          height: isPhone ? '50vw' : '35vw',
+          top: isMobileOrTablet ? '5vh' : '-10vh',
+          left: isMobileOrTablet ? '-15vw' : '0',
+          width: isMobileOrTablet ? '50vw' : '35vw',
+          height: isMobileOrTablet ? '50vw' : '35vw',
           transform: 'scaleX(-1) rotate3d(0, 0, 1, 0deg)',
           transformOrigin: '50% 50%',
           willChange: 'transform, opacity',
@@ -438,10 +445,10 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         ref={crRef}
         className="fixed z-[100] pointer-events-none"
         style={{
-          top: isPhone ? '5vh' : '-10vh',
-          right: isPhone ? '-15vw' : '0',
-          width: isPhone ? '50vw' : '35vw',
-          height: isPhone ? '50vw' : '35vw',
+          top: isMobileOrTablet ? '5vh' : '-10vh',
+          right: isMobileOrTablet ? '-15vw' : '0',
+          width: isMobileOrTablet ? '50vw' : '35vw',
+          height: isMobileOrTablet ? '50vw' : '35vw',
           transform: 'rotate3d(0, 0, 1, 0deg)',
           transformOrigin: '50% 50%',
           willChange: 'transform, opacity',
@@ -451,20 +458,20 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
       </div> */}
 
       {/* Hero section with sticky logo */}
-      <section className={`relative z-10 ${isPhone ? '' : 'min-h-[150vh]'}`}>
+      <section className={`relative z-10 ${isMobileOrTablet ? '' : 'min-h-[150vh]'}`}>
         {/* Sticky logo container */}
         <div 
           ref={logoContainerRef}
-          className={`${isPhone ? '' : 'sticky top-0'} ${isPhone ? '' : 'h-screen'} flex items-center justify-center px-6`}
-          style={isPhone ? { paddingTop: '1vh', minHeight: '45vh' } : {}}
+          className={`${isMobileOrTablet ? '' : 'sticky top-0'} ${isMobileOrTablet ? '' : 'h-screen'} flex items-center justify-center px-6`}
+          style={isMobileOrTablet ? { paddingTop: '1vh', minHeight: '45vh' } : {}}
         >
           <div 
             ref={logoWrapperRef}
             className="w-full relative flex flex-col items-center gap-2"
             style={{ 
-              maxWidth: isPhone ? '90vw' : '800px', 
-              maxHeight: isPhone ? '80vw' : '800px',
-              height: isPhone ? 'auto' : '70vh',
+              maxWidth: isMobileOrTablet ? '90vw' : '800px', 
+              maxHeight: isMobileOrTablet ? '80vw' : '800px',
+              height: isMobileOrTablet ? 'auto' : '70vh',
               willChange: 'transform',
               backfaceVisibility: 'hidden',
               transform: 'translateZ(0)',
@@ -535,9 +542,9 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         {/* 2025 Content - images grid */}
         <div 
           ref={imagesRef}
-          className={`relative z-10 px-6 pb-24 ${isPhone ? 'mt-4' : '-mt-[50vh]'}`}
+          className={`relative z-10 px-6 pb-24 ${isMobileOrTablet ? 'mt-4' : '-mt-[50vh]'}`}
           style={{ 
-            opacity: isPhone && !hasScrolled ? 0 : undefined, 
+            opacity: isMobileOrTablet && !hasScrolled ? 0 : undefined, 
             willChange: 'transform, opacity',
             backfaceVisibility: 'hidden',
             transform: 'translateZ(0)',
@@ -560,7 +567,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
               </div>
             )}
             {/* 6 Column Image Grid - Small with lots of space */}
-            <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 gap-12 sm:gap-16 md:gap-20">
+            <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-6 gap-8 sm:gap-12 lg:gap-20 justify-center select-none">
               {images2025.map((src, idx) => {
                 const isReduced = reducedSizeImages2025.has(src);
                 const isExpanded = expandedSizeImages2025.has(src);
@@ -568,16 +575,16 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
                 const isSlightlyReduced = slightlyReducedImages2025.has(src);
                 const isUniformReduced = uniformReducedImages2025.has(src);
                 const sizeClasses = isExpanded
-                  ? 'w-[60px] h-[60px] sm:w-[110px] sm:h-[110px] md:w-[140px] md:h-[140px]'
+                  ? 'w-[40px] h-[40px] sm:w-[75px] sm:h-[75px] md:w-[95px] md:h-[95px]'
                   : isSlightlyExpanded
-                    ? (isPhone ? 'w-[62px] h-[62px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px]' : 'w-[55px] h-[55px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px]')
+                    ? (isPhone ? 'w-[42px] h-[42px] sm:w-[70px] sm:h-[70px] md:w-[85px] md:h-[85px]' : 'w-[36px] h-[36px] sm:w-[70px] sm:h-[70px] md:w-[85px] md:h-[85px]')
                     : isReduced
-                      ? 'w-[35px] h-[35px] sm:w-[70px] sm:h-[70px] md:w-[80px] md:h-[80px]'
+                      ? 'w-[24px] h-[24px] sm:w-[45px] sm:h-[45px] md:w-[54px] md:h-[54px]'
                       : isSlightlyReduced
-                        ? 'w-[42px] h-[42px] sm:w-[85px] sm:h-[85px] md:w-[100px] md:h-[100px]'
+                        ? 'w-[28px] h-[28px] sm:w-[58px] sm:h-[58px] md:w-[66px] md:h-[66px]'
                         : isUniformReduced
-                          ? 'w-[38px] h-[38px] sm:w-[78px] sm:h-[78px] md:w-[90px] md:h-[90px]'
-                          : 'w-[50px] h-[50px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px]';
+                          ? 'w-[26px] h-[26px] sm:w-[54px] sm:h-[54px] md:w-[62px] md:h-[62px]'
+                          : 'w-[34px] h-[34px] sm:w-[70px] sm:h-[70px] md:w-[82px] md:h-[82px]';
 
                 return (
                   <div 
@@ -813,8 +820,18 @@ function HeroLogoSequence({ theme = 'dark', heroScale = 1, heroY = 0, animatedOu
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
       {/* Render AnimatedLogo always visible, outline-only, correct stroke color */}
-      <div style={{ transform: `translateZ(0) translateY(${heroY}px) scale(${heroScale})`, transformOrigin: '50% 50%' }}>
+      <div className="flex flex-col items-center gap-3" style={{ transform: `translateZ(0) translateY(${heroY}px) scale(${heroScale})`, transformOrigin: '50% 50%' }}>
         <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} strokeWidth={animatedOutlineWidth} />
+        <h3
+          className="text-center text-[7px] sm:text-[9px] tracking-[0.15em] text-neutral-600 dark:text-neutral-400 whitespace-nowrap"
+          style={{
+            fontFamily:
+              "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
+            fontWeight: 400,
+          }}
+        >
+          2025 MERCH DESIGN
+        </h3>
       </div>
     </div>
   );

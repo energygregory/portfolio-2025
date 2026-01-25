@@ -223,6 +223,21 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
+  // iPad Air/Pro 11" Portrait (820x1052)
+  "820x1052": {
+    heroScale: 1.05,
+    heroY: 75,
+    animatedOutlineWidth: 3.2,
+    assetX: 0,
+    assetY: -594,
+    assetScale: 0.46,
+    assetH: 2.02,
+    assetV: 1.25,
+    widgetScale: 0.7,
+    widgetY: 149,
+    navY: 79,
+    assetOutlineThickness: 0.8,
+  },
   // Tablet Landscape (generic for ~1000px-1366px widths)
   // Adjusted Y to ensure visibility on 10.9-12.9 inch screens in landscape
   "tabletLandscape": {
@@ -239,16 +254,17 @@ const DEVICE_CONFIGS = {
   },
   // Default fallback for desktop
   desktop: {
-    heroScale: 1.6,
+    heroScale: 1.9,
     heroY: 147,
     animatedOutlineWidth: 1.5,
     assetX: 0,
-    assetY: -1106,
-    assetH: 1.27,
-    assetV: 0.96,
+    assetY: -1454,
+    assetH: 1.39,
+    assetV: 0.9,
+    assetScale: 0.61,
     widgetScale: 0.7,
-    widgetY: 0,
-    assetOutlineThickness: 0.8,
+    widgetY: 200,
+    assetOutlineThickness: 1,
   },
   // Default fallback for mobile
   mobile: {
@@ -360,10 +376,11 @@ function App() {
 
   // Theme state with toggle — initialize from localStorage or prefers-color-scheme
   const getInitialTheme = () => {
+    // Force dark mode default as requested
     if (typeof window === 'undefined') return 'dark';
     const stored = window.localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') return stored;
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    return 'dark'; // Default to dark for all devices
   };
 
   const [theme, setTheme] = useState(getInitialTheme);
@@ -789,24 +806,28 @@ function App() {
       )}
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
-      <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
-        <Asset1Svg
-          theme={theme}
-          outlineThickness={HARDCODED_ASSET_THICKNESS}
-          className={`pointer-events-none absolute left-1/2 top-12 z-20`}
-          style={{
-            transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
-            width: '140%',
-            maxWidth: 'none',
-            height: 'auto',
-            opacity: assetHidden ? 0 : 1,
-            transition: 'opacity 300ms ease, transform 300ms ease',
-            willChange: 'opacity, transform',
-          }}
-        />
+      <div className="relative flex-1" style={{ minHeight: '100vh' }}>
+        {location.pathname === '/' && (
+          <Asset1Svg
+            theme={theme}
+            outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
+            className={`pointer-events-none absolute left-1/2 top-12 z-20`}
+            style={{
+              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) scale(${liveConfig.assetScale ?? 1})`,
+              width: '140%',
+              maxWidth: 'none',
+              height: 'auto',
+              opacity: assetHidden ? 0 : 1,
+              transition: 'opacity 300ms ease, transform 300ms ease',
+              willChange: 'opacity, transform',
+            }}
+          />
+        )}
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER - HIDDEN AS REQUESTED */}
-      {/* <div style={{
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - HIDDEN TEMPORARILY */}
+      <div 
+        className="hidden flex-col gap-[5px]"
+        style={{
           position: 'fixed',
           bottom: '100px',
           left: '50%',
@@ -817,78 +838,80 @@ function App() {
           borderRadius: '8px',
           zIndex: 1000,
           fontFamily: 'monospace',
-          fontSize: '12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '5px'
+          fontSize: '12px'
         }}>
           <div style={{fontWeight: 'bold'}}>Screen: {screenDimensions}</div>
           <div style={{fontWeight: 'bold'}}>Animated Logo</div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Scale: </label>
             <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.heroScale} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} />
-            <span>{liveConfig.heroScale}</span>
+            <input type="number" step="0.01" value={liveConfig.heroScale} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Thickness: </label>
             <input type="range" min="0.5" max="5" step="0.1" value={liveConfig.animatedOutlineWidth} onChange={(e) => handleConfigChange('animatedOutlineWidth', parseFloat(e.target.value))} />
-            <span>{liveConfig.animatedOutlineWidth}</span>
+            <input type="number" step="0.1" value={liveConfig.animatedOutlineWidth} onChange={(e) => handleConfigChange('animatedOutlineWidth', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Y pos: </label>
             <input type="range" min="-200" max="300" step="1" value={liveConfig.heroY} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} />
-            <span>{liveConfig.heroY}</span>
+            <input type="number" step="1" value={liveConfig.heroY} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>X pos: </label>
             <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
-            <span>{liveConfig.assetX}</span>
+            <input type="number" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Y pos: </label>
-            <input type="range" min="-1200" max="0" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
-            <span>{liveConfig.assetY}</span>
+            <input type="range" min="-5000" max="2000" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
+            <label>Scale: </label>
+            <input type="range" min="0.1" max="2" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} />
+            <input type="number" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
             <label>X stretch: </label>
-            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.assetH} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} />
-            <span>{liveConfig.assetH}</span>
+            <input type="range" min="-5" max="20" step="0.1" value={liveConfig.assetH} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.assetH} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Y stretch: </label>
-            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
-            <span>{liveConfig.assetV}</span>
+            <input type="range" min="-5" max="20" step="0.1" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Outline thickness (light mode): </label>
-            <input type="range" min="1" max="10" step="0.5" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
-            <span>{liveConfig.assetOutlineThickness}</span>
+            <input type="range" min="-10" max="50" step="1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Nav Bar</div>
-           <div>
+           <div className="flex items-center gap-2">
             <label>Y pos: </label>
             <input type="range" min="0" max="300" step="1" value={liveConfig.navY} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} />
-            <span>{liveConfig.navY}</span>
+            <input type="number" step="1" value={liveConfig.navY} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Now Playing Widget</div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Scale: </label>
             <input type="range" min="0.2" max="2" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} />
-            <span>{liveConfig.widgetScale}</span>
+            <input type="number" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <label>Y pos: </label>
             <input type="range" min="-200" max="200" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
-            <span>{liveConfig.widgetY}</span>
+            <input type="number" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
-        </div> */}
+        </div>
         
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
