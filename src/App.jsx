@@ -326,7 +326,7 @@ const DEVICE_CONFIGS = {
     heroY: 147,
     animatedOutlineWidth: 2,
     assetX: 38,
-    assetY: -2141,
+    assetY: -1920,
     assetScale: 0.35,
     assetH: 1.3,
     assetV: 1.4,

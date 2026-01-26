@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sphere, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import UAParser from 'ua-parser-js';
 
 // Procedural Dot Globe (Halftone ish)
 const HalftoneSphere = ({ theme }) => {
@@ -160,6 +161,7 @@ export default function Admin({ theme = 'dark' }) {
     const [userLocation, setUserLocation] = useState(null);
     const [ipData, setIpData] = useState(null);
     const [sessionTime, setSessionTime] = useState(0);
+    const [deviceInfo, setDeviceInfo] = useState(null);
 
     // Timer for session duration
     useEffect(() => {
@@ -170,18 +172,48 @@ export default function Admin({ theme = 'dark' }) {
         return () => clearInterval(timer);
     }, [isAuthenticated]);
 
-    // Fetch IP Data for "Real Numbers"
+    // Fetch IP Data for "Real Numbers" and Parse UA
     useEffect(() => {
         if (!isAuthenticated) return;
         
-        // Use a free IP API to get real client data
-        fetch('https://ipapi.co/json/')
-            .then(res => res.json())
-            .then(data => {
+        // 1. Get Device Info
+        const parser = new UAParser();
+        setDeviceInfo(parser.getResult());
+
+        // 2. Get IP Info (Try ipapi.co, fallback to others if needed)
+        const fetchIP = async () => {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                if (!res.ok) throw new Error('Blocked or Limit Reached');
+                const data = await res.json();
                 setIpData(data);
                 setUserLocation(data);
-            })
-            .catch(err => console.error("Could not fetch IP data", err));
+            } catch (err) {
+                console.warn("Primary IP API failed, trying fallback...", err);
+                try {
+                    const res2 = await fetch('https://ipwhois.app/json/');
+                    const data2 = await res2.json();
+                     setIpData({
+                        ip: data2.ip,
+                        city: data2.city,
+                        region: data2.region,
+                        country_name: data2.country,
+                        org: data2.isp,
+                        timezone: data2.timezone?.id || 'UTC',
+                        latitude: data2.latitude,
+                        longitude: data2.longitude
+                    });
+                    setUserLocation({
+                        lat: data2.latitude,
+                        lon: data2.longitude
+                    });
+                } catch (err2) {
+                     console.error("All IP APIs failed", err2);
+                }
+            }
+        };
+
+        fetchIP();
             
     }, [isAuthenticated]);
 
@@ -255,27 +287,27 @@ export default function Admin({ theme = 'dark' }) {
             {/* Grid Layout - Real Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
                 <StatCard 
-                    title="Current Status" 
-                    value={ipData ? "Online" : "Connecting..."} 
-                    sub="System Operational" 
+                    title="System Status" 
+                    value={ipData ? "Online" : "Scanning..."} 
+                    sub="Deployment Active" 
                     theme={theme} 
                 />
                 <StatCard 
-                    title="Your IP Address" 
+                    title="Admin IP" 
                     value={ipData ? ipData.ip : "---.---.---.---"} 
-                    sub={ipData ? ipData.org : "Loading ISP..."} 
+                    sub={ipData ? (ipData.org || ipData.asn) : "Identifying..."} 
                     theme={theme} 
                 />
                 <StatCard 
-                    title="Session Duration" 
+                    title="Session" 
                     value={formatTime(sessionTime)} 
-                    sub="Current Active Session" 
+                    sub="Current Login Duration" 
                     theme={theme} 
                 />
                 <StatCard 
-                    title="Active Users" 
-                    value="1" 
-                    sub="You (Admin)" 
+                    title="Live Analytics" 
+                    value="Active" 
+                    sub="Tracking via Vercel" 
                     theme={theme} 
                 />
             </div>
@@ -285,7 +317,7 @@ export default function Admin({ theme = 'dark' }) {
                 {/* Globe Section - Spans 2 cols */}
                 <div className="lg:col-span-2">
                     <div className="mb-4 flex items-center justify-between">
-                         <h3 className="text-[10px] text-neutral-400 uppercase tracking-[0.2em]">Real-Time GeoLocation</h3>
+                         <h3 className="text-[10px] text-neutral-400 uppercase tracking-[0.2em]">Real-Time GeoLocation (You)</h3>
                     </div>
                     <HalftoneGlobe theme={theme} userLocation={userLocation} />
                 </div>
@@ -317,23 +349,23 @@ export default function Admin({ theme = 'dark' }) {
 
                     {/* Device Parameters */}
                     <div className={`p-6 border rounded-none ${theme === 'light' ? 'bg-white border-neutral-100' : 'bg-neutral-900/30 border-neutral-800'}`}>
-                         <h3 className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] mb-6">Client Client</h3>
+                         <h3 className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] mb-6">Client Info</h3>
                          <div className="space-y-4 text-xs font-mono">
                              <div className="flex justify-between">
-                                <span className="text-neutral-500">Platform</span>
-                                <span>{navigator.platform}</span>
+                                <span className="text-neutral-500">Browser</span>
+                                <span>{deviceInfo?.browser?.name} {deviceInfo?.browser?.version}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-neutral-500">Cores</span>
-                                <span>{navigator.hardwareConcurrency || 4}</span>
+                                <span className="text-neutral-500">OS</span>
+                                <span>{deviceInfo?.os?.name} {deviceInfo?.os?.version}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-neutral-500">Language</span>
-                                <span>{navigator.language.toUpperCase()}</span>
+                                <span className="text-neutral-500">Device</span>
+                                <span>{deviceInfo?.device?.vendor || 'Desktop'} {deviceInfo?.device?.model || 'Workstation'}</span>
                             </div>
                              <div className="flex justify-between">
-                                <span className="text-neutral-500">Status</span>
-                                <span className="text-green-500">AUTHENTICATED</span>
+                                <span className="text-neutral-500">Engine</span>
+                                <span className="text-green-500">{deviceInfo?.engine?.name || 'V8'}</span>
                             </div>
                          </div>
                     </div>
