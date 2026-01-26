@@ -12,6 +12,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+*/
 
 a {
   font-weight: 500;
@@ -26,7 +27,23 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  /* Disable selection and context menus globally */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
+
+/* Allow selection in inputs and textareas */
+input, textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
 
 h1 {
   font-size: 3.2em;
@@ -63,7 +80,7 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-} */
+}
 
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;600&display=swap");
 @tailwind base;

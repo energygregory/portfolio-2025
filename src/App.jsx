@@ -238,6 +238,22 @@ const DEVICE_CONFIGS = {
     navY: 79,
     assetOutlineThickness: 0.8,
   },
+  // iPad Air/Pro 11" Landscape (1180x692)
+  "1180x692": {
+    heroScale: 0.86,
+    heroY: 72,
+    animatedOutlineWidth: 1.9,
+    assetX: 0,
+    assetY: -657,
+    assetScale: 0.65,
+    assetH: 1.3,
+    assetV: 1.05,
+    widgetScale: 0.6,
+    widgetY: 147,
+    navY: 79,
+    assetOutlineThickness: 0.3,
+    marqueeY: 170,
+  },
   // Tablet Landscape (generic for ~1000px-1366px widths)
   // Adjusted Y to ensure visibility on 10.9-12.9 inch screens in landscape
   "tabletLandscape": {
@@ -256,15 +272,17 @@ const DEVICE_CONFIGS = {
   desktop: {
     heroScale: 1.9,
     heroY: 147,
-    animatedOutlineWidth: 1.5,
+    animatedOutlineWidth: 2,
     assetX: 0,
     assetY: -1454,
+    assetScale: 0.61,
     assetH: 1.39,
     assetV: 0.9,
-    assetScale: 0.61,
+    assetOutlineThickness: 0.4,
+    navY: 79,
     widgetScale: 0.7,
     widgetY: 200,
-    assetOutlineThickness: 1,
+    marqueeY: 96,
   },
   // Default fallback for mobile
   mobile: {
@@ -665,37 +683,41 @@ function App() {
         <nav className="flex items-center gap-6 text-sm px-2">
           <NavLink
             to="/"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Home
           </NavLink>
           <NavLink
             to="/work"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/about"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/contact"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
@@ -740,37 +762,41 @@ function App() {
         <nav className="flex items-center gap-4 text-xs px-2">
           <NavLink
             to="/"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Home
           </NavLink>
           <NavLink
             to="/work"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/about"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/contact"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
@@ -824,9 +850,9 @@ function App() {
           />
         )}
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER - HIDDEN TEMPORARILY */}
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP & TABLET */}
       <div 
-        className="hidden flex-col gap-[5px]"
+        className="hidden"
         style={{
           position: 'fixed',
           bottom: '100px',
@@ -841,6 +867,22 @@ function App() {
           fontSize: '12px'
         }}>
           <div style={{fontWeight: 'bold'}}>Screen: {screenDimensions}</div>
+          <div className="flex items-center gap-2 mb-2">
+            <button 
+              onClick={() => setShowMarquee(!showMarquee)}
+              style={{
+                background: showMarquee ? '#4ADE80' : '#F87171',
+                color: 'black',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '2px 8px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              Marquee: {showMarquee ? 'ON' : 'OFF'}
+            </button>
+          </div>
           <div style={{fontWeight: 'bold'}}>Animated Logo</div>
           <div className="flex items-center gap-2">
             <label>Scale: </label>
@@ -887,9 +929,9 @@ function App() {
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
           <div className="flex items-center gap-2">
-            <label>Outline thickness (light mode): </label>
-            <input type="range" min="-10" max="50" step="1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
-            <input type="number" step="1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+            <label>Outline thickness: </label>
+            <input type="range" min="0" max="20" step="0.1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Nav Bar</div>
@@ -910,6 +952,14 @@ function App() {
             <input type="range" min="-200" max="200" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
             <input type="number" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Marquee (Scrolling PNGs)</div>
+          <div className="flex items-center gap-2">
+            <label>Y Margin: </label>
+            <input type="range" min="0" max="300" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
         </div>
         
@@ -925,8 +975,10 @@ function App() {
                 heroY={liveConfig.heroY ?? 0} 
                 animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
                 showMarquee={showMarquee}
+                marqueeY={liveConfig.marqueeY ?? 96}
               />} />
-              <Route path="/work" element={<Work />} />
+              {/* LOCKED ROUTES */}
+              {/* <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />
               <Route path="/flyhigh" element={<FlyHigh />} />
@@ -935,7 +987,17 @@ function App() {
               <Route path="/williamru" element={<WilliamRu />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/pricelist" element={<PriceList />} />
-              <Route path="/admin" element={<Admin theme={theme} />} />
+              <Route path="/admin" element={<Admin theme={theme} />} /> */}
+              
+              {/* Redirect any other route to Home */}
+              <Route path="*" element={<Home 
+                theme={theme} 
+                heroScale={liveConfig.heroScale ?? 1} 
+                heroY={liveConfig.heroY ?? 0} 
+                animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
+                showMarquee={showMarquee}
+                marqueeY={liveConfig.marqueeY ?? 96}
+              />} />  
             </Routes>
           </Suspense>
         </main>

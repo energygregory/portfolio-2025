@@ -242,7 +242,7 @@ const portfolioLogos = [
   },
 ];
 
-export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8, showMarquee = true, selectedDevice = '' }) {
+export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8, showMarquee = true, marqueeY = 96, selectedDevice = '' }) {
   console.log('Home component is rendering');
   
   // Initialize with actual media query values to avoid stale state
@@ -462,7 +462,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         {/* Sticky logo container */}
         <div 
           ref={logoContainerRef}
-          className={`${isMobileOrTablet ? '' : 'sticky top-0'} ${isMobileOrTablet ? '' : 'h-screen'} flex items-center justify-center px-6`}
+          className={`${isMobileOrTablet ? '' : 'sticky top-0'} ${isMobileOrTablet ? '' : 'h-screen'} flex items-center justify-center px-6 relative z-20`}
           style={isMobileOrTablet ? { paddingTop: '1vh', minHeight: '45vh' } : {}}
         >
           <div 
@@ -496,7 +496,8 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         {/* Scrolling marquee of 2025 images - fades out as you scroll */}
         {showMarquee && (
           <div 
-            className={`w-full overflow-hidden py-4 mt-24 transition-opacity duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${hasScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            className={`w-full overflow-hidden py-4 transition-opacity duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${hasScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            style={{ marginTop: `${marqueeY}px` }}
             onClick={() => {
               // Smooth scroll to the images grid with offset
               if (imagesRef.current) {
@@ -545,6 +546,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
           className={`relative z-10 px-6 pb-24 ${isMobileOrTablet ? 'mt-4' : '-mt-[50vh]'}`}
           style={{ 
             opacity: isMobileOrTablet && !hasScrolled ? 0 : undefined, 
+            pointerEvents: isMobileOrTablet && !hasScrolled ? 'none' : 'auto',
             willChange: 'transform, opacity',
             backfaceVisibility: 'hidden',
             transform: 'translateZ(0)',
@@ -575,16 +577,16 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
                 const isSlightlyReduced = slightlyReducedImages2025.has(src);
                 const isUniformReduced = uniformReducedImages2025.has(src);
                 const sizeClasses = isExpanded
-                  ? 'w-[40px] h-[40px] sm:w-[75px] sm:h-[75px] md:w-[95px] md:h-[95px]'
+                  ? 'w-[46px] h-[46px] sm:w-[75px] sm:h-[75px] md:w-[95px] md:h-[95px]'
                   : isSlightlyExpanded
-                    ? (isPhone ? 'w-[42px] h-[42px] sm:w-[70px] sm:h-[70px] md:w-[85px] md:h-[85px]' : 'w-[36px] h-[36px] sm:w-[70px] sm:h-[70px] md:w-[85px] md:h-[85px]')
+                    ? (isPhone ? 'w-[48px] h-[48px] sm:w-[70px] sm:h-[70px] md:w-[85px] md:h-[85px]' : 'w-[42px] h-[42px] sm:w-[70px] sm:h-[70px] md:w-[85px] md:h-[85px]')
                     : isReduced
-                      ? 'w-[24px] h-[24px] sm:w-[45px] sm:h-[45px] md:w-[54px] md:h-[54px]'
+                      ? 'w-[28px] h-[28px] sm:w-[45px] sm:h-[45px] md:w-[54px] md:h-[54px]'
                       : isSlightlyReduced
-                        ? 'w-[28px] h-[28px] sm:w-[58px] sm:h-[58px] md:w-[66px] md:h-[66px]'
+                        ? 'w-[32px] h-[32px] sm:w-[58px] sm:h-[58px] md:w-[66px] md:h-[66px]'
                         : isUniformReduced
-                          ? 'w-[26px] h-[26px] sm:w-[54px] sm:h-[54px] md:w-[62px] md:h-[62px]'
-                          : 'w-[34px] h-[34px] sm:w-[70px] sm:h-[70px] md:w-[82px] md:h-[82px]';
+                          ? 'w-[30px] h-[30px] sm:w-[54px] sm:h-[54px] md:w-[62px] md:h-[62px]'
+                          : 'w-[40px] h-[40px] sm:w-[70px] sm:h-[70px] md:w-[82px] md:h-[82px]';
 
                 return (
                   <div 
