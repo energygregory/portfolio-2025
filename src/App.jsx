@@ -934,7 +934,8 @@ function App() {
           />
         )}
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP & TABLET */}
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP ONLY */}
+      {viewMode === 'desktop' && (
       <div 
         className=""
         style={{
@@ -1063,6 +1064,7 @@ function App() {
 
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
         </div>
+      )}
         
         {/* Main content - above Asset1 */}
         <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'}`}>
