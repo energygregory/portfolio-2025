@@ -614,12 +614,8 @@ function App() {
     const handler = () => {
       const now = Date.now();
       const doUpdate = () => {
-        // Only hide on mobile/tablet (width <= 1024px)
-        if (window.innerWidth <= 1024) {
-          setAssetHidden(window.scrollY > 20);
-        } else {
-          setAssetHidden(false);
-        }
+        // Hide on scroll for all devices (including desktop)
+        setAssetHidden(window.scrollY > 20);
       };
       if (now - last >= throttleMs) {
         last = now;
@@ -629,11 +625,7 @@ function App() {
     };
     window.addEventListener('scroll', handler, { passive: true });
     // initialize
-    if (window.innerWidth <= 1024) {
-      setAssetHidden(window.scrollY > 20);
-    } else {
-      setAssetHidden(false);
-    }
+    setAssetHidden(window.scrollY > 20);
     
     return () => {
       window.removeEventListener('scroll', handler);
