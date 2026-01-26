@@ -932,10 +932,11 @@ function App() {
           />
         )}
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP & TABLET */}
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP & TABLET - HIDDEN */}
       <div 
         className=""
         style={{
+          display: 'none', // HIDDEN
           position: 'fixed',
           bottom: '100px',
           left: '50%',
