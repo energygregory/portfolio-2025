@@ -545,8 +545,8 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
                         alt="" 
                         className="object-contain flex-shrink-0 transition-transform duration-300"
                         style={{ 
-                          width: isPhone ? '48px' : `${size}px`,
-                          height: isPhone ? '48px' : `${size}px`
+                          width: `${size}px`,
+                          height: `${size}px`
                         }}
                         draggable={false}
                         decoding="async"

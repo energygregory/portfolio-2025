@@ -30,11 +30,12 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "", 
     '  stroke-linejoin: round !important;',
     '  opacity: 1 !important;',
     '}',
-    // Mobile: keep filled dark colour for small screens
+    // Mobile: outline only, matching animated logo style
     '@media (max-width: 640px) {',
     '  .asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
-    '    fill: #4d4d4d !important;',
-    '    stroke: none !important;',
+    '    fill: none !important;',
+    '    stroke: currentColor !important;',
+    '    stroke-width: var(--outline-width, 3px) !important;',
     '  }',
     '}',
   ].join('\n');
