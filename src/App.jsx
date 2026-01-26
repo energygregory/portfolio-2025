@@ -934,8 +934,8 @@ function App() {
           />
         )}
 
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP ONLY */}
-      {viewMode === 'desktop' && (
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP ONLY - HIDDEN */}
+      {false && viewMode === 'desktop' && (
       <div 
         className=""
         style={{
@@ -1083,15 +1083,15 @@ function App() {
               />} />
               
               {/* LOCKED ROUTES */}
-              <Route path="/work" element={<Work />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/around" element={<Around />} />
-              <Route path="/flyhigh" element={<FlyHigh />} />
-              <Route path="/legacydrip" element={<LegacyDrip />} />
-              <Route path="/terzo" element={<Terzo />} />
-              <Route path="/williamru" element={<WilliamRu />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/pricelist" element={<PriceList />} />
+              {/* <Route path="/work" element={<Work />} /> */}
+              {/* <Route path="/about" element={<About />} /> */}
+              {/* <Route path="/around" element={<Around />} /> */}
+              {/* <Route path="/flyhigh" element={<FlyHigh />} /> */}
+              {/* <Route path="/legacydrip" element={<LegacyDrip />} /> */}
+              {/* <Route path="/terzo" element={<Terzo />} /> */}
+              {/* <Route path="/williamru" element={<WilliamRu />} /> */}
+              {/* <Route path="/contact" element={<Contact />} /> */}
+              {/* <Route path="/pricelist" element={<PriceList />} /> */}
               <Route path="/admin" element={<Admin theme={theme} />} />
               
               {/* Redirect any other route to Home */}
