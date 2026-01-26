@@ -1083,7 +1083,7 @@ function App() {
               />} />
               
               {/* LOCKED ROUTES */}
-              {/* <Route path="/work" element={<Work />} />
+              <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />
               <Route path="/flyhigh" element={<FlyHigh />} />
@@ -1092,7 +1092,7 @@ function App() {
               <Route path="/williamru" element={<WilliamRu />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/pricelist" element={<PriceList />} />
-              <Route path="/admin" element={<Admin theme={theme} />} /> */}
+              <Route path="/admin" element={<Admin theme={theme} />} />
               
               {/* Redirect any other route to Home */}
               <Route path="*" element={<Home 
