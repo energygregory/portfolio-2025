@@ -21,6 +21,7 @@ export default function AnimatedLogo({ className = "", start = true, style = {},
       duration: 4500,
       delay: stagger(80),
       loop: true,
+      direction: "alternate",
       loopDelay: 325,
     });
   }, [start]);

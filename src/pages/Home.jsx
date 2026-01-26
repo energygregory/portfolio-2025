@@ -167,6 +167,8 @@ const expandedSizeImages2025 = new Set([
   "/Images/2025/wr2.png",
   "/Images/2025/wr3.png",
   "/Images/2025/wr4.png",
+  "/Images/2025/box2a.png",
+  "/Images/2025/box3a.png",
 ]);
 
 const slightlyExpandedImages2025 = new Set([
@@ -176,8 +178,6 @@ const slightlyExpandedImages2025 = new Set([
   "/Images/2025/RED2b.png",
   "/Images/2025/around1.png",
   "/Images/2025/around2.png",
-  "/Images/2025/box2a.png",
-  "/Images/2025/box3a.png",
 ]);
 
 // Slightly reduced size images
@@ -242,7 +242,7 @@ const portfolioLogos = [
   },
 ];
 
-export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8, showMarquee = true, marqueeY = 96, selectedDevice = '' }) {
+export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8, showMarquee = true, marqueeY = 96, marqueeScale = 1, marqueeSpeed = 60, selectedDevice = '' }) {
   console.log('Home component is rendering');
   
   // Initialize with actual media query values to avoid stale state
@@ -259,13 +259,24 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
     return window.matchMedia('(max-width: 1366px)').matches;
   });
 
-  // Listener for screen resize/orientation change to update isMobileOrTablet
+  // Listener for screen resize/orientation change to update isMobileOrTablet and isPhone
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mql = window.matchMedia('(max-width: 1366px)');
-    const handler = (e) => setIsMobileOrTablet(e.matches);
-    mql.addEventListener('change', handler);
-    return () => mql.removeEventListener('change', handler);
+    
+    // Mobile/Tablet handler
+    const mqlMobile = window.matchMedia('(max-width: 1366px)');
+    const mobileHandler = (e) => setIsMobileOrTablet(e.matches);
+    mqlMobile.addEventListener('change', mobileHandler);
+    
+    // Phone handler
+    const mqlPhone = window.matchMedia('(max-width: 640px)');
+    const phoneHandler = (e) => setIsPhone(e.matches);
+    mqlPhone.addEventListener('change', phoneHandler);
+
+    return () => {
+      mqlMobile.removeEventListener('change', mobileHandler);
+      mqlPhone.removeEventListener('change', phoneHandler);
+    };
   }, []);
 
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -488,57 +499,74 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
               {/* Replace hero videos with loading animation placeholder + outlined logo sequence */}
               <HeroLogoSequence theme={theme} heroScale={heroScale} heroY={heroY} animatedOutlineWidth={animatedOutlineWidth} />
             </div>
+
+            {/* Scrolling marquee of 2025 images - moved inside the sticky container to prevent overlap */}
+            {showMarquee && (
+              <div 
+                className={`transition-opacity duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${hasScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${isMobileOrTablet ? 'w-full py-24 overflow-hidden relative' : 'absolute left-1/2 -translate-x-1/2 w-screen overflow-hidden'}`}
+                style={{ 
+                  marginTop: isMobileOrTablet 
+                    ? `${(marqueeY ?? 96) + heroY}px` 
+                    : undefined,
+                  top: isMobileOrTablet ? undefined : '50%',
+                  transform: isMobileOrTablet ? undefined : `translate(-50%, calc(-50% + ${(marqueeY ?? 96) + heroY + 150}px))`, // Center X, adjust Y based on config
+                }}
+                onClick={() => {
+                  // Smooth scroll to the images grid with offset
+                  if (imagesRef.current) {
+                    const yOffset = -20; // Slight offset to ensure "TAP ON HOLD..." is nicely positioned at top
+                    const element = imagesRef.current;
+                    const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+                    
+                    window.scrollTo({
+                      top: y,
+                      behavior: 'smooth'
+                    });
+                  }
+                }}
+              >
+                <div 
+                  className="flex animate-marquee"
+                  style={{
+                    animation: `marquee ${marqueeSpeed}s linear infinite`,
+                    width: 'max-content',
+                    gap: isPhone ? '24px' : '64px'
+                  }}
+                >
+                  {[...images2025, ...images2025].map((src, idx) => {
+                     // Calculate logical size: Default w-48 is 192px. Multiply by scale.
+                     const baseSize = isPhone ? 48 : 192;
+                     const size = baseSize * marqueeScale;
+                     
+                     return (
+                      <img 
+                        key={idx}
+                        src={src} 
+                        alt="" 
+                        className="object-contain flex-shrink-0 transition-transform duration-300"
+                        style={{ 
+                          width: isPhone ? '48px' : `${size}px`,
+                          height: isPhone ? '48px' : `${size}px`
+                        }}
+                        draggable={false}
+                        decoding="async"
+                        fetchpriority="low"
+                      />
+                    );
+                  })}
+                </div>
+                <style>{`
+                  @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                  }
+                `}</style>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Hero logo sequence component (inline below) */}
-
-        {/* Scrolling marquee of 2025 images - fades out as you scroll */}
-        {showMarquee && (
-          <div 
-            className={`w-full overflow-hidden py-4 transition-opacity duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${hasScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            style={{ marginTop: `${marqueeY}px` }}
-            onClick={() => {
-              // Smooth scroll to the images grid with offset
-              if (imagesRef.current) {
-                const yOffset = -20; // Slight offset to ensure "TAP ON HOLD..." is nicely positioned at top
-                const element = imagesRef.current;
-                const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-                
-                window.scrollTo({
-                  top: y,
-                  behavior: 'smooth'
-                });
-              }
-            }}
-          >
-            <div 
-              className="flex gap-6 animate-marquee"
-              style={{
-                animation: 'marquee 60s linear infinite',
-                width: 'max-content',
-              }}
-            >
-              {[...images2025, ...images2025].map((src, idx) => (
-                <img 
-                  key={idx}
-                  src={src} 
-                  alt="" 
-                  className="w-12 h-12 object-contain flex-shrink-0"
-                  draggable={false}
-                  decoding="async"
-                  fetchpriority="low"
-                />
-              ))}
-            </div>
-            <style>{`
-              @keyframes marquee {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(-50%); }
-              }
-            `}</style>
-          </div>
-        )}
 
         {/* 2025 Content - images grid */}
         <div 

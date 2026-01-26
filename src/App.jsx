@@ -93,6 +93,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
+import { getDeviceCategory } from "./utils/detectDevice";
 
 // Disable right-click context menu on images (removed for security - ineffective and annoying)
 // if (typeof document !== 'undefined') {
@@ -126,6 +127,25 @@ const HARDCODED_ASSET_THICKNESS = 0.8;
 // Device-specific configurations (hardcoded per user's adjustments)
 // Key format: "widthxheight" for precise matching
 const DEVICE_CONFIGS = {
+  // iPhone 14 Pro Mobile (Generic Mobile Fallback updated to these values)
+  mobile: {
+    heroScale: 0.72,
+    heroY: 129,
+    animatedOutlineWidth: 4.4,
+    assetX: 0,
+    assetY: -200,
+    assetScale: 1,
+    assetH: 1.03,
+    assetV: 0.88,
+    navY: 54,
+    widgetScale: 0.66,
+    widgetY: 90,
+    assetOutlineThickness: 0.8,
+    marqueeY: 57,
+    marqueeScale: 1, // Default scale
+    marqueeGap: 24, // mobile gap 6 (6 * 4 = 24px)
+    marqueeSpeed: 60, // 60s
+  },
   // iPhone 12 Pro (390x844) - LOCKED IN
   "390x844": {
     heroScale: 0.69,
@@ -139,34 +159,44 @@ const DEVICE_CONFIGS = {
     widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
+    marqueeScale: 1,
+    marqueeGap: 24,
+    marqueeSpeed: 60,
   },
-  // iPhone 14 Pro (393x852) - LOCKED IN from screenshot
+  // iPhone 14 Pro (393x852) - Explicit match
   "393x852": {
     heroScale: 0.72,
-    heroY: 68,
+    heroY: 129,
     animatedOutlineWidth: 4.4,
     assetX: 0,
     assetY: -200,
+    assetScale: 1,
     assetH: 1.03,
     assetV: 0.88,
-    navY: 79,
+    navY: 54,
     widgetScale: 0.66,
     widgetY: 90,
     assetOutlineThickness: 0.8,
+    marqueeY: 57,
+    marqueeScale: 1,
+    marqueeGap: 24,
+    marqueeSpeed: 60,
   },
   // Specific match for user's screenshot dimensions
   "462x775": {
     heroScale: 0.72,
-    heroY: 68,
+    heroY: 129,
     animatedOutlineWidth: 4.4,
     assetX: 0,
     assetY: -200,
+    assetScale: 1,
     assetH: 1.03,
     assetV: 0.88,
-    navY: 79,
+    navY: 54,
     widgetScale: 0.66,
     widgetY: 90,
     assetOutlineThickness: 0.8,
+    marqueeY: 57,
   },
   // iPhone 16 Plus (430x932) - LOCKED IN
   "430x932": {
@@ -226,6 +256,24 @@ const DEVICE_CONFIGS = {
   // iPad Air/Pro 11" Portrait (820x1052)
   "820x1052": {
     heroScale: 1.05,
+    heroY: 158,
+    animatedOutlineWidth: 2.6,
+    assetX: 0,
+    assetY: -594,
+    assetScale: 0.46,
+    assetH: 2.02,
+    assetV: 1.25,
+    widgetScale: 0.7,
+    widgetY: 149,
+    navY: 79,
+    assetOutlineThickness: 0.5,
+    marqueeY: 147,
+    marqueeScale: 0.3,
+    marqueeSpeed: 60,
+  },
+  // iPad Pro 11" (834x1194)
+  "834x1194": {
+    heroScale: 1.05,
     heroY: 75,
     animatedOutlineWidth: 3.2,
     assetX: 0,
@@ -241,7 +289,7 @@ const DEVICE_CONFIGS = {
   // iPad Air/Pro 11" Landscape (1180x692)
   "1180x692": {
     heroScale: 0.86,
-    heroY: 72,
+    heroY: 105,
     animatedOutlineWidth: 1.9,
     assetX: 0,
     assetY: -657,
@@ -252,7 +300,9 @@ const DEVICE_CONFIGS = {
     widgetY: 147,
     navY: 79,
     assetOutlineThickness: 0.3,
-    marqueeY: 170,
+    marqueeY: 76,
+    marqueeScale: 0.3,
+    marqueeSpeed: 60,
   },
   // Tablet Landscape (generic for ~1000px-1366px widths)
   // Adjusted Y to ensure visibility on 10.9-12.9 inch screens in landscape
@@ -261,70 +311,70 @@ const DEVICE_CONFIGS = {
     heroY: 100,
     animatedOutlineWidth: 2.2,
     assetX: 0,
-    assetY: -550, 
+    assetY: 0, 
     assetH: 1.3,
     assetV: 1.05,
     widgetScale: 0.75,
-    widgetY: 0,
+    widgetY: 80,
     assetOutlineThickness: 0.8,
   },
   // Default fallback for desktop
   desktop: {
-    heroScale: 1.9,
+    heroScale: 1.44,
     heroY: 147,
     animatedOutlineWidth: 2,
-    assetX: 0,
-    assetY: -1454,
-    assetScale: 0.61,
-    assetH: 1.39,
-    assetV: 0.9,
+    assetX: 38,
+    assetY: -2141,
+    assetScale: 0.35,
+    assetH: 1.3,
+    assetV: 1.4,
     assetOutlineThickness: 0.4,
+    assetRotation: 90,
     navY: 79,
     widgetScale: 0.7,
     widgetY: 200,
-    marqueeY: 96,
+    marqueeY: 49,
+    marqueeScale: 0.4,
+    marqueeGap: 64, // desktop md:gap-16 (16 * 4 = 64px)
+    marqueeSpeed: 60, // 60s
   },
   // Default fallback for mobile
-  mobile: {
-    heroScale: 0.72,
-    heroY: 68,
-    animatedOutlineWidth: 4.4,
-    assetX: 0,
-    assetY: -200,
-    assetH: 1.03,
-    assetV: 0.88,
-    navY: 79,
-    widgetScale: 0.66,
-    widgetY: 90,
-    assetOutlineThickness: 0.8,
-  },
+  // mobile: { ... } // moved to top for organization
 };
 
-// Helper to get config based on screen dimensions
-const getDeviceConfig = (dims) => {
-  // On first render or in SSR, dims might not be ready.
-  if (!dims || dims === '?x?') {
-    return DEVICE_CONFIGS.desktop; // Default to desktop
-  }
-
-  // Check for an exact match first (e.g., "390x844")
-  if (DEVICE_CONFIGS[dims]) {
+// Helper to get config based on screen dimensions and device type
+const getDeviceConfig = (dims, deviceMode) => {
+  // 1. Exact match override (e.g. for specific iPhone testing)
+  if (dims && DEVICE_CONFIGS[dims]) {
     return DEVICE_CONFIGS[dims];
   }
 
-  // If no exact match, fallback to category based on width
-  const width = parseInt(dims.split('x')[0]);
-  if (isNaN(width)) {
-    return DEVICE_CONFIGS.desktop; // Safety fallback
+  // 2. Intelligent Device Detection (User Agent + Screen Info)
+  
+  // If Hardcore Detection says Desktop, force Desktop
+  if (deviceMode === 'desktop') {
+    return DEVICE_CONFIGS.desktop;
+  }
+  
+  // If Hardcore Detection says Mobile, check if it's a Tablet or Phone
+  const category = getDeviceCategory(); 
+  
+  // Fallback if Hardcore Detection is ambiguous or we need detailed tablet logic
+  if (category === 'tablet' || (deviceMode === 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 768)) {
+    // Check orientation for tablets
+    const width = typeof window !== 'undefined' ? (window.visualViewport?.width || window.innerWidth) : 0;
+    
+    // iPad 10th Gen Portrait (width 820)
+    if (width === 820) return DEVICE_CONFIGS["820x1052"];
+
+    // Tablet Landscape (iPad Pro Landscape, etc)
+    if (width > 850) return DEVICE_CONFIGS.tabletLandscape;
+    // Tablet Portrait
+    return DEVICE_CONFIGS["768x1024"]; 
   }
 
-  if (width <= 640) return DEVICE_CONFIGS.mobile;
-  // Use Tablet Portrait config for widths up to ~850px (covers iPad 10.9" portrait 820px, iPad Air portrait)
-  if (width <= 850) return DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile;
-  // Use Tablet Landscape config for larger tablets
-  if (width <= 1366) return DEVICE_CONFIGS.tabletLandscape || DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile; 
-  
-  return DEVICE_CONFIGS.desktop;
+  // 3. Fallback to mobile if category is 'phone' or unknown
+  return DEVICE_CONFIGS.mobile;
 };
 
 // Get current viewport dimensions (respects responsive testing tools)
@@ -382,6 +432,36 @@ const portfolioLogos = [
 
 function App() {
   console.log('App component is rendering');
+
+  // Hardcore Device Mode Detection (matches index.html script)
+  const [viewMode, setViewMode] = useState(() => {
+    // Safety check for SSR, defaults to whatever the window has
+    if (typeof window !== 'undefined' && window.__DEVICE_MODE__) {
+      return window.__DEVICE_MODE__;
+    }
+    return 'desktop'; // Default fallback
+  });
+
+  // Resize listener for view mode
+  useEffect(() => {
+    const handleResize = () => {
+      // Re-run the logic from index.html if needed
+      const isMobileHardware = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(navigator.userAgent || '');
+      const isSmallScreen = window.matchMedia("only screen and (max-width: 768px)").matches;
+      const newMode = (isMobileHardware || isSmallScreen) ? 'mobile' : 'desktop';
+      
+      if (newMode !== viewMode) {
+        setViewMode(newMode);
+        
+        // Sync the HTML class for consistency
+        document.documentElement.classList.remove('device-mobile', 'device-desktop');
+        document.documentElement.classList.add(`device-${newMode}`);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [viewMode]);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -436,13 +516,13 @@ function App() {
     return `${w}x${h}`;
   });
 
-  // Get device config based on current screen dimensions
-  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(screenDimensions));
+  // Get device config based on current screen dimensions AND viewMode
+  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(screenDimensions, viewMode));
 
-  // Update the config whenever screen dimensions change
+  // Update the config whenever screen dimensions OR viewMode change
   useEffect(() => {
-    setCurrentConfig(getDeviceConfig(screenDimensions));
-  }, [screenDimensions]);
+    setCurrentConfig(getDeviceConfig(screenDimensions, viewMode));
+  }, [screenDimensions, viewMode]);
 
   // Update screen dimensions when viewport changes
   useEffect(() => {
@@ -534,7 +614,12 @@ function App() {
     const handler = () => {
       const now = Date.now();
       const doUpdate = () => {
-        setAssetHidden(window.scrollY > 20);
+        // Only hide on mobile/tablet (width <= 1024px)
+        if (window.innerWidth <= 1024) {
+          setAssetHidden(window.scrollY > 20);
+        } else {
+          setAssetHidden(false);
+        }
       };
       if (now - last >= throttleMs) {
         last = now;
@@ -544,7 +629,12 @@ function App() {
     };
     window.addEventListener('scroll', handler, { passive: true });
     // initialize
-    setAssetHidden(window.scrollY > 20);
+    if (window.innerWidth <= 1024) {
+      setAssetHidden(window.scrollY > 20);
+    } else {
+      setAssetHidden(false);
+    }
+    
     return () => {
       window.removeEventListener('scroll', handler);
       if (rafId) cancelAnimationFrame(rafId);
@@ -839,7 +929,7 @@ function App() {
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute left-1/2 top-12 z-20`}
             style={{
-              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) scale(${liveConfig.assetScale ?? 1})`,
+              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) scale(${liveConfig.assetScale ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
               width: '140%',
               maxWidth: 'none',
               height: 'auto',
@@ -852,7 +942,7 @@ function App() {
 
       {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP & TABLET */}
       <div 
-        className="hidden"
+        className=""
         style={{
           position: 'fixed',
           bottom: '100px',
@@ -933,6 +1023,11 @@ function App() {
             <input type="range" min="0" max="20" step="0.1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
             <input type="number" step="0.1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
+          <div className="flex items-center gap-2">
+            <label>Rotation: </label>
+            <input type="range" min="-360" max="360" step="1" value={liveConfig.assetRotation ?? 0} onChange={(e) => handleConfigChange('assetRotation', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.assetRotation ?? 0} onChange={(e) => handleConfigChange('assetRotation', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
 
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Nav Bar</div>
            <div className="flex items-center gap-2">
@@ -960,11 +1055,23 @@ function App() {
             <input type="number" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
 
+          <div className="flex items-center gap-2">
+            <label>Img Scale: </label>
+            <input type="range" min="0.1" max="3" step="0.1" value={liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeScale', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label>Speed (s): </label>
+            <input type="range" min="1" max="120" step="1" value={liveConfig.marqueeSpeed ?? 60} onChange={(e) => handleConfigChange('marqueeSpeed', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.marqueeSpeed ?? 60} onChange={(e) => handleConfigChange('marqueeSpeed', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
           <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
         </div>
         
         {/* Main content - above Asset1 */}
-        <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
+        <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >
@@ -972,11 +1079,13 @@ function App() {
               <Route path="/" element={<Home 
                 theme={theme} 
                 heroScale={liveConfig.heroScale ?? 1} 
-                heroY={liveConfig.heroY ?? 0} 
+                heroY={liveConfig.heroY ?? 0}  
                 animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
                 showMarquee={showMarquee}
                 marqueeY={liveConfig.marqueeY ?? 96}
+                marqueeScale={liveConfig.marqueeScale ?? 1}
               />} />
+              
               {/* LOCKED ROUTES */}
               {/* <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
@@ -991,12 +1100,14 @@ function App() {
               
               {/* Redirect any other route to Home */}
               <Route path="*" element={<Home 
+                marqueeScale={liveConfig.marqueeScale ?? 1}
                 theme={theme} 
                 heroScale={liveConfig.heroScale ?? 1} 
                 heroY={liveConfig.heroY ?? 0} 
                 animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
                 showMarquee={showMarquee}
                 marqueeY={liveConfig.marqueeY ?? 96}
+                marqueeSpeed={liveConfig.marqueeSpeed ?? 60}
               />} />  
             </Routes>
           </Suspense>
