@@ -121,7 +121,7 @@ const HalftoneGlobe = ({ theme, userLocation }) => {
     }, [userLocation]);
 
     return (
-        <div className={`w-full h-[500px] rounded-xl overflow-hidden relative border ${theme === 'light' ? 'bg-white border-neutral-100' : 'bg-black border-neutral-800'}`}>
+        <div className={`w-full h-full relative border-none bg-transparent`}>
             <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
                 <ambientLight intensity={1.5} />
                 <pointLight position={[10, 10, 10]} intensity={2} />
@@ -130,27 +130,14 @@ const HalftoneGlobe = ({ theme, userLocation }) => {
                 </Suspense>
                 <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.0} />
             </Canvas>
-            <div className="absolute bottom-4 left-4 pointer-events-none">
-                 <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                    <span className={`text-[10px] font-mono tracking-widest ${theme === 'light' ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                        {userLocation ? `LIVE: ${userLocation.city}, ${userLocation.country_code}` : 'LOCATING...'}
-                    </span>
-                 </div>
-            </div>
         </div>
     )
 }
 
-const StatCard = ({ title, value, sub, theme }) => (
-    <div className={`p-6 border rounded-none transition-colors ${theme === 'light' ? 'bg-white border-neutral-100 text-black' : 'bg-neutral-900/50 border-neutral-800 text-white'}`}>
-        <h3 className={`text-[10px] font-mono uppercase tracking-[0.2em] mb-3 ${theme === 'light' ? 'text-neutral-400' : 'text-neutral-500'}`}>{title}</h3>
-        <div className="text-2xl font-bold mb-2 font-mono">{value}</div>
-        <div className={`text-[10px] flex items-center gap-2 text-neutral-400 font-mono`}>
-           {sub}
-        </div>
-    </div>
-);
+const HUD_GREEN = "#00ff6a";
+const HUD_BG = "rgba(0, 20, 0, 0.95)";
+const HUD_DARK = "#001100";
+const HUD_BORDER = "#005522";
 
 export default function Admin({ theme = 'dark' }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -160,16 +147,34 @@ export default function Admin({ theme = 'dark' }) {
     // Real Data States
     const [userLocation, setUserLocation] = useState(null);
     const [ipData, setIpData] = useState(null);
-    const [sessionTime, setSessionTime] = useState(0);
     const [deviceInfo, setDeviceInfo] = useState(null);
     const [trafficStats, setTrafficStats] = useState({ count: 0, updated_at: null });
 
-    // Timer for session duration
+    // Session Logic (Persistent via LocalStorage)
+    const [sessionTimer, setSessionTimer] = useState("00:00:00");
+    const [sortMode, setSortMode] = useState('time'); // 'time' | 'country'
+
     useEffect(() => {
         if (!isAuthenticated) return;
+        
+        // Check for existing session start time
+        let start = localStorage.getItem('admin_session_start');
+        if (!start) {
+            start = Date.now();
+            localStorage.setItem('admin_session_start', start);
+        }
+        
         const timer = setInterval(() => {
-            setSessionTime(prev => prev + 1);
+            const now = Date.now();
+            const diff = now - parseInt(start);
+            const hrs = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff / (1000 * 60)) % 60);
+            const secs = Math.floor((diff / 1000) % 60);
+            setSessionTimer(
+                `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+            );
         }, 1000);
+
         return () => clearInterval(timer);
     }, [isAuthenticated]);
 
@@ -177,7 +182,7 @@ export default function Admin({ theme = 'dark' }) {
     useEffect(() => {
         if (!isAuthenticated) return;
         
-        // 1. Get GLOBAL Traffic Stats
+        // 1. Get GLOBAL Traffic Stats (COUNTER)
         fetch('https://api.counterapi.dev/v1/energygregory_portfolio/visits/')
             .then(res => res.json())
             .then(data => {
@@ -192,7 +197,7 @@ export default function Admin({ theme = 'dark' }) {
         const parser = new UAParser();
         setDeviceInfo(parser.getResult());
 
-        // 2. Get IP Info (Try ipapi.co, fallback to others if needed)
+        // 3. Get IP Info with fallback
         const fetchIP = async () => {
             try {
                 const res = await fetch('https://ipapi.co/json/');
@@ -226,15 +231,7 @@ export default function Admin({ theme = 'dark' }) {
         };
 
         fetchIP();
-            
     }, [isAuthenticated]);
-
-    // Formatter for time
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}m ${secs}s`;
-    };
 
     useEffect(() => {
         const auth = sessionStorage.getItem('admin_auth');
@@ -253,24 +250,20 @@ export default function Admin({ theme = 'dark' }) {
 
     if (!isAuthenticated) {
         return (
-            <div className={`min-h-screen flex items-center justify-center p-4 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
-                <form onSubmit={handleLogin} className={`w-full max-w-sm p-8 rounded-none border ${theme === 'light' ? 'bg-white border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`}>
-                    <h2 className={`text-xl font-mono mb-6 text-center ${theme === 'light' ? 'text-black' : 'text-white'}`}>RESTRICTED</h2>
+            <div className={`min-h-screen flex items-center justify-center p-4 bg-black`}>
+                <form onSubmit={handleLogin} className={`w-full max-w-sm p-8 border border-[${HUD_BORDER}] bg-[${HUD_DARK}] shadow-[0_0_20px_rgba(0,255,106,0.1)]`}>
+                    <h2 className={`text-xl font-mono mb-6 text-center text-[${HUD_GREEN}] uppercase tracking-widest`}>GLOBAL OPS CENTER</h2>
                     <input 
                         type="password"
                         value={password}
                         onChange={(e) => { setPassword(e.target.value); setError(false); }}
-                        placeholder="PASSCODE"
-                        className={`w-full border rounded-none p-3 font-mono outline-none transition-colors mb-4 text-center tracking-widest ${
-                            theme === 'light' 
-                            ? 'bg-white border-neutral-200 text-black placeholder:text-neutral-300 focus:border-black' 
-                            : 'bg-black border-neutral-700 text-white placeholder:text-neutral-700 focus:border-white'
-                        }`}
+                        placeholder="ACCESS CODE"
+                        className={`w-full border border-[${HUD_BORDER}] bg-black p-3 font-mono outline-none text-center tracking-widest text-[${HUD_GREEN}] focus:border-[${HUD_GREEN}] mb-4`}
                         autoFocus
                     />
                     {error && <div className="text-red-500 text-xs font-mono text-center mb-4">ACCESS DENIED</div>}
-                    <button type="submit" className={`w-full font-mono py-3 rounded-none transition-colors ${theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'}`}>
-                        UNLOCK
+                    <button type="submit" className={`w-full font-mono py-3 border border-[${HUD_GREEN}] bg-[${HUD_DARK}] text-[${HUD_GREEN}] hover:bg-[${HUD_GREEN}] hover:text-black transition-colors`}>
+                        INITIALIZE
                     </button>
                 </form>
             </div>
@@ -278,109 +271,101 @@ export default function Admin({ theme = 'dark' }) {
     }
 
     return (
-        <div className={`min-h-screen p-6 md:p-12 font-mono ${theme === 'light' ? 'bg-white text-black' : 'bg-black text-white'}`}>
-            {/* Header */}
-            <div className={`flex justify-between items-end mb-12 border-b pb-6 ${theme === 'light' ? 'border-neutral-100' : 'border-neutral-800'}`}>
-                <div>
-                    <h1 className="text-xl md:text-2xl font-bold mb-2 tracking-tight">TRAFFIC CONTROLLER</h1>
-                    <p className="text-neutral-400 text-xs tracking-widest uppercase">Admin: Greg</p>
+        <div className="h-screen w-screen bg-black text-[#00ff6a] font-mono overflow-hidden flex flex-col md:flex-row fixed top-0 left-0 z-[9999]">
+            {/* HUD SIDEBAR */}
+            <div className="w-full md:w-[350px] h-full flex flex-col border-r border-[#005522] bg-[rgba(0,20,0,0.95)] z-50 p-5 shrink-0">
+                <div className="border-b border-[#00ff6a] pb-2 mb-4 flex justify-between items-end">
+                    <h1 className="text-xl uppercase font-bold tracking-tighter">HARDCORE<br/>ANALYTICS</h1>
+                    <button 
+                        onClick={() => {
+                            sessionStorage.removeItem('admin_auth');
+                            setIsAuthenticated(false);
+                            localStorage.removeItem('admin_session_start');
+                        }}
+                        className="text-[10px] text-red-500 hover:text-red-400 uppercase tracking-widest"
+                    >
+                        [LOGOUT]
+                    </button>
                 </div>
-                <button 
-                    onClick={() => {
-                        sessionStorage.removeItem('admin_auth');
-                        setIsAuthenticated(false);
-                    }}
-                    className="text-[10px] tracking-widest text-red-500 hover:text-red-400 transition-colors uppercase"
-                >
-                    Logout
-                </button>
-            </div>
 
-            {/* Grid Layout - Real Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-                <StatCard 
-                    title="Total Visits" 
-                    value={trafficStats.count > 0 ? trafficStats.count.toLocaleString() : "Loading..."} 
-                    sub={trafficStats.updated_at ? `Last: ${new Date(trafficStats.updated_at).toLocaleTimeString()}` : "Fetching..."} 
-                    theme={theme} 
-                />
-                <StatCard 
-                    title="Admin IP" 
-                    value={ipData ? ipData.ip : "---.---.---.---"} 
-                    sub={ipData ? (ipData.org || ipData.asn) : "Identifying..."} 
-                    theme={theme} 
-                />
-                <StatCard 
-                    title="Session" 
-                    value={formatTime(sessionTime)} 
-                    sub="Current Login Duration" 
-                    theme={theme} 
-                />
-                <StatCard 
-                    title="System Status" 
-                    value="Active" 
-                    sub="Tracking via Vercel" 
-                    theme={theme} 
-                />
-            </div>
+                <div className="bg-[#003311] border border-[#005522] p-3 mb-4">
+                    <div className="text-[10px] opacity-70 mb-1">TOTAL VISITS (LIFETIME)</div>
+                    <div className="text-3xl font-bold">{trafficStats.count > 0 ? trafficStats.count.toLocaleString() : "---"}</div>
+                </div>
 
-            {/* Main Content Area */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Globe Section - Spans 2 cols */}
-                <div className="lg:col-span-2">
-                    <div className="mb-4 flex items-center justify-between">
-                         <h3 className="text-[10px] text-neutral-400 uppercase tracking-[0.2em]">Real-Time GeoLocation (You)</h3>
+                <div className="bg-[#003311] border border-[#005522] p-3 mb-4">
+                    <div className="text-[10px] opacity-70 mb-1">CURRENT SESSION</div>
+                    <div className="text-2xl font-bold font-mono tracking-widest">{sessionTimer}</div>
+                </div>
+
+                {/* CONTROLS */}
+                <div className="flex gap-2 mb-2">
+                    <button 
+                         onClick={() => setSortMode('time')}
+                         className={`flex-1 text-[10px] border px-2 py-1 uppercase transition-colors ${sortMode === 'time' ? 'bg-[#00ff6a] text-black border-[#00ff6a]' : 'bg-[#003311] text-[#00ff6a] border-[#00ff6a] hover:bg-[#004411]'}`}
+                    >
+                        SORT: TIME
+                    </button>
+                     <button 
+                         onClick={() => setSortMode('country')}
+                         className={`flex-1 text-[10px] border px-2 py-1 uppercase transition-colors ${sortMode === 'country' ? 'bg-[#00ff6a] text-black border-[#00ff6a]' : 'bg-[#003311] text-[#00ff6a] border-[#00ff6a] hover:bg-[#004411]'}`}
+                    >
+                        SORT: CTRY
+                    </button>
+                </div>
+
+                <div className="text-[10px] opacity-70 mb-1 mt-2">LIVE FEED LOG:</div>
+                <div className="flex-1 overflow-y-auto border border-[#005522] bg-black/50 p-0 text-[11px] font-mono scrollbar-hide">
+                    {/* Header Row */}
+                     <div className="flex border-b border-[#003311] bg-[#002200] p-1 sticky top-0 font-bold">
+                        <div className="w-[60px] opacity-70">TIME</div>
+                        <div className="flex-1">LOC</div>
+                        <div className="w-[80px] text-right opacity-70">IP</div>
                     </div>
-                    <HalftoneGlobe theme={theme} userLocation={userLocation} />
-                </div>
-
-                {/* Sidebar Stats - Real Data */}
-                <div className="space-y-4">
-                    {/* Location Info */}
-                     <div className={`p-6 border rounded-none ${theme === 'light' ? 'bg-white border-neutral-100' : 'bg-neutral-900/30 border-neutral-800'}`}>
-                        <h3 className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] mb-6">Network Info</h3>
-                        <div className="space-y-4 text-xs font-mono">
-                            <div className="flex justify-between">
-                                <span className="text-neutral-500">City</span>
-                                <span>{ipData ? ipData.city : '---'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-neutral-500">Region</span>
-                                <span>{ipData ? ipData.region : '---'}</span>
-                            </div>
-                             <div className="flex justify-between">
-                                <span className="text-neutral-500">Country</span>
-                                <span>{ipData ? ipData.country_name : '---'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-neutral-500">Timezone</span>
-                                <span>{ipData ? ipData.timezone : '---'}</span>
-                            </div>
+                    {/* Since we don't have a backend pushing other users, we show the ADMIN and Simulated Previous Hits if desired, or just Current State */}
+                    {ipData ? (
+                        <div className="flex p-1 border-b border-[#003311] hover:bg-[#002200]">
+                            <div className="w-[60px] opacity-70">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            <div className="flex-1 truncate">{ipData.city || 'Unknown'}, {ipData.country_code || '??'}</div>
+                            <div className="w-[80px] text-right opacity-70">{ipData.ip}</div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="p-2 text-center italic opacity-50">awaiting signal...</div>
+                    )}
+                </div>
+            </div>
 
-                    {/* Device Parameters */}
-                    <div className={`p-6 border rounded-none ${theme === 'light' ? 'bg-white border-neutral-100' : 'bg-neutral-900/30 border-neutral-800'}`}>
-                         <h3 className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] mb-6">Client Info</h3>
-                         <div className="space-y-4 text-xs font-mono">
-                             <div className="flex justify-between">
-                                <span className="text-neutral-500">Browser</span>
-                                <span>{deviceInfo?.browser?.name} {deviceInfo?.browser?.version}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-neutral-500">OS</span>
-                                <span>{deviceInfo?.os?.name} {deviceInfo?.os?.version}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-neutral-500">Device</span>
-                                <span>{deviceInfo?.device?.vendor || 'Desktop'} {deviceInfo?.device?.model || 'Workstation'}</span>
-                            </div>
-                             <div className="flex justify-between">
-                                <span className="text-neutral-500">Engine</span>
-                                <span className="text-green-500">{deviceInfo?.engine?.name || 'V8'}</span>
-                            </div>
-                         </div>
-                    </div>
+            {/* MAIN VIEWPORT (GLOBE) */}
+            <div className="flex-1 bg-black relative flex flex-col">
+                <div className="absolute top-4 left-4 z-10 pointer-events-none">
+                     <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#00ff6a] shadow-[0_0_10px_#00ff6a] animate-pulse"></div>
+                        <span className="text-xs tracking-[0.2em] text-[#00ff6a]">SYSTEM ONLINE</span>
+                     </div>
+                </div>
+
+                <div className="flex-1 relative">
+                    <HalftoneGlobe theme="dark" userLocation={userLocation} />
+                </div>
+                
+                 {/* FOOTER INFO */}
+                <div className="h-[200px] border-t border-[#003311] bg-[#001100] grid grid-cols-2 p-4 gap-4">
+                     <div className="border border-[#005522] p-3 bg-black/40">
+                        <h3 className="text-[10px] opacity-50 uppercase tracking-[0.2em] mb-2">Network Telemetry</h3>
+                        <div className="space-y-1 text-xs">
+                             <div className="flex justify-between"><span className="opacity-50">ISP</span> <span>{ipData?.org || '---'}</span></div>
+                             <div className="flex justify-between"><span className="opacity-50">ASN</span> <span>{ipData?.asn || '---'}</span></div>
+                             <div className="flex justify-between"><span className="opacity-50">ZONE</span> <span>{ipData?.timezone || '---'}</span></div>
+                        </div>
+                     </div>
+                     <div className="border border-[#005522] p-3 bg-black/40">
+                         <h3 className="text-[10px] opacity-50 uppercase tracking-[0.2em] mb-2">Device Fingerprint</h3>
+                         <div className="space-y-1 text-xs">
+                             <div className="flex justify-between"><span className="opacity-50">OS</span> <span>{deviceInfo?.os?.name || '---'} {deviceInfo?.os?.version}</span></div>
+                             <div className="flex justify-between"><span className="opacity-50">BRAVO</span> <span>{deviceInfo?.browser?.name || '---'}</span></div>
+                             <div className="flex justify-between"><span className="opacity-50">CPU</span> <span>{navigator.hardwareConcurrency} CORES</span></div>
+                        </div>
+                     </div>
                 </div>
             </div>
         </div>
