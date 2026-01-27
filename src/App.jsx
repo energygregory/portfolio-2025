@@ -93,6 +93,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
+import { getDeviceCategory } from "./utils/detectDevice";
 
 // Disable right-click context menu on images (removed for security - ineffective and annoying)
 // if (typeof document !== 'undefined') {
@@ -102,7 +103,6 @@ import { useEffect, useState, useRef, Suspense, lazy } from "react";
 //     }
 //   });
 // }
-import Landing from "./pages/Landing.jsx";
 import Home from "./pages/Home.jsx";
 const Work = lazy(() => import("./pages/Work.jsx"));
 const About = lazy(() => import("./pages/About.jsx"));
@@ -113,6 +113,7 @@ const Around = lazy(() => import("./pages/Around.jsx"));
 const FlyHigh = lazy(() => import("./pages/FlyHigh.jsx"));
 const LegacyDrip = lazy(() => import("./pages/LegacyDrip.jsx"));
 const PriceList = lazy(() => import("./pages/PriceList.jsx"));
+const Admin = lazy(() => import("./pages/Admin.jsx"));
 
 import NavigationLoader from "./components/NavigationLoader";
 import Asset1Svg from "./components/Asset1Svg";
@@ -126,6 +127,26 @@ const HARDCODED_ASSET_THICKNESS = 0.8;
 // Device-specific configurations (hardcoded per user's adjustments)
 // Key format: "widthxheight" for precise matching
 const DEVICE_CONFIGS = {
+  // iPhone 14 Pro Mobile (Generic Mobile Fallback updated to these values)
+  mobile: {
+    heroScale: 0.72,
+    heroY: 129,
+    animatedOutlineWidth: 4.4,
+    assetX: 0,
+    assetY: -181,
+    assetScale: 1,
+    assetH: 1,
+    assetV: 0.88,
+    navY: 54,
+    widgetScale: 0.66,
+    widgetY: 90,
+    assetOutlineThickness: 0.8,
+    assetRotation: 0,
+    marqueeY: 11,
+    marqueeScale: 0.6,
+    marqueeGap: 24, // mobile gap 6 (6 * 4 = 24px)
+    marqueeSpeed: 60, // 60s
+  },
   // iPhone 12 Pro (390x844) - LOCKED IN
   "390x844": {
     heroScale: 0.69,
@@ -136,23 +157,48 @@ const DEVICE_CONFIGS = {
     assetH: 0.93,
     assetV: 1,
     navY: 166,
-    widgetScale: 0.8,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
+    marqueeScale: 1,
+    marqueeGap: 24,
+    marqueeSpeed: 60,
   },
-  // iPhone 14 Pro (393x852) - LOCKED IN
+  // iPhone 14 Pro (393x852) - Explicit match
   "393x852": {
-    heroScale: 0.65,
-    heroY: 79,
-    animatedOutlineWidth: 5,
+    heroScale: 0.72,
+    heroY: 129,
+    animatedOutlineWidth: 4.4,
     assetX: 0,
-    assetY: -127,
-    assetH: 0.96,
-    assetV: 1,
-    navY: 133,
-    widgetScale: 0.8,
-    widgetY: 0,
+    assetY: -181,
+    assetScale: 1,
+    assetH: 1,
+    assetV: 0.88,
+    navY: 54,
+    widgetScale: 0.66,
+    widgetY: 90,
     assetOutlineThickness: 0.8,
+    assetRotation: 0,
+    marqueeY: 11,
+    marqueeScale: 0.6,
+    marqueeGap: 24,
+    marqueeSpeed: 60,
+  },
+  // Specific match for user's screenshot dimensions
+  "462x775": {
+    heroScale: 0.72,
+    heroY: 129,
+    animatedOutlineWidth: 4.4,
+    assetX: 0,
+    assetY: -200,
+    assetScale: 1,
+    assetH: 1.03,
+    assetV: 0.88,
+    navY: 54,
+    widgetScale: 0.66,
+    widgetY: 90,
+    assetOutlineThickness: 0.8,
+    marqueeY: 57,
   },
   // iPhone 16 Plus (430x932) - LOCKED IN
   "430x932": {
@@ -164,7 +210,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.94,
     assetV: 1,
     navY: 209,
-    widgetScale: 0.85,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
@@ -178,7 +224,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.91,
     assetV: 0.98,
     navY: 123,
-    widgetScale: 0.8,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
@@ -192,7 +238,7 @@ const DEVICE_CONFIGS = {
     assetH: 0.93,
     assetV: 0.98,
     navY: 202,
-    widgetScale: 0.85,
+    widgetScale: 0.5,
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
@@ -205,58 +251,132 @@ const DEVICE_CONFIGS = {
     assetY: -704,
     assetH: 1.36,
     assetV: 1.17,
-    widgetScale: 1,
+    widgetScale: 0.7,
     widgetY: 0,
+    assetOutlineThickness: 0.8,
+  },
+  // iPad Air/Pro 11" Portrait (820x1052)
+  "820x1052": {
+    heroScale: 1.05,
+    heroY: 158,
+    animatedOutlineWidth: 2.6,
+    assetX: 0,
+    assetY: -594,
+    assetScale: 0.46,
+    assetH: 2.02,
+    assetV: 1.25,
+    widgetScale: 0.7,
+    widgetY: 149,
+    navY: 79,
+    assetOutlineThickness: 0.5,
+    marqueeY: 147,
+    marqueeScale: 0.3,
+    marqueeSpeed: 60,
+  },
+  // iPad Pro 11" (834x1194)
+  "834x1194": {
+    heroScale: 1.05,
+    heroY: 75,
+    animatedOutlineWidth: 3.2,
+    assetX: 0,
+    assetY: -594,
+    assetScale: 0.46,
+    assetH: 2.02,
+    assetV: 1.25,
+    widgetScale: 0.7,
+    widgetY: 149,
+    navY: 79,
+    assetOutlineThickness: 0.8,
+  },
+  // iPad Air/Pro 11" Landscape (1180x692)
+  "1180x692": {
+    heroScale: 0.86,
+    heroY: 105,
+    animatedOutlineWidth: 1.9,
+    assetX: 0,
+    assetY: -657,
+    assetScale: 0.65,
+    assetH: 1.3,
+    assetV: 1.05,
+    widgetScale: 0.6,
+    widgetY: 147,
+    navY: 79,
+    assetOutlineThickness: 0.3,
+    marqueeY: 76,
+    marqueeScale: 0.3,
+    marqueeSpeed: 60,
+  },
+  // Tablet Landscape (generic for ~1000px-1366px widths)
+  // Adjusted Y to ensure visibility on 10.9-12.9 inch screens in landscape
+  "tabletLandscape": {
+    heroScale: 1.25,
+    heroY: 100,
+    animatedOutlineWidth: 2.2,
+    assetX: 0,
+    assetY: 0, 
+    assetH: 1.3,
+    assetV: 1.05,
+    widgetScale: 0.75,
+    widgetY: 80,
     assetOutlineThickness: 0.8,
   },
   // Default fallback for desktop
   desktop: {
-    heroScale: 1.6,
+    heroScale: 1.44,
     heroY: 147,
-    animatedOutlineWidth: 1.5,
-    assetX: 0,
-    assetY: -1106,
-    assetH: 1.27,
-    assetV: 0.96,
-    widgetScale: 1,
-    widgetY: 0,
-    assetOutlineThickness: 0.8,
+    animatedOutlineWidth: 2,
+    assetX: 38,
+    assetY: -1920,
+    assetScale: 0.35,
+    assetH: 1.3,
+    assetV: 1.4,
+    assetOutlineThickness: 0.4,
+    assetRotation: 90,
+    navY: 79,
+    widgetScale: 0.7,
+    widgetY: 200,
+    marqueeY: 49,
+    marqueeScale: 0.4,
+    marqueeGap: 64, // desktop md:gap-16 (16 * 4 = 64px)
+    marqueeSpeed: 60, // 60s
   },
   // Default fallback for mobile
-  mobile: {
-    heroScale: 1,
-    heroY: 0,
-    animatedOutlineWidth: 3.8,
-    assetX: 0,
-    assetY: -200,
-    assetH: 1.03,
-    assetV: 0.88,
-  },
+  // mobile: { ... } // moved to top for organization
 };
 
-// Helper to get config based on screen dimensions
-const getDeviceConfig = (dims) => {
-  // On first render or in SSR, dims might not be ready.
-  if (!dims || dims === '?x?') {
-    return DEVICE_CONFIGS.desktop; // Default to desktop
-  }
-
-  // Check for an exact match first (e.g., "390x844")
-  if (DEVICE_CONFIGS[dims]) {
+// Helper to get config based on screen dimensions and device type
+const getDeviceConfig = (dims, deviceMode) => {
+  // 1. Exact match override (e.g. for specific iPhone testing)
+  if (dims && DEVICE_CONFIGS[dims]) {
     return DEVICE_CONFIGS[dims];
   }
 
-  // If no exact match, fallback to category based on width
-  const width = parseInt(dims.split('x')[0]);
-  if (isNaN(width)) {
-    return DEVICE_CONFIGS.desktop; // Safety fallback
+  // 2. Intelligent Device Detection (User Agent + Screen Info)
+  
+  // If Hardcore Detection says Desktop, force Desktop
+  if (deviceMode === 'desktop') {
+    return DEVICE_CONFIGS.desktop;
+  }
+  
+  // If Hardcore Detection says Mobile, check if it's a Tablet or Phone
+  const category = getDeviceCategory(); 
+  
+  // Fallback if Hardcore Detection is ambiguous or we need detailed tablet logic
+  if (category === 'tablet' || (deviceMode === 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 768)) {
+    // Check orientation for tablets
+    const width = typeof window !== 'undefined' ? (window.visualViewport?.width || window.innerWidth) : 0;
+    
+    // iPad 10th Gen Portrait (width 820)
+    if (width === 820) return DEVICE_CONFIGS["820x1052"];
+
+    // Tablet Landscape (iPad Pro Landscape, etc)
+    if (width > 850) return DEVICE_CONFIGS.tabletLandscape;
+    // Tablet Portrait
+    return DEVICE_CONFIGS["768x1024"]; 
   }
 
-  if (width <= 640) return DEVICE_CONFIGS.mobile;
-  // Use iPad config as the default for tablets
-  if (width <= 1024) return DEVICE_CONFIGS["768x1024"] || DEVICE_CONFIGS.mobile; 
-  
-  return DEVICE_CONFIGS.desktop;
+  // 3. Fallback to mobile if category is 'phone' or unknown
+  return DEVICE_CONFIGS.mobile;
 };
 
 // Get current viewport dimensions (respects responsive testing tools)
@@ -314,6 +434,53 @@ const portfolioLogos = [
 
 function App() {
   console.log('App component is rendering');
+
+  // TRAFFIC COUNTER: Increment visits (once per session)
+  useEffect(() => {
+    const hasCounted = sessionStorage.getItem('visit_counted');
+    // Only count if not running on localhost to avoid pollution (optional, but good practice)
+    const isLocal = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+    
+    if (!hasCounted && !isLocal) {
+      fetch('https://api.counterapi.dev/v1/energygregory_portfolio/visits/up')
+        .then(res => res.json())
+        .then(data => {
+          console.log('Visitor counted:', data.count);
+          sessionStorage.setItem('visit_counted', 'true');
+        })
+        .catch(err => console.error('Traffic counter error:', err));
+    }
+  }, []);
+
+  // Hardcore Device Mode Detection (matches index.html script)
+  const [viewMode, setViewMode] = useState(() => {
+    // Safety check for SSR, defaults to whatever the window has
+    if (typeof window !== 'undefined' && window.__DEVICE_MODE__) {
+      return window.__DEVICE_MODE__;
+    }
+    return 'desktop'; // Default fallback
+  });
+
+  // Resize listener for view mode
+  useEffect(() => {
+    const handleResize = () => {
+      // Re-run the logic from index.html if needed
+      const isMobileHardware = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(navigator.userAgent || '');
+      const isSmallScreen = window.matchMedia("only screen and (max-width: 768px)").matches;
+      const newMode = (isMobileHardware || isSmallScreen) ? 'mobile' : 'desktop';
+      
+      if (newMode !== viewMode) {
+        setViewMode(newMode);
+        
+        // Sync the HTML class for consistency
+        document.documentElement.classList.remove('device-mobile', 'device-desktop');
+        document.documentElement.classList.add(`device-${newMode}`);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [viewMode]);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -325,13 +492,20 @@ function App() {
   // Asset1 remains visible on desktop; mobile stays hidden via CSS
 
   // Theme state with toggle — initialize from localStorage or prefers-color-scheme
-  // DARK MODE ONLY - No theme toggle
-  const [theme, setTheme] = useState('dark');
-  // appliedTheme is what we apply to document classes/background — update it after a short delay
-  const [appliedTheme, setAppliedTheme] = useState('dark');
+  const getInitialTheme = () => {
+    // Force dark mode default as requested
+    if (typeof window === 'undefined') return 'dark';
+    const stored = window.localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    return 'dark'; // Default to dark for all devices
+  };
+
+  const [theme, setTheme] = useState(getInitialTheme);
+  // appliedTheme is what we apply to document classes/background — update it INSTANTLY now
+  // const [appliedTheme, setAppliedTheme] = useState(theme);
 
   const toggleTheme = () => {
-    // Do nothing - dark mode only
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   // Persist theme choice so refresh keeps user's preference
@@ -341,13 +515,14 @@ function App() {
     } catch (e) {
       // ignore
     }
-  }, [appliedTheme]);
+  }, [theme]);
 
-  // When `theme` changes (controls video opacity), delay applying the theme classes
-  useEffect(() => {
+  // When `theme` changes -> INSTANT apply
+  // Removed the 500ms delay that caused the "white box" desync issue
+  /* useEffect(() => {
     const timer = setTimeout(() => setAppliedTheme(theme), 500); // match video transition duration
     return () => clearTimeout(timer);
-  }, [theme]);
+  }, [theme]); */
 
   // icon/pill positions — hardcoded per user request
   const iconOffset = 9;
@@ -360,13 +535,13 @@ function App() {
     return `${w}x${h}`;
   });
 
-  // Get device config based on current screen dimensions
-  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(screenDimensions));
+  // Get device config based on current screen dimensions AND viewMode
+  const [currentConfig, setCurrentConfig] = useState(() => getDeviceConfig(screenDimensions, viewMode));
 
-  // Update the config whenever screen dimensions change
+  // Update the config whenever screen dimensions OR viewMode change
   useEffect(() => {
-    setCurrentConfig(getDeviceConfig(screenDimensions));
-  }, [screenDimensions]);
+    setCurrentConfig(getDeviceConfig(screenDimensions, viewMode));
+  }, [screenDimensions, viewMode]);
 
   // Update screen dimensions when viewport changes
   useEffect(() => {
@@ -458,6 +633,7 @@ function App() {
     const handler = () => {
       const now = Date.now();
       const doUpdate = () => {
+        // Hide on scroll for all devices (including desktop)
         setAssetHidden(window.scrollY > 20);
       };
       if (now - last >= throttleMs) {
@@ -469,6 +645,7 @@ function App() {
     window.addEventListener('scroll', handler, { passive: true });
     // initialize
     setAssetHidden(window.scrollY > 20);
+    
     return () => {
       window.removeEventListener('scroll', handler);
       if (rafId) cancelAnimationFrame(rafId);
@@ -521,8 +698,8 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    // Apply visual theme changes based on appliedTheme (delayed)
-    if (appliedTheme === "dark") {
+    // Apply visual theme changes based on theme (INSTANT)
+    if (theme === "dark") {
       root.classList.add("dark", "theme-dark");
       root.classList.remove("theme-light");
       root.style.backgroundColor = "#000000";
@@ -540,201 +717,442 @@ function App() {
 
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", appliedTheme === "dark" ? "#000000" : "#ffffff");
+      metaTheme.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
     }
-  }, [appliedTheme]);
+  }, [theme]);
 
   return (
     <>
-      {location.pathname === '/' ? (
-        <Suspense fallback={<div className="min-h-screen bg-black" />}>
-          <Landing />
-        </Suspense>
-      ) : (
-        <div
-          id="app-content"
+      <div
+        id="app-content"
           className={`min-h-screen relative flex flex-col overflow-x-hidden ${
-            appliedTheme === "dark"
+            theme === "dark"
               ? "bg-black text-white theme-dark"
               : "bg-white text-black theme-light"
           }`}
-        >
-          <NavigationLoader theme={theme} onInitialLoad={() => {
-            const initialLoader = document.getElementById('initial-loader');
-            if (initialLoader) initialLoader.remove();
-          }} />
+      >
+      <NavigationLoader theme={theme} onInitialLoad={() => {
+        // Remove the initial HTML loader when React's NavigationLoader takes over
+        const initialLoader = document.getElementById('initial-loader');
+        if (initialLoader) initialLoader.remove();
+      }} />
 
-          {/* NAV BAR (Desktop & Mobile) */}
-          <>
-            {/* Desktop: sticky bar at top, full width */}
-            <header
-              className={`
-                hidden sm:flex
-                z-50 justify-center items-center app-header
-                sticky top-0 p-4 border-b w-full
-                ${
-                  theme === "dark"
-                    ? "border-neutral-800 bg-black/90 backdrop-blur-sm"
-                    : "border-neutral-300 bg-white/90 backdrop-blur-sm"
-                }
-              `}
-            >
-              {/* ... nav content ... */}
-              <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                <Link to="/" aria-label="Home">
-                  <img
-                    src="/LOGOS/newlogo.svg"
-                    alt="Home"
-                    className="nav-logo h-8"
-                  />
-                </Link>
-              </div>
-              <nav className="flex items-center gap-6 text-sm px-2">
-                <NavLink
-                  to="/home" // Changed from "/"
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? "active" : ""}`
-                  }
-                  style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
-                >
-                  Home
-                </NavLink>
-                <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-                  Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-                </span>
-                <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-                  About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-                </span>
-                <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-                  Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-                </span>
-              </nav>
-            </header>
-
-            {/* Mobile: floating pill at bottom */}
-            <header
-                style={{ paddingLeft: `${pillPadding}px`, bottom: `${liveConfig.navY ?? 48}px` }}
-              className={`
-                sm:hidden
-                z-50 flex justify-center items-center app-header
-                fixed left-1/2 -translate-x-1/2 w-auto py-2 px-8 rounded-full border
-                transition-transform transition-opacity duration-300 ease-in-out
-                ${navHidden ? 'translate-y-6 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
-                ${
-                  theme === "dark"
-                    ? "border-neutral-800 bg-black/80 backdrop-blur-sm"
-                    : "border-neutral-300 bg-white/80 backdrop-blur-sm"
-                }
-              `}
-            >
-              <button
-                onClick={toggleTheme}
-                className="theme-toggle-btn absolute top-1/2 p-1.5 rounded-full outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 active:ring-0"
-                style={{ right: `${iconOffset}px`, transform: 'translateY(-50%) scale(1.12)', WebkitTapHighlightColor: 'transparent' }}
-                aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-              >
-                {theme === "dark" ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </button>
-              <nav className="flex items-center gap-4 text-xs px-2">
-                <NavLink
-                  to="/home" // Changed from "/"
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? "active" : ""}`
-                  }
-                  style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
-                >
-                  Home
-                </NavLink>
-                <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-                  Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-                </span>
-                <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-                  About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-                </span>
-                <span className="nav-link opacity-40 cursor-not-allowed" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-                  Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
-                </span>
-              </nav>
-            </header>
-          </>
-
-          {/* Now Playing Widget */}
-          <div
-            style={{
-              position: 'absolute',
-              top: Math.max(80, liveConfig.widgetY || 80) + 'px',
-              left: '50%',
-              opacity: assetHidden ? 0 : 1,
-              transition: 'opacity 300ms ease',
-              willChange: 'opacity',
-              transform: `translateX(-50%) scale(${liveConfig.widgetScale})`,
-              zIndex: 50,
-              pointerEvents: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Suspense fallback={null}>
-              <SpotifyNowPlaying theme={appliedTheme} />
-            </Suspense>
-          </div>
-
-          {/* Main Content Area */}
-          <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
-            <Asset1Svg
-              theme={appliedTheme}
-              outlineThickness={HARDCODED_ASSET_THICKNESS}
-              className={`pointer-events-none absolute left-1/2 top-12 z-20`}
-              style={{
-                transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
-                width: '140%',
-                maxWidth: 'none',
-                height: 'auto',
-                opacity: assetHidden ? 0 : 1,
-                transition: 'opacity 300ms ease, transform 300ms ease',
-                willChange: 'opacity, transform',
-              }}
+      {/* NAV BAR (CENTERED LINKS) */}
+      {/* Desktop: sticky bar at top, full width */}
+      <header
+        className={`
+          hidden sm:flex
+          z-50 justify-center items-center app-header
+          sticky top-0 p-4 border-b w-full
+          ${
+            theme === "dark"
+              ? "border-neutral-800 bg-black/90 backdrop-blur-sm"
+              : "border-neutral-300 bg-white/90 backdrop-blur-sm"
+          }
+        `}
+      >
+        {/* Top-left clickable logo */}
+        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+          <Link to="/" aria-label="Home">
+            <img
+              src="/LOGOS/newlogo.svg"
+              alt="Home"
+              className="nav-logo h-8"
             />
-            <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''}`}>
-              <Suspense fallback={<div className="min-h-screen" />}>
-                <Routes location={location} key={location.pathname}>
-                  <Route path="/home" element={<Home 
-                    theme={theme} 
-                    heroScale={liveConfig.heroScale ?? 1} 
-                    heroY={liveConfig.heroY ?? 0} 
-                    animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
-                    showMarquee={showMarquee}
-                  />} />
-                  <Route path="/work" element={<Work />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/around" element={<Around />} />
-                  <Route path="/flyhigh" element={<FlyHigh />} />
-                  <Route path="/legacydrip" element={<LegacyDrip />} />
-                  <Route path="/terzo" element={<Terzo />} />
-                  <Route path="/williamru" element={<WilliamRu />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/pricelist" element={<PriceList />} />
-                </Routes>
-              </Suspense>
-            </main>
-          </div>
+          </Link>
+        </div>
+        
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="theme-toggle-btn absolute top-1/2 p-2 rounded-full outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 active:ring-0"
+          style={{ right: `${iconOffset}px`, transform: 'translateY(-50%) scale(1.12)', WebkitTapHighlightColor: 'transparent' }}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          {theme === "dark" ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
+            </svg>
+          )}
+        </button>
+        
+        {/* Nav links */}
+        <nav className="flex items-center gap-6 text-sm px-2">
+          <NavLink
+            to="/"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/work"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          </NavLink>
+          <NavLink
+            to="/about"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          </NavLink>
+          <NavLink
+            to="/contact"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          </NavLink>
+        </nav>
+      </header>
 
-          {/* Footer */}
-          <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
-            <Footer />
+      {/* Mobile: floating pill at bottom */}
+      <header
+          style={{ paddingLeft: `${pillPadding}px`, bottom: `${liveConfig.navY ?? 48}px` }}
+        className={`
+          sm:hidden
+          z-50 flex justify-center items-center app-header
+          fixed left-1/2 -translate-x-1/2 w-auto py-2 px-8 rounded-full border
+          transition-transform transition-opacity duration-300 ease-in-out
+          ${navHidden ? 'translate-y-6 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+          ${
+            theme === "dark"
+              ? "border-neutral-800 bg-black/80 backdrop-blur-sm"
+              : "border-neutral-300 bg-white/80 backdrop-blur-sm"
+          }
+        `}
+      >
+        {/* Theme toggle on mobile */}
+        <button
+          onClick={toggleTheme}
+          className="theme-toggle-btn absolute top-1/2 p-1.5 rounded-full outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0 active:ring-0"
+          style={{ right: `${iconOffset}px`, transform: 'translateY(-50%) scale(1.12)', WebkitTapHighlightColor: 'transparent' }}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          {theme === "dark" ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+              <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
+            </svg>
+          )}
+        </button>
+        
+        {/* Nav links for mobile */}
+        <nav className="flex items-center gap-4 text-xs px-2">
+          <NavLink
+            to="/"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/work"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          </NavLink>
+          <NavLink
+            to="/about"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          </NavLink>
+          <NavLink
+            to="/contact"
+            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
+            }
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+          >
+            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
+          </NavLink>
+        </nav>
+      </header>
+
+      {/* Now Playing Widget - Inside hero logo area, before Asset1 */}
+      {location.pathname === '/' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: Math.max(80, liveConfig.widgetY || 80) + 'px',
+            left: 0,
+            right: 0,
+            margin: '0 auto',
+            width: '100%',
+            opacity: assetHidden ? 0 : 1,
+            transition: 'opacity 300ms ease',
+            willChange: 'opacity',
+            transform: `scale(${liveConfig.widgetScale})`,
+            transformOrigin: 'center',
+            zIndex: 50,
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Suspense fallback={null}>
+            <SpotifyNowPlaying theme={theme} />
           </Suspense>
         </div>
       )}
+
+      {/* Asset1.svg decorative element - positioned between navbar and footer */}
+      <div className="relative flex-1" style={{ minHeight: '100vh' }}>
+        {location.pathname === '/' && (
+          <Asset1Svg
+            theme={theme}
+            outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
+            className={`pointer-events-none absolute left-1/2 top-12 z-20`}
+            style={{
+              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) scale(${liveConfig.assetScale ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
+              width: '140%',
+              maxWidth: 'none',
+              height: 'auto',
+              opacity: assetHidden ? 0 : 1,
+              transition: 'opacity 300ms ease, transform 300ms ease',
+              willChange: 'opacity, transform',
+            }}
+          />
+        )}
+
+      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP ONLY - HIDDEN */}
+      {false && viewMode === 'desktop' && (
+      <div 
+        className=""
+        style={{
+          position: 'fixed',
+          bottom: '100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '8px',
+          zIndex: 1000,
+          fontFamily: 'monospace',
+          fontSize: '12px'
+        }}>
+          <div style={{fontWeight: 'bold'}}>Screen: {screenDimensions}</div>
+          <div className="flex items-center gap-2 mb-2">
+            <button 
+              onClick={() => setShowMarquee(!showMarquee)}
+              style={{
+                background: showMarquee ? '#4ADE80' : '#F87171',
+                color: 'black',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '2px 8px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              Marquee: {showMarquee ? 'ON' : 'OFF'}
+            </button>
+          </div>
+          <div style={{fontWeight: 'bold'}}>Animated Logo</div>
+          <div className="flex items-center gap-2">
+            <label>Scale: </label>
+            <input type="range" min="0.5" max="2" step="0.01" value={liveConfig.heroScale} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} />
+            <input type="number" step="0.01" value={liveConfig.heroScale} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>Thickness: </label>
+            <input type="range" min="0.5" max="5" step="0.1" value={liveConfig.animatedOutlineWidth} onChange={(e) => handleConfigChange('animatedOutlineWidth', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.animatedOutlineWidth} onChange={(e) => handleConfigChange('animatedOutlineWidth', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>Y pos: </label>
+            <input type="range" min="-200" max="300" step="1" value={liveConfig.heroY} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.heroY} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
+          <div className="flex items-center gap-2">
+            <label>X pos: </label>
+            <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>Y pos: </label>
+            <input type="range" min="-5000" max="2000" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>Scale: </label>
+            <input type="range" min="0.1" max="2" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} />
+            <input type="number" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>X stretch: </label>
+            <input type="range" min="-5" max="20" step="0.1" value={liveConfig.assetH} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.assetH} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>Y stretch: </label>
+            <input type="range" min="-5" max="20" step="0.1" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.assetV} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
+          <div className="flex items-center gap-2">
+            <label>Outline thickness: </label>
+            <input type="range" min="0" max="20" step="0.1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.assetOutlineThickness} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>Rotation: </label>
+            <input type="range" min="-360" max="360" step="1" value={liveConfig.assetRotation ?? 0} onChange={(e) => handleConfigChange('assetRotation', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.assetRotation ?? 0} onChange={(e) => handleConfigChange('assetRotation', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Nav Bar</div>
+           <div className="flex items-center gap-2">
+            <label>Y pos: </label>
+            <input type="range" min="0" max="300" step="1" value={liveConfig.navY} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.navY} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Now Playing Widget</div>
+          <div className="flex items-center gap-2">
+            <label>Scale: </label>
+            <input type="range" min="0.2" max="2" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} />
+            <input type="number" step="0.01" value={liveConfig.widgetScale} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+          <div className="flex items-center gap-2">
+            <label>Y pos: </label>
+            <input type="range" min="-200" max="200" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.widgetY} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div style={{fontWeight: 'bold', marginTop: '10px'}}>Marquee (Scrolling PNGs)</div>
+          <div className="flex items-center gap-2">
+            <label>Y Margin: </label>
+            <input type="range" min="0" max="300" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label>Img Scale: </label>
+            <input type="range" min="0.1" max="3" step="0.1" value={liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeScale', parseFloat(e.target.value))} />
+            <input type="number" step="0.1" value={liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeScale', parseFloat(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label>Speed (s): </label>
+            <input type="range" min="1" max="120" step="1" value={liveConfig.marqueeSpeed ?? 60} onChange={(e) => handleConfigChange('marqueeSpeed', parseInt(e.target.value))} />
+            <input type="number" step="1" value={liveConfig.marqueeSpeed ?? 60} onChange={(e) => handleConfigChange('marqueeSpeed', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
+          </div>
+
+          <pre style={{display: 'none'}}>{JSON.stringify(liveConfig, null, 2)}</pre>
+        </div>
+      )}
+        
+        {/* Main content - above Asset1 */}
+        <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'}`}>
+          <Suspense
+            fallback={<div className="min-h-screen" />}
+          >
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home 
+                theme={theme} 
+                heroScale={liveConfig.heroScale ?? 1} 
+                heroY={liveConfig.heroY ?? 0}  
+                animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
+                showMarquee={showMarquee}
+                marqueeY={liveConfig.marqueeY ?? 96}
+                marqueeScale={liveConfig.marqueeScale ?? 1}
+              />} />
+              
+              {/* LOCKED ROUTES */}
+              {/* <Route path="/work" element={<Work />} /> */}
+              {/* <Route path="/about" element={<About />} /> */}
+              {/* <Route path="/around" element={<Around />} /> */}
+              {/* <Route path="/flyhigh" element={<FlyHigh />} /> */}
+              {/* <Route path="/legacydrip" element={<LegacyDrip />} /> */}
+              {/* <Route path="/terzo" element={<Terzo />} /> */}
+              {/* <Route path="/williamru" element={<WilliamRu />} /> */}
+              {/* <Route path="/contact" element={<Contact />} /> */}
+              <Route path="/pricelist" element={<PriceList />} />
+              {/* <Route path="/admin" element={<Admin theme={theme} />} /> */}
+              
+              {/* Redirect any other route to Home */}
+              <Route path="*" element={<Home 
+                marqueeScale={liveConfig.marqueeScale ?? 1}
+                theme={theme} 
+                heroScale={liveConfig.heroScale ?? 1} 
+                heroY={liveConfig.heroY ?? 0} 
+                animatedOutlineWidth={liveConfig.animatedOutlineWidth ?? 3.8}
+                showMarquee={showMarquee}
+                marqueeY={liveConfig.marqueeY ?? 96}
+                marqueeSpeed={liveConfig.marqueeSpeed ?? 60}
+              />} />  
+            </Routes>
+          </Suspense>
+        </main>
+      </div>
+      
+      {/* Metallic Chain Border with Liquid Metal Effect - HIDDEN */}
+      {/* <div className={`w-full overflow-hidden py-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
+        <div 
+          className="w-full flex"
+          style={{
+            height: '60px',
+          }}
+        >
+          <div className="hidden md:block flex-1 h-full">
+            <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
+          </div>
+          <div className="flex-1 h-full">
+            <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
+          </div>
+          <div className="flex-1 h-full">
+            <LiquidLogo logoUrl="/LOGOS/half.svg" logoScale={0.9} effectScale={0.5} />
+          </div>
+        </div>
+      </div> */}
+
+      <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
+        <Footer />
+      </Suspense>
+    </div>
     </>
   );
 }
+
 export default App;

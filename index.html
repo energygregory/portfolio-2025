@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/LOGOS/newlogo-white.svg" />
     <link rel="preload" href="/LOGOS/newlogo.png" as="image" />
     <link rel="preload" href="/1221.webm" as="video" type="video/webm" />
     <link rel="preload" href="/animation.webm" as="video" type="video/webm" />
@@ -30,7 +30,42 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#000000" id="theme-color-meta" />
-    <title>portfolio</title>
+    <title>Designed by Greg</title>
+
+  <script>
+    (function() {
+      // 0. RESET (in case of re-run)
+      window.__DEVICE_MODE__ = null;
+      
+      var d = document.documentElement;
+      var u = navigator.userAgent || navigator.vendor || window.opera;
+      
+      // 1. HARDWARE CHECK (User-Agent Regex)
+      // Detects actual mobile hardware (Phones/Tablets) regardless of screen size.
+      var isMobileHardware = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(u);
+
+      // 2. SCREEN CHECK (Fallback)
+      // Detects if the screen is physically small (narrower than 768px).
+      var isSmallScreen = window.matchMedia("only screen and (max-width: 768px)").matches;
+
+      // 3. THE DECISION
+      // If it's hardware mobile OR a small screen, it's mobile.
+      var isMobile = isMobileHardware || isSmallScreen;
+
+      // 4. ACTION (0ms Latency)
+      // Add class to HTML tag for CSS to see immediately
+      d.className += isMobile ? " device-mobile" : " device-desktop";
+      
+      // Save global flag for React/JSX to read instantly
+      window.__DEVICE_MODE__ = isMobile ? 'mobile' : 'desktop';
+    })();
+  </script>
+
+  <style>
+    /* Prevents the 'wrong' view from even attempting to take up space */
+    .device-mobile .desktop-view-wrapper { display: none !important; }
+    .device-desktop .mobile-view-wrapper { display: none !important; }
+  </style>
   </head>
   <body>
     <!-- Initial loading screen - shows immediately before React loads -->

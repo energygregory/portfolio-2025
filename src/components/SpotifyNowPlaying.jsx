@@ -21,7 +21,15 @@ const SpotifyNowPlaying = ({ theme = 'dark' }) => {
         if (!track) throw new Error('No track data found');
 
         const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
-        const songName = track.name;
+        let songName = track.name;
+        // Clean up title: remove (feat. ...), [Remix], etc to keep it short
+        songName = songName.replace(/\s*[\(\[].*?(feat|ft|remix|version).*?[\)\]]/gi, '').trim();
+        
+        // Truncate if still too long (max 25 chars)
+        if (songName.length > 25) {
+          songName = songName.substring(0, 25) + '...';
+        }
+
         const artistName = track.artist['#text'];
         const url = track.url;
         const imageSrc = (track.image?.[2]?.['#text']) || 'https://via.placeholder.com/64?text=Music';

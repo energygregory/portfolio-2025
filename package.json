@@ -13,9 +13,9 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
+    "@react-three/fiber": "^9.4.2",
     "@react-three/postprocessing": "^3.0.4",
-    "@types/three": "^0.182.0",
+    "@vercel/analytics": "^1.6.1",
     "animejs": "^4.2.2",
     "dompurify": "^3.3.1",
     "postprocessing": "^6.38.2",
@@ -23,7 +23,8 @@
     "react-device-detect": "^2.2.3",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
-    "three": "^0.182.0"
+    "three": "^0.182.0",
+    "ua-parser-js": "^2.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

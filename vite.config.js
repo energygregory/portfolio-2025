@@ -1,24 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import viteImagemin from "vite-plugin-imagemin";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    // Compress images during build for faster loading
-    viteImagemin({
-      gifsicle: { optimizationLevel: 7, interlaced: false },
-      optipng: { optimizationLevel: 7 },
-      mozjpeg: { quality: 80 },
-      pngquant: { quality: [0.7, 0.9], speed: 4 },
-      svgo: {
-        plugins: [
-          { name: "removeViewBox", active: false },
-          { name: "removeEmptyAttrs", active: false },
-        ],
-      },
-    }),
   ],
   build: {
     // Enable asset inlining for small images (< 10kb become base64)
@@ -56,13 +42,17 @@ export default defineConfig({
       "54a93074926f.ngrok-free.app",
       "bad276294d51.ngrok-free.app",
       "ecd30e2995cf.ngrok-free.app",
-      "b6e9448af744.ngrok-free.app",
-      "ff614dd5ac9f.ngrok-free.app",
+      "fe046b7a796e0c.lhr.life",
+      "cbe616d28152f5.lhr.life",
       "upset-symbols-rest.loca.lt",
-      "unabashed-dayfly-coraline.ngrok-free.dev",
+      "96ead36722f5ee.lhr.life",
+      "eda110df46647c.lhr.life",
+      "2a8534bfe36635.lhr.life",
       "2b87577bcc66.ngrok-free.app",
       "064f6a546f44.ngrok-free.app",
-      "https://thick-bananas-deny.loca.lt",
+      "2e8dccef22df81.lhr.life",
+      "d7744db09a919c.lhr.life",
+      "976e1fbf600dd4.lhr.life",
     ],
   },
 });

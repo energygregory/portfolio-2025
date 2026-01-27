@@ -18,10 +18,11 @@ export default function AnimatedLogo({ className = "", start = true, style = {},
     animate(drawables, {
       draw: ["0 0", "0 1", "1 1"],
       ease: "inOutQuad",
-      duration: 3000,
+      duration: 4500,
       delay: stagger(80),
       loop: true,
-      loopDelay: 2000,
+      direction: "alternate",
+      loopDelay: 325,
     });
   }, [start]);
 

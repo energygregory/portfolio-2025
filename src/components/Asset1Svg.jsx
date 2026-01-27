@@ -30,13 +30,6 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "", 
     '  stroke-linejoin: round !important;',
     '  opacity: 1 !important;',
     '}',
-    // Mobile: keep filled dark colour for small screens
-    '@media (max-width: 640px) {',
-    '  .asset1-svg-container svg path, .asset1-svg-container svg rect, .asset1-svg-container svg circle, .asset1-svg-container svg polygon, .asset1-svg-container svg polyline, .asset1-svg-container svg ellipse {',
-    '    fill: #4d4d4d !important;',
-    '    stroke: none !important;',
-    '  }',
-    '}',
   ].join('\n');
 
   const lightCss = [
