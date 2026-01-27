@@ -1,0 +1,17 @@
+{
+  "name": "greg-portfolio-backend",
+  "version": "1.0.0",
+  "description": "Traffic analytics server for designedbygreg.com",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "geoip-lite": "^1.4.9"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1108,8 +1108,8 @@ function App() {
               {/* <Route path="/terzo" element={<Terzo />} /> */}
               {/* <Route path="/williamru" element={<WilliamRu />} /> */}
               {/* <Route path="/contact" element={<Contact />} /> */}
-              {/* <Route path="/pricelist" element={<PriceList />} /> */}
-              <Route path="/admin" element={<Admin theme={theme} />} />
+              <Route path="/pricelist" element={<PriceList />} />
+              {/* <Route path="/admin" element={<Admin theme={theme} />} /> */}
               
               {/* Redirect any other route to Home */}
               <Route path="*" element={<Home 
