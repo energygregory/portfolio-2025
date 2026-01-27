@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sphere, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 
 // Procedural Dot Globe (Halftone ish)
 const HalftoneSphere = ({ theme }) => {
