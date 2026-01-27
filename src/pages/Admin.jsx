@@ -162,6 +162,7 @@ export default function Admin({ theme = 'dark' }) {
     const [ipData, setIpData] = useState(null);
     const [sessionTime, setSessionTime] = useState(0);
     const [deviceInfo, setDeviceInfo] = useState(null);
+    const [trafficStats, setTrafficStats] = useState({ count: 0, updated_at: null });
 
     // Timer for session duration
     useEffect(() => {
@@ -172,11 +173,22 @@ export default function Admin({ theme = 'dark' }) {
         return () => clearInterval(timer);
     }, [isAuthenticated]);
 
-    // Fetch IP Data for "Real Numbers" and Parse UA
+    // Fetch IP Data & TRAFFIC STATS
     useEffect(() => {
         if (!isAuthenticated) return;
         
-        // 1. Get Device Info
+        // 1. Get GLOBAL Traffic Stats
+        fetch('https://api.counterapi.dev/v1/energygregory_portfolio/visits/')
+            .then(res => res.json())
+            .then(data => {
+                setTrafficStats({
+                    count: data.count,
+                    updated_at: data.updated_at
+                });
+            })
+            .catch(err => console.error("Stats Error", err));
+
+        // 2. Get Device Info
         const parser = new UAParser();
         setDeviceInfo(parser.getResult());
 
@@ -287,9 +299,9 @@ export default function Admin({ theme = 'dark' }) {
             {/* Grid Layout - Real Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
                 <StatCard 
-                    title="System Status" 
-                    value={ipData ? "Online" : "Scanning..."} 
-                    sub="Deployment Active" 
+                    title="Total Visits" 
+                    value={trafficStats.count > 0 ? trafficStats.count.toLocaleString() : "Loading..."} 
+                    sub={trafficStats.updated_at ? `Last: ${new Date(trafficStats.updated_at).toLocaleTimeString()}` : "Fetching..."} 
                     theme={theme} 
                 />
                 <StatCard 
@@ -305,7 +317,7 @@ export default function Admin({ theme = 'dark' }) {
                     theme={theme} 
                 />
                 <StatCard 
-                    title="Live Analytics" 
+                    title="System Status" 
                     value="Active" 
                     sub="Tracking via Vercel" 
                     theme={theme} 

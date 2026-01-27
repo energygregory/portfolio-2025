@@ -435,6 +435,23 @@ const portfolioLogos = [
 function App() {
   console.log('App component is rendering');
 
+  // TRAFFIC COUNTER: Increment visits (once per session)
+  useEffect(() => {
+    const hasCounted = sessionStorage.getItem('visit_counted');
+    // Only count if not running on localhost to avoid pollution (optional, but good practice)
+    const isLocal = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+    
+    if (!hasCounted && !isLocal) {
+      fetch('https://api.counterapi.dev/v1/energygregory_portfolio/visits/up')
+        .then(res => res.json())
+        .then(data => {
+          console.log('Visitor counted:', data.count);
+          sessionStorage.setItem('visit_counted', 'true');
+        })
+        .catch(err => console.error('Traffic counter error:', err));
+    }
+  }, []);
+
   // Hardcore Device Mode Detection (matches index.html script)
   const [viewMode, setViewMode] = useState(() => {
     // Safety check for SSR, defaults to whatever the window has
