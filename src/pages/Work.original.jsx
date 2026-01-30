@@ -14,7 +14,7 @@ export default function Work() {
   const [openFolder, setOpenFolder] = useState(null);
 
   // use a mini-nav like PriceList: 'Brands' | 'Skill Set'
-  const [activeCategory, setActiveCategory] = useState('merch');
+  const [activeCategory, setActiveCategory] = useState('brands');
   const dropdownRef = useRef(null);
 
   // Caption pop state: track which caption is currently 'popped'
@@ -35,33 +35,33 @@ export default function Work() {
   };
 
   return (
-    <main className="px-6 py-16 flex flex-col items-center">
-      {/* <h1 className="text-3xl font-mono mb-6 text-center">what is my work made of?</h1> */}
+    <main className="px-6 py-16">
+      <h1 className="text-3xl font-mono mb-6">what is my work made of?</h1>
 
       {/* Mini nav (same visual style as PriceList) */}
-      <div className="w-full max-w-xl mb-6 flex justify-center">
-        <nav className="flex gap-12 mb-6 border-b border-neutral-700 pb-3" ref={dropdownRef}>
+      <div className="w-full mb-6">
+        <nav className="flex gap-6 mb-6 border-b border-neutral-700 pb-3" ref={dropdownRef}>
           <button
-            onClick={() => setActiveCategory('merch')}
+            onClick={() => setActiveCategory('brands')}
             className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
-              activeCategory === 'merch' ? 'mini-nav-active' : ''
+              activeCategory === 'brands' ? 'mini-nav-active' : ''
             }`}
           >
-            Merch Design
+            Brands
           </button>
           <button
-            onClick={() => setActiveCategory('graphic')}
+            onClick={() => setActiveCategory('type')}
             className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
-              activeCategory === 'graphic' ? 'mini-nav-active' : ''
+              activeCategory === 'type' ? 'mini-nav-active' : ''
             }`}
           >
-            Graphic Design
+            Skill Set
           </button>
         </nav>
       </div>
-      {activeCategory === 'merch' && (
-        <section className="max-w-4xl w-full">
-          <ul className="space-y-4 text-center">
+      {activeCategory === 'brands' && (
+        <section className="max-w-4xl">
+          <ul className="space-y-4">
             {[
               { label: 'William Ru', path: '/williamru' },
               { label: 'Legacy Drip', path: '/legacydrip' },
@@ -83,8 +83,8 @@ export default function Work() {
         </section>
       )}
 
-      {activeCategory === 'graphic' && (
-        <section className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full max-w-4xl">
+      {activeCategory === 'type' && (
+        <section className="grid grid-cols-2 sm:grid-cols-4 gap-6">
           {['Tech Pack Design', 'Logo Design', 'Realistic Mockup', 'Packaging'].slice(0,4).map((label, idx) => {
             const id = `type-${idx}`;
             const color = folders[idx]?.color || '#9CA3AF';

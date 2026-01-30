@@ -784,40 +784,42 @@ function App() {
         <nav className="flex items-center gap-6 text-sm px-2">
           <NavLink
             to="/"
-            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""} pointer-events-none`
+              `nav-link ${isActive ? "active" : ""}`
             }
-            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Home
           </NavLink>
           <NavLink
             to="/work"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Work
+            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/about"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            About
+            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/contact"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Contact
+            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
         </nav>
       </header>
@@ -860,40 +862,42 @@ function App() {
         <nav className="flex items-center gap-4 text-xs px-2">
           <NavLink
             to="/"
-            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""} pointer-events-none`
+              `nav-link ${isActive ? "active" : ""}`
             }
-            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
             Home
           </NavLink>
           <NavLink
             to="/work"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Work
+            Work <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/about"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            About
+            About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
           <NavLink
             to="/contact"
+            onClick={(e) => e.preventDefault()}
             className={({ isActive }) =>
-              `nav-link ${isActive ? "active" : ""}`
+              `nav-link ${isActive ? "active" : ""} opacity-50 cursor-not-allowed pointer-events-none`
             }
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            style={{ pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Contact
+            Contact <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>
           </NavLink>
         </nav>
       </header>
@@ -1094,7 +1098,7 @@ function App() {
               />} />
               
               {/* UNLOCKED ROUTES */}
-              <Route path="/work" element={<Work />} />
+              {/* <Route path="/work" element={<Work />} />
               <Route path="/about" element={<About />} />
               <Route path="/around" element={<Around />} />
               <Route path="/flyhigh" element={<FlyHigh />} />
@@ -1102,7 +1106,7 @@ function App() {
               <Route path="/terzo" element={<Terzo />} />
               <Route path="/williamru" element={<WilliamRu />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/pricelist" element={<PriceList />} />
+              <Route path="/pricelist" element={<PriceList />} /> */}
               {/* <Route path="/admin" element={<Admin theme={theme} />} /> */}
               
               {/* Redirect any other route to Home */}
