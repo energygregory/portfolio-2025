@@ -104,9 +104,9 @@ import { getDeviceCategory } from "./utils/detectDevice";
 //   });
 // }
 import Home from "./pages/Home.jsx";
-const Work = lazy(() => import("./pages/Work.jsx"));
-const About = lazy(() => import("./pages/About.jsx"));
-const Contact = lazy(() => import("./pages/Contact.jsx"));
+import Work from "./pages/Work.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
 const Terzo = lazy(() => import("./pages/Terzo.jsx"));
 const WilliamRu = lazy(() => import("./pages/WilliamRu.jsx"));
 const Around = lazy(() => import("./pages/Around.jsx"));
