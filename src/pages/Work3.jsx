@@ -1,5 +1,7 @@
-import React, { useState, useRef } from "react";
-import BlurCarousel from "../components/BlurCarousel";
+import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Folder from "../components/Folder";
+import logos from "../data/logos";
 
 const CategoryList = ({ items }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
@@ -38,29 +40,26 @@ const CategoryItem = ({ label, onMouseEnter, onMouseLeave, isDimmed }) => {
 
 export default function Work() {
   const [activeCategory, setActiveCategory] = useState('graphic');
+  const dropdownRef = useRef(null);
 
   return (
-    <main className="min-h-screen bg-[#e5e5e5] dark:bg-black transition-colors duration-500 font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-8">
+    <main className="px-6 py-16 flex flex-col items-center min-h-screen">
       
       {/* Mini nav */}
-      <div className="w-full max-w-xl mb-4 flex justify-center z-50 sticky top-8">
-        <nav className="flex gap-12 mb-6 border-b border-black/20 dark:border-white/20 pb-0 backdrop-blur-sm relative">
+      <div className="w-full max-w-xl mb-12 flex justify-center">
+        <nav className="flex gap-12 mb-6 border-b border-neutral-700 pb-3" ref={dropdownRef}>
           <button
             onClick={() => setActiveCategory('merch')}
-            className={`font-mono uppercase text-sm tracking-widest pb-3 px-2 transition-colors relative top-[1px] ${
-              activeCategory === 'merch' 
-                ? 'text-black dark:text-white border-b-2 border-black dark:border-white' 
-                : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300'
+            className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
+              activeCategory === 'merch' ? 'mini-nav-active' : ''
             }`}
           >
             Merch Design
           </button>
           <button
             onClick={() => setActiveCategory('graphic')}
-            className={`font-mono uppercase text-sm tracking-widest pb-3 px-2 transition-colors relative top-[1px] ${
-              activeCategory === 'graphic' 
-                ? 'text-black dark:text-white border-b-2 border-black dark:border-white' 
-                : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300'
+            className={`mini-nav-btn font-mono uppercase text-sm tracking-widest pb-2 transition-colors ${
+              activeCategory === 'graphic' ? 'mini-nav-active' : ''
             }`}
           >
             Graphic Design
@@ -69,13 +68,13 @@ export default function Work() {
       </div>
 
       {activeCategory === 'merch' && (
-        <section className="w-full h-[80vh] flex items-start justify-start">
-            <BlurCarousel />
+        <section className="max-w-4xl w-full">
+           {/* List content removed */}
         </section>
       )}
 
       {activeCategory === 'graphic' && (
-        <section className="w-full max-w-4xl mt-12">
+        <section className="w-full max-w-4xl">
           <CategoryList items={['LOGOS', 'POSTERS', 'VISUAL DESIGN']} />
         </section>
       )}
