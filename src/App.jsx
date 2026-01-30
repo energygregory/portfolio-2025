@@ -1100,6 +1100,9 @@ function App() {
                 marqueeScale={liveConfig.marqueeScale ?? 1}
               />} />
               
+              {/* PUBLIC ROUTES (Accessible by link) */}
+              <Route path="/pricelist" element={<PriceList />} />
+
               {/* LOCALHOST ROUTES - Only accessible locally */}
               {isLocalhost && (
                 <>
@@ -1111,7 +1114,6 @@ function App() {
                   <Route path="/terzo" element={<Terzo />} />
                   <Route path="/williamru" element={<WilliamRu />} />
                   <Route path="/contact" element={<Contact />} />
-                  <Route path="/pricelist" element={<PriceList />} />
                   {/* <Route path="/admin" element={<Admin theme={theme} />} /> */}
                 </>
               )}
