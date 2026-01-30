@@ -44,10 +44,11 @@ const BlurCarousel = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-[85vh] mx-auto flex justify-start pl-0 overflow-hidden">
+        // Full width/height container
+        <div className="relative w-full h-full mx-auto flex justify-start pl-0 overflow-hidden">
             <div 
                 ref={containerRef}
-                className="flex flex-col items-start overflow-y-auto overflow-x-hidden h-full w-full no-scrollbar snap-y snap-mandatory py-[40vh]"
+                className="flex flex-col items-start overflow-y-auto overflow-x-hidden h-full w-full no-scrollbar snap-y snap-mandatory py-[30vh]"
             >
                 {images.map((img, idx) => (
                     <CarouselItem 
@@ -84,8 +85,8 @@ const CarouselItem = ({ src, containerRef, scrollTop }) => {
         const maxDist = 500; // Range of effect
         let norm = Math.min(dist / maxDist, 1);
         
-        // Easing
-        const easedNorm = Math.pow(norm, 2.5);
+        // Easing: Linear for gradual blur from center
+        const easedNorm = norm; 
 
         // Calculate Blur
         const maxBlur = 6;
@@ -121,10 +122,10 @@ const CarouselItem = ({ src, containerRef, scrollTop }) => {
         <div 
             ref={itemRef}
             className="snap-center shrink-0 w-full flex items-center justify-start transition-all duration-100 ease-out will-change-transform my-2 sm:my-0 pl-0"
-            style={{...style, height: window.innerWidth < 640 ? '200px' : '450px'}}
+            style={{...style, height: window.innerWidth < 640 ? '150px' : '450px'}}
         >
              {/* Image container */}
-            <div className="w-[180px] h-[180px] sm:w-[450px] sm:h-[450px] relative">
+            <div className="w-[120px] h-[120px] sm:w-[450px] sm:h-[450px] relative">
                 <img 
                     src={src} 
                     alt="" 

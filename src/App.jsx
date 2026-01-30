@@ -104,7 +104,8 @@ import { getDeviceCategory } from "./utils/detectDevice";
 //   });
 // }
 import Home from "./pages/Home.jsx";
-import Work from "./pages/Work.jsx";
+import WorkGraphic from "./pages/WorkGraphic.jsx";
+import WorkMerch from "./pages/WorkMerch.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 const Terzo = lazy(() => import("./pages/Terzo.jsx"));
@@ -433,6 +434,7 @@ const portfolioLogos = [
 ];
 
 function App() {
+  const location = useLocation(); // Hook for conditional footer rendering
   const isLocalhost = typeof window !== 'undefined' && 
     (
       window.location.hostname === 'localhost' || 
@@ -492,7 +494,7 @@ function App() {
   }, [viewMode]);
   
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation(); // Already defined above
   
   // Track if navigating from Work page to brand page
   const [slideTransition, setSlideTransition] = useState(false);
@@ -1112,7 +1114,9 @@ function App() {
               {/* LOCALHOST ROUTES - Only accessible locally */}
               {isLocalhost && (
                 <>
-                  <Route path="/work" element={<Work />} />
+                  <Route path="/work" element={<WorkGraphic />} />
+                  <Route path="/work/graphic" element={<WorkGraphic />} />
+                  <Route path="/work/merch" element={<WorkMerch />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/around" element={<Around />} />
                   <Route path="/flyhigh" element={<FlyHigh />} />
@@ -1160,9 +1164,12 @@ function App() {
         </div>
       </div> */}
 
-      <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
-        <Footer />
-      </Suspense>
+      {/* Hide global footer on Merch page which has its own fixed footer */}
+      {!location.pathname.includes('/work/merch') && (
+        <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
+          <Footer />
+        </Suspense>
+      )}
     </div>
     </>
   );

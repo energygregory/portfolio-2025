@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import BlurCarousel from "../components/BlurCarousel";
+import Footer from "../components/Footer";
 
 const CategoryList = ({ items }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
@@ -40,11 +41,13 @@ export default function Work() {
   const [activeCategory, setActiveCategory] = useState('graphic');
 
   return (
-    <main className="min-h-screen bg-[#e5e5e5] dark:bg-black transition-colors duration-500 font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-8">
+    // Fixed page size for Merch (h-screen overflow-hidden) to prevent body scroll
+    // Graphic Design allows scrolling
+    <main className={`transition-colors duration-500 font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
       
-      {/* Mini nav */}
-      <div className="w-full max-w-xl mb-4 flex justify-center z-50 sticky top-8">
-        <nav className="flex gap-12 mb-6 border-b border-black/20 dark:border-white/20 pb-0 backdrop-blur-sm relative">
+      {/* Mini nav - Adjusted z-index to sit on top of carousel */}
+      <div className="w-full max-w-xl mb-4 flex justify-center z-[60] sticky top-24 sm:top-32">
+        <nav className="flex gap-12 mb-6 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
           <button
             onClick={() => setActiveCategory('merch')}
             className={`font-mono uppercase text-sm tracking-widest pb-3 px-2 transition-colors relative top-[1px] ${
@@ -69,16 +72,26 @@ export default function Work() {
       </div>
 
       {activeCategory === 'merch' && (
-        <section className="w-full h-[80vh] flex items-start justify-start">
+        // Full screen fixed background for the carousel
+        // z-0 puts it behind the mini nav (z-[60])
+        <section className="fixed inset-0 w-full h-full z-0 flex items-start justify-start">
             <BlurCarousel />
         </section>
       )}
 
       {activeCategory === 'graphic' && (
-        <section className="w-full max-w-4xl mt-12">
+        <section className="w-full max-w-4xl mt-12 mb-20">
           <CategoryList items={['LOGOS', 'POSTERS', 'VISUAL DESIGN']} />
         </section>
       )}
+
+      {/* Fixed Footer for Merch, Normal for Graphic? 
+          User said "FOOTER STUCK AT THE BOTTOM".
+          Usually footer is static. But if Merch is fixed height, footer must be fixed.
+      */}
+      <div className={`w-full ${activeCategory === 'merch' ? 'fixed bottom-0 left-0 z-[60]' : ''}`}>
+        <Footer />
+      </div>
     </main>
   );
 }
