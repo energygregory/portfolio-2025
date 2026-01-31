@@ -3,6 +3,11 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sphere, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { UAParser } from 'ua-parser-js';
+import { io } from 'socket.io-client';
+
+const BACKEND_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3000' 
+  : 'https://replace-with-your-production-backend.com';
 
 // Procedural Dot Globe (Halftone ish)
 const HalftoneSphere = ({ theme }) => {
@@ -106,20 +111,7 @@ const Globe = ({ markers, theme }) => {
   );
 };
 
-const HalftoneGlobe = ({ theme, userLocation }) => {
-    // Determine markers based on actual data if available
-    const markers = useMemo(() => {
-        const m = [];
-        if (userLocation && userLocation.latitude) {
-            m.push({
-                lat: userLocation.latitude,
-                lon: userLocation.longitude,
-                country: "You (" + userLocation.city + ")"
-            });
-        }
-        return m;
-    }, [userLocation]);
-
+const HalftoneGlobe = ({ theme, markers = [] }) => {
     return (
         <div className={`w-full h-full relative border-none bg-transparent`}>
             <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
@@ -149,6 +141,7 @@ export default function Admin({ theme = 'dark' }) {
     const [ipData, setIpData] = useState(null);
     const [deviceInfo, setDeviceInfo] = useState(null);
     const [trafficStats, setTrafficStats] = useState({ count: 0, updated_at: null });
+    const [realtimeHits, setRealtimeHits] = useState([]); // List of live hits from Socket
 
     // Session Logic (Persistent via LocalStorage)
     const [sessionTimer, setSessionTimer] = useState("00:00:00");
@@ -182,16 +175,20 @@ export default function Admin({ theme = 'dark' }) {
     useEffect(() => {
         if (!isAuthenticated) return;
         
-        // 1. Get GLOBAL Traffic Stats (COUNTER)
-        fetch('https://api.counterapi.dev/v1/energygregory_portfolio/visits/')
-            .then(res => res.json())
-            .then(data => {
-                setTrafficStats({
-                    count: data.count,
-                    updated_at: data.updated_at
-                });
-            })
-            .catch(err => console.error("Stats Error", err));
+        // 1. Live Socket Connection
+        const socket = io(BACKEND_URL);
+        
+        socket.emit('admin_join');
+
+        socket.on('init_data', (data) => {
+             setTrafficStats({ count: data.total, updated_at: new Date() });
+             setRealtimeHits(data.history || []);
+        });
+
+        socket.on('admin_update', (data) => {
+             setTrafficStats(prev => ({ ...prev, count: data.total }));
+             setRealtimeHits(prev => [data.new_hit, ...prev].slice(0, 100)); 
+        });
 
         // 2. Get Device Info
         const parser = new UAParser();
@@ -320,17 +317,17 @@ export default function Admin({ theme = 'dark' }) {
                      <div className="flex border-b border-[#003311] bg-[#002200] p-1 sticky top-0 font-bold">
                         <div className="w-[60px] opacity-70">TIME</div>
                         <div className="flex-1">LOC</div>
-                        <div className="w-[80px] text-right opacity-70">IP</div>
+                        <div className="w-[80px] text-right opacity-70">STS</div>
                     </div>
-                    {/* Since we don't have a backend pushing other users, we show the ADMIN and Simulated Previous Hits if desired, or just Current State */}
-                    {ipData ? (
-                        <div className="flex p-1 border-b border-[#003311] hover:bg-[#002200]">
-                            <div className="w-[60px] opacity-70">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                            <div className="flex-1 truncate">{ipData.city || 'Unknown'}, {ipData.country_code || '??'}</div>
-                            <div className="w-[80px] text-right opacity-70">{ipData.ip}</div>
+                    
+                    {realtimeHits.length > 0 ? realtimeHits.map((hit, i) => (
+                        <div key={i} className="flex p-1 border-b border-[#003311] hover:bg-[#002200]">
+                            <div className="w-[60px] opacity-70">{hit.time ? hit.time.split(' ')[0] : '--:--'}</div>
+                            <div className="flex-1 truncate">{hit.city || 'Unknown'}, {hit.country || 'EARTH'}</div>
+                            <div className="w-[80px] text-right opacity-70 text-[#00ff6a]">LIVE</div>
                         </div>
-                    ) : (
-                        <div className="p-2 text-center italic opacity-50">awaiting signal...</div>
+                    )) : (
+                         <div className="p-2 text-center italic opacity-50">scanning frequencies...</div>
                     )}
                 </div>
             </div>
@@ -345,7 +342,7 @@ export default function Admin({ theme = 'dark' }) {
                 </div>
 
                 <div className="flex-1 relative">
-                    <HalftoneGlobe theme="dark" userLocation={userLocation} />
+                    <HalftoneGlobe theme="dark" markers={realtimeHits} />
                 </div>
                 
                  {/* FOOTER INFO */}

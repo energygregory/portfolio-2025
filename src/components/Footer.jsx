@@ -175,7 +175,7 @@ export default function Footer() {
     <footer
       className={`${
         isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-      } mt-auto relative overflow-hidden`}
+      } mt-auto relative overflow-hidden pb-0 border-t-0`}
       style={{
         fontFamily:
           "'PT Mono', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
@@ -202,8 +202,8 @@ export default function Footer() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-4 relative z-10">
-        {/* Mobile Compact Layout */}
-        <div className="lg:hidden py-2">
+        {/* Mobile Compact Layout - FIX: Reduced Padding to close Green Gap */}
+        <div className="lg:hidden py-[2px] pb-[safe-area-inset-bottom]">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
             <AnimatedLogo className="w-24" />

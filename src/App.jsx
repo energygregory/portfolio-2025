@@ -93,6 +93,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
+import AnalyticsTracker from "./components/AnalyticsTracker";
 import { getDeviceCategory } from "./utils/detectDevice";
 
 // Disable right-click context menu on images (removed for security - ineffective and annoying)
@@ -104,6 +105,7 @@ import { getDeviceCategory } from "./utils/detectDevice";
 //   });
 // }
 import Home from "./pages/Home.jsx";
+import Work from "./pages/Work.jsx";
 import WorkGraphic from "./pages/WorkGraphic.jsx";
 import WorkMerch from "./pages/WorkMerch.jsx";
 import About from "./pages/About.jsx";
@@ -326,20 +328,20 @@ const DEVICE_CONFIGS = {
     heroScale: 1.44,
     heroY: 147,
     animatedOutlineWidth: 2,
-    assetX: 38,
-    assetY: -1920,
-    assetScale: 0.35,
-    assetH: 1.3,
-    assetV: 1.4,
-    assetOutlineThickness: 0.4,
-    assetRotation: 90,
+    assetX: 0,
+    assetY: -200, // Brought visible
+    assetScale: 1,
+    assetH: 1.27,
+    assetV: 0.96,
+    assetOutlineThickness: 0.8,
+    assetRotation: 0,
     navY: 79,
-    widgetScale: 0.7,
-    widgetY: 200,
+    widgetScale: 0.7, // Smaller
+    widgetY: 200, // Lower
     marqueeY: 49,
     marqueeScale: 0.4,
-    marqueeGap: 64, // desktop md:gap-16 (16 * 4 = 64px)
-    marqueeSpeed: 60, // 60s
+    marqueeGap: 64, // desktop md:gap-16
+    marqueeSpeed: 60,
   },
   // Default fallback for mobile
   // mobile: { ... } // moved to top for organization
@@ -734,6 +736,7 @@ function App() {
 
   return (
     <>
+      <AnalyticsTracker />
       <div
         id="app-content"
           className={`min-h-screen relative flex flex-col overflow-x-hidden ${
@@ -942,14 +945,14 @@ function App() {
       )}
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
-      <div className="relative flex-1" style={{ minHeight: '100vh' }}>
+      <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
         {location.pathname === '/' && (
           <Asset1Svg
             theme={theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute left-1/2 top-12 z-20`}
             style={{
-              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) scale(${liveConfig.assetScale ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
+              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
               width: '140%',
               maxWidth: 'none',
               height: 'auto',
@@ -1114,7 +1117,7 @@ function App() {
               {/* LOCALHOST ROUTES - Only accessible locally */}
               {isLocalhost && (
                 <>
-                  <Route path="/work" element={<WorkGraphic />} />
+                  <Route path="/work" element={<Work />} />
                   <Route path="/work/graphic" element={<WorkGraphic />} />
                   <Route path="/work/merch" element={<WorkMerch />} />
                   <Route path="/about" element={<About />} />
@@ -1124,7 +1127,7 @@ function App() {
                   <Route path="/terzo" element={<Terzo />} />
                   <Route path="/williamru" element={<WilliamRu />} />
                   <Route path="/contact" element={<Contact />} />
-                  {/* <Route path="/admin" element={<Admin theme={theme} />} /> */}
+                  <Route path="/admin" element={<Admin theme={theme} />} />
                 </>
               )}
               

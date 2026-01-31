@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
         // Localhost fallback for testing
         if (ip === '::1' || ip === '127.0.0.1') {
             // Random IP for testing if local
-            // ip = '8.8.8.8'; 
+            ip = '8.8.8.8'; 
         }
 
         const geo = geoip.lookup(ip);

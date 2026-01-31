@@ -46,8 +46,8 @@ export default function Work() {
     <main className={`transition-colors duration-500 font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
       
       {/* Mini nav - Adjusted z-index to sit on top of carousel */}
-      <div className="w-full max-w-xl mb-4 flex justify-center z-[60] sticky top-24 sm:top-32">
-        <nav className="flex gap-12 mb-6 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
+      <div className="w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:sticky sm:top-32 sm:left-auto sm:translate-x-0">
+        <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
           <button
             onClick={() => setActiveCategory('merch')}
             className={`font-mono uppercase text-sm tracking-widest pb-3 px-2 transition-colors relative top-[1px] ${
@@ -69,6 +69,7 @@ export default function Work() {
             Graphic Design
           </button>
         </nav>
+        <span className="uppercase tracking-[0] text-[10px] text-neutral-500 mt-1">Selected Works</span>
       </div>
 
       {activeCategory === 'merch' && (
@@ -81,17 +82,18 @@ export default function Work() {
 
       {activeCategory === 'graphic' && (
         <section className="w-full max-w-4xl mt-12 mb-20">
-          <CategoryList items={['LOGOS', 'POSTERS', 'VISUAL DESIGN']} />
+          <CategoryList items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN']} />
         </section>
       )}
 
       {/* Fixed Footer for Merch, Normal for Graphic? 
-          User said "FOOTER STUCK AT THE BOTTOM".
-          Usually footer is static. But if Merch is fixed height, footer must be fixed.
+          User said "TAKE AWAY THE FOOTER IN THE MERCH DESIGN SECTION"
       */}
-      <div className={`w-full ${activeCategory === 'merch' ? 'fixed bottom-0 left-0 z-[60]' : ''}`}>
-        <Footer />
-      </div>
+      {activeCategory !== 'merch' && (
+        <div className="w-full">
+          <Footer />
+        </div>
+      )}
     </main>
   );
 }

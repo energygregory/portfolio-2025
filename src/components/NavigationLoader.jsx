@@ -35,7 +35,8 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange, onIn
       setVisible(true);
 
       const isMobile = window.innerWidth < 768;
-      const NAV_DELAY_MS = isMobile ? 800 : 1400;
+      // Drastically reduced delay as per user request for "efficient" transitions
+      const NAV_DELAY_MS = 50; 
       await new Promise((resolve) => setTimeout(resolve, NAV_DELAY_MS));
 
       // Fade out
@@ -106,12 +107,13 @@ export default function NavigationLoader({ theme = "dark", onVisibleChange, onIn
         targetRef.current = url.pathname + url.search + url.hash;
         setVisible(true);
 
-        // navigate after delay so the logo animation is visible
-        const isMobile = window.innerWidth < 768;
-        const NAV_DELAY_MS = isMobile ? 800 : 1400;
-        setTimeout(() => {
-          if (targetRef.current) navigate(targetRef.current);
-        }, NAV_DELAY_MS);
+        // navigate IMMEDIATELY - User requested INSTANT transition
+        const NAV_DELAY_MS = 0;
+        if (targetRef.current) navigate(targetRef.current);
+        
+        // setTimeout(() => {
+        //   if (targetRef.current) navigate(targetRef.current);
+        // }, NAV_DELAY_MS);
       } catch (err) {
         return;
       }

@@ -36,7 +36,7 @@ export default function About() {
             {/* Photo */}
             <div className="flex justify-center lg:justify-end">
               <img
-                src="/about-photo.jpg"
+                src="/Images/2025/IMG_0801%203.heic"
                 alt="Gregory"
                 className="w-full max-w-md rounded-lg shadow-lg"
               />

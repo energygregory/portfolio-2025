@@ -48,7 +48,7 @@ export default function WorkNav() {
     const isGraphic = location.pathname.endsWith('/graphic') || location.pathname === '/work';
 
     return (
-        <div className="w-full max-w-xl flex justify-center z-[60] fixed top-[110px] sm:top-[140px] left-1/2 -translate-x-1/2 mix-blend-difference">
+        <div className="w-full max-w-xl flex justify-center z-[60] fixed top-[20px] sm:top-[140px] left-1/2 -translate-x-1/2 mix-blend-difference">
           <nav className="flex gap-4 sm:gap-12 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
             <button
               onClick={() => navigate('/work/merch')}

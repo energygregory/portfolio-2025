@@ -45,7 +45,7 @@ export default function WorkGraphic() {
       {/* Spacer for fixed nav handled by pt-48 (12rem approx ~192px) */}
       
       <section className="w-full max-w-4xl mt-0 mb-20 animate-in fade-in duration-500">
-        <CategoryListInternal items={['LOGOS', 'POSTERS', 'VISUAL DESIGN']} />
+        <CategoryListInternal items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN']} />
       </section>
 
       {/* Global Footer will be rendered by App.jsx, which is perfect for this page */}
