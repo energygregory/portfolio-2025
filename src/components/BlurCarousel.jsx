@@ -178,6 +178,7 @@ const CarouselItem = ({ src, containerRef, scrollTop, manualSize, verticalGap, x
              xShift = (1 - easedNorm) * maxShift; 
         }
         
+        // Apply calculated styles
         setStyle({
             filter: `blur(${blur}px)`,
             opacity: opacity,

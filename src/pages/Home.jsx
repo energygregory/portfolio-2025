@@ -385,6 +385,8 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
     if (logoWrapperRef.current) {
       logoWrapperRef.current.style.transform = `translate3d(0, ${logoTranslateY}px, 0) scale(${logoScale})`;
       logoWrapperRef.current.style.opacity = logoOpacity;
+      // Hide completely when invisible to prevent blocking interactions
+      logoWrapperRef.current.style.visibility = logoOpacity <= 0.01 ? 'hidden' : 'visible';
     }
     
     if (clRef.current) {
@@ -431,6 +433,9 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
   const logoGap = useMemo(() => (isMobileOrTablet ? 40 : 80), [isMobileOrTablet]);
   const logoHeight = useMemo(() => (isMobileOrTablet ? 22 : 28), [isMobileOrTablet]);
 
+  // State for desktop hover effect on grid
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
   return (
     <main className={`min-h-screen flex flex-col overflow-x-hidden relative ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
       {/* Light mode video background removed */}
@@ -473,12 +478,12 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         {/* Sticky logo container */}
         <div 
           ref={logoContainerRef}
-          className={`${isMobileOrTablet ? '' : 'sticky top-0'} ${isMobileOrTablet ? '' : 'h-screen'} flex items-center justify-center px-6 relative z-20`}
+          className={`${isMobileOrTablet ? '' : 'sticky top-0 pointer-events-none'} ${isMobileOrTablet ? '' : 'h-screen'} flex items-center justify-center px-6 relative z-20`}
           style={isMobileOrTablet ? { paddingTop: '1vh', minHeight: '45vh' } : {}}
         >
           <div 
             ref={logoWrapperRef}
-            className="w-full relative flex flex-col items-center gap-2"
+            className="w-full relative flex flex-col items-center gap-2 pointer-events-none"
             style={{ 
               maxWidth: isMobileOrTablet ? '90vw' : '800px', 
               maxHeight: isMobileOrTablet ? '80vw' : '800px',
@@ -495,7 +500,14 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
                 themes doesn't remount/restart playback. Both videos play in
                 parallel; we simply fade between them. This assumes the two
                 assets are identical content in different colours (as noted). */}
-            <div className="relative w-full h-auto select-none flex items-center justify-center" style={{ transform: 'scale(1.5)' }}>
+            <div 
+              className="relative w-full h-auto select-none flex items-center justify-center transition-all duration-500 ease-out pointer-events-none" 
+              style={{ 
+                transform: 'scale(1.5)',
+                opacity: !isMobileOrTablet && hoveredIndex !== null ? 0.05 : 1,
+                filter: !isMobileOrTablet && hoveredIndex !== null ? 'blur(2px) grayscale(100%)' : 'none',
+              }}
+            >
               {/* Replace hero videos with loading animation placeholder + outlined logo sequence */}
               <HeroLogoSequence theme={theme} heroScale={heroScale} heroY={heroY} animatedOutlineWidth={animatedOutlineWidth} />
             </div>
@@ -503,13 +515,16 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
             {/* Scrolling marquee of 2025 images - moved inside the sticky container to prevent overlap */}
             {showMarquee && (
               <div 
-                className={`transition-opacity duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${hasScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${isMobileOrTablet ? 'w-full py-24 overflow-hidden relative' : 'absolute left-1/2 -translate-x-1/2 w-screen overflow-hidden'}`}
+                className={`transition-all duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${isMobileOrTablet ? 'w-full py-24 overflow-hidden relative' : 'absolute left-1/2 -translate-x-1/2 w-screen overflow-hidden'}`}
                 style={{ 
                   marginTop: isMobileOrTablet 
                     ? `${(marqueeY ?? 96) + heroY}px` 
                     : undefined,
                   top: isMobileOrTablet ? undefined : '50%',
                   transform: isMobileOrTablet ? undefined : `translate(-50%, calc(-50% + ${(marqueeY ?? 96) + heroY + 150}px))`, // Center X, adjust Y based on config
+                  opacity: hasScrolled ? 0 : (!isMobileOrTablet && hoveredIndex !== null ? 0.05 : 1),
+                  pointerEvents: hasScrolled ? 'none' : 'auto',
+                  filter: !isMobileOrTablet && hoveredIndex !== null && !hasScrolled ? 'blur(2px) grayscale(100%)' : 'none',
                 }}
                 onClick={() => {
                   // Smooth scroll to the images grid with offset
@@ -575,6 +590,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
           style={{ 
             opacity: isMobileOrTablet && !hasScrolled ? 0 : undefined, 
             pointerEvents: isMobileOrTablet && !hasScrolled ? 'none' : 'auto',
+            zIndex: !isMobileOrTablet && hoveredIndex !== null ? 50 : undefined,
             willChange: 'transform, opacity',
             backfaceVisibility: 'hidden',
             transform: 'translateZ(0)',
@@ -616,10 +632,21 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
                           ? 'w-[30px] h-[30px] sm:w-[54px] sm:h-[54px] md:w-[62px] md:h-[62px]'
                           : 'w-[40px] h-[40px] sm:w-[70px] sm:h-[70px] md:w-[82px] md:h-[82px]';
 
+                const isHovered = !isMobileOrTablet && hoveredIndex === idx;
+                const isDimmed = !isMobileOrTablet && hoveredIndex !== null && hoveredIndex !== idx;
+
                 return (
                   <div 
                     key={idx}
-                    className={`${sizeClasses} mx-auto flex items-center justify-center relative`}
+                    className={`${sizeClasses} mx-auto flex items-center justify-center relative transition-all duration-500 ease-out`}
+                    style={{
+                      transform: isHovered ? 'scale(3)' : 'scale(1)',
+                      opacity: isDimmed ? 0.05 : 1,
+                      zIndex: isHovered ? 50 : 1,
+                      filter: isDimmed ? 'blur(2px) grayscale(100%)' : 'none',
+                    }}
+                    onMouseEnter={() => !isMobileOrTablet && setHoveredIndex(idx)}
+                    onMouseLeave={() => !isMobileOrTablet && setHoveredIndex(null)}
                     onTouchStart={(e) => handleTouchStart(idx, src, e)}
                     onTouchEnd={handleTouchEnd}
                     onTouchCancel={handleTouchEnd}
@@ -628,9 +655,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
                     <img 
                       src={src} 
                       alt=""
-                      className={`max-w-full max-h-full object-contain select-none transition-transform duration-500 ${
-                        !isPhone ? 'hover:scale-110' : ''
-                      }`}
+                      className="max-w-full max-h-full object-contain select-none"
                       loading={idx < 18 ? "eager" : "lazy"}
                       decoding="async"
                       fetchpriority={idx < 12 ? "high" : "low"}
@@ -667,7 +692,13 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
       <div className="w-full h-20 sm:h-28 md:h-40"></div>
 
       {/* Clientele Section - Properly centered grid layout */}
-      <section className="w-full mt-24 sm:mt-0 px-6">
+      <section 
+        className="w-full mt-24 sm:mt-0 px-6 transition-all duration-500 ease-out"
+        style={{
+          opacity: !isMobileOrTablet && hoveredIndex !== null ? 0.05 : 1,
+          filter: !isMobileOrTablet && hoveredIndex !== null ? 'blur(2px) grayscale(100%)' : 'none',
+        }}
+      >
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <h3
@@ -848,7 +879,7 @@ function HeroLogoSequence({ theme = 'dark', heroScale = 1, heroY = 0, animatedOu
   const strokeColor = theme === 'dark' ? '#4d4d4d' : '#000000';
 
   return (
-    <div style={{ width: '100%', maxWidth: 360, margin: '0 auto' }}>
+    <div style={{ width: '100%', maxWidth: 360, margin: '0 auto', pointerEvents: 'none' }}>
       {/* Render AnimatedLogo always visible, outline-only, correct stroke color */}
       <div className="flex flex-col items-center gap-3" style={{ transform: `translateZ(0) translateY(${heroY}px) scale(${heroScale})`, transformOrigin: '50% 50%' }}>
         <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} strokeWidth={animatedOutlineWidth} />
