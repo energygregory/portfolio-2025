@@ -946,7 +946,7 @@ function App() {
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden flex flex-col" style={{ minHeight: '100vh' }}>
-        {(location.pathname === '/' || ((location.pathname === '/work' || location.pathname.startsWith('/work/')) && viewMode === 'mobile')) && (
+        {(location.pathname === '/' || location.pathname === '/about' || ((location.pathname === '/work' || location.pathname.startsWith('/work/')) && viewMode === 'mobile')) && (
           <Asset1Svg
             theme={theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
