@@ -338,7 +338,7 @@ export default function Work() {
   return (
     // Fixed page size for Merch (h-screen overflow-hidden) to prevent body scroll
     // Graphic Design allows scrolling
-    <main className={`transition-colors duration-500 font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+    <main className={`transition-colors duration-500 font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'w-full flex-grow'}`}>
       
       {/* Mini nav - Adjusted z-index to sit on top of carousel */}
       <div 
@@ -390,9 +390,9 @@ export default function Work() {
           </section>
         )}
 
-        {/* Footer should be at the bottom of the flex container */}
-        <div className="w-full mt-auto">
-          <Footer />
+        {/* Footer should be at the bottom of the flex container - Zero margins */}
+        <div className="w-full mt-auto mb-0 bg-transparent h-0 overflow-visible">
+          {/* Footer removed here, relying on App.jsx global footer */}
         </div>
       </div>
     </main>

@@ -945,7 +945,7 @@ function App() {
       )}
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
-      <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
+      <div className="relative flex-1 overflow-hidden flex flex-col" style={{ minHeight: '100vh' }}>
         {(location.pathname === '/' || ((location.pathname === '/work' || location.pathname.startsWith('/work/')) && viewMode === 'mobile')) && (
           <Asset1Svg
             theme={theme}
@@ -1096,7 +1096,7 @@ function App() {
       )}
         
         {/* Main content - above Asset1 */}
-        <main className={`relative z-10 p-4 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'}`}>
+        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >
@@ -1169,7 +1169,7 @@ function App() {
       </div> */}
 
       {/* Hide global footer on Merch page and Work page (which manages its own footer) */}
-      {!location.pathname.startsWith('/work') && (
+      {!location.pathname.includes('/work/merch') && (
         <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
           <Footer />
         </Suspense>

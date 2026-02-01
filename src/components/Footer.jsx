@@ -175,7 +175,7 @@ export default function Footer() {
     <footer
       className={`${
         isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-      } mt-auto relative overflow-hidden pb-0 border-t-0`}
+      } w-full relative overflow-hidden pb-0 border-t-0`}
       style={{
         fontFamily:
           "'PT Mono', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
@@ -201,7 +201,7 @@ export default function Footer() {
       <div className={`absolute inset-0 ${isDark ? "bg-black/70" : "bg-white/90"}`} />
 
       {/* Content */}
-      <div className="w-full lg:max-w-7xl lg:mx-auto lg:px-6 py-4 relative z-10">
+      <div className="w-full lg:max-w-7xl lg:mx-auto lg:px-6 py-4 relative z-10 box-border">
         {/* Mobile Compact Layout - FIX: Reduced Padding to close Green Gap */}
         <div className="lg:hidden py-[2px] pb-[safe-area-inset-bottom] w-full">
           <div className="flex items-center justify-between gap-4 px-4">
