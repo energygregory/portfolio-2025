@@ -7,10 +7,14 @@ import Footer from "../components/Footer";
 const LogosContent = () => {
     const logos = [
       "/Images/2025/LOGOS/3.png",
-      "/Images/2025/LOGOS/Asset 3.svg",
+      "/Images/2025/LOGOS/TERZO.png",
       "/Images/2025/LOGOS/BRAND-ONE.svg", 
       "/Images/2025/LOGOS/black.png",
-      "/Images/2025/LOGOS/flyhigh.svg"
+      "/Images/2025/LOGOS/flyhigh.svg",
+      "/Images/2025/LOGOS/GRUB2.png",
+      "/Images/2025/LOGOS/William Ru.png",
+      "/Images/2025/LOGOS/bubble logo.png",
+      "/Images/2025/LOGOS/no background black 2.png"
     ];
 
     // State for mobile long-press preview
@@ -126,7 +130,57 @@ const LogosContent = () => {
       </div>
     );
 };
-const PostersContent = () => <div className="p-4 text-center">Posters content gallery will go here</div>;
+const PostersContent = () => {
+    // Poster images from /Images/2025/POSTERS
+    // Order based on visual fan arrangement (Left to Right)
+    const posters = [
+      "/Images/2025/POSTERS/po$t00.jpg",
+      "/Images/2025/POSTERS/food0.jpg",
+      "/Images/2025/POSTERS/po$t.jpg",
+      "/Images/2025/POSTERS/filter announcer.jpg",
+      "/Images/2025/POSTERS/po$t0.jpg",
+    ];
+
+    return (
+      <div className="w-full flex items-center justify-center py-20 overflow-hidden min-h-[60vh]">
+        <div className="relative w-full max-w-[1200px] h-[400px] md:h-[600px] flex items-center justify-center">
+            {posters.map((src, i) => {
+                const total = posters.length;
+                const mid = (total - 1) / 2;
+                const indexVar = i - mid; // -2, -1, 0, 1, 2
+                
+                // Fan calculations
+                const rotate = indexVar * 12; // Degrees of rotation
+                
+                // Z-index: simple stack left to right
+                const zIndex = 10 + i;
+
+                return (
+                    <div 
+                        key={i}
+                        className="absolute w-[45vw] md:w-[340px] aspect-[0.7] shadow-xl md:shadow-2xl transition-all duration-500 ease-out hover:scale-110 hover:z-[100] group origin-center"
+                        style={{
+                            left: '50%',
+                            top: '50%',
+                            // Use percentage-based translation relative to the card itself for responsiveness
+                            // translateX(indexVar * 45%) creates the overlap
+                            transform: `translate(-50%, -50%) translateX(${indexVar * 45}%) translateY(${Math.abs(indexVar) * 8}%) rotate(${rotate}deg)`,
+                            zIndex: zIndex,
+                        }}
+                    >
+                         <img 
+                            src={src} 
+                            alt={`Poster ${i + 1}`}
+                            className="w-full h-full object-cover brightness-90 group-hover:brightness-100 transition-all duration-300 rounded-[2px]"
+                            loading="lazy"
+                         />
+                    </div>
+                )
+            })}
+        </div>
+      </div>
+    );
+};
 const VisualDesignContent = () => <div className="p-4 text-center">Visual Design content gallery will go here</div>;
 const PackagingContent = () => <div className="p-4 text-center">Packaging Design content gallery will go here</div>;
 const TechpackContent = () => <div className="p-4 text-center">Techpack Design content gallery will go here</div>;
