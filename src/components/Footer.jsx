@@ -201,10 +201,10 @@ export default function Footer() {
       <div className={`absolute inset-0 ${isDark ? "bg-black/70" : "bg-white/90"}`} />
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-4 relative z-10">
+      <div className="w-full lg:max-w-7xl lg:mx-auto lg:px-6 py-4 relative z-10">
         {/* Mobile Compact Layout - FIX: Reduced Padding to close Green Gap */}
-        <div className="lg:hidden py-[2px] pb-[safe-area-inset-bottom]">
-          <div className="flex items-center justify-between gap-4">
+        <div className="lg:hidden py-[2px] pb-[safe-area-inset-bottom] w-full">
+          <div className="flex items-center justify-between gap-4 px-4">
             {/* Logo */}
             <AnimatedLogo className="w-24" />
             

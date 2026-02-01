@@ -946,17 +946,17 @@ function App() {
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden" style={{ minHeight: '100vh' }}>
-        {location.pathname === '/' && (
+        {(location.pathname === '/' || ((location.pathname === '/work' || location.pathname.startsWith('/work/')) && viewMode === 'mobile')) && (
           <Asset1Svg
             theme={theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
-            className={`pointer-events-none absolute left-1/2 top-12 z-20`}
+            className={`pointer-events-none absolute left-1/2 top-12 ${location.pathname === '/' ? 'z-20' : 'z-0'}`}
             style={{
               transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
               width: '140%',
               maxWidth: 'none',
               height: 'auto',
-              opacity: assetHidden ? 0 : 1,
+              opacity: (location.pathname === '/' && assetHidden) ? 0 : 1,
               transition: 'opacity 300ms ease, transform 300ms ease',
               willChange: 'opacity, transform',
             }}
@@ -1118,8 +1118,9 @@ function App() {
               {isLocalhost && (
                 <>
                   <Route path="/work" element={<Work />} />
-                  <Route path="/work/graphic" element={<WorkGraphic />} />
-                  <Route path="/work/merch" element={<WorkMerch />} />
+                  <Route path="/work/:section" element={<Work />} />
+                  {/* <Route path="/work/graphic" element={<WorkGraphic />} /> */}
+                  {/* <Route path="/work/merch" element={<WorkMerch />} /> */}
                   <Route path="/about" element={<About />} />
                   <Route path="/around" element={<Around />} />
                   <Route path="/flyhigh" element={<FlyHigh />} />
@@ -1168,7 +1169,7 @@ function App() {
       </div> */}
 
       {/* Hide global footer on Merch page and Work page (which manages its own footer) */}
-      {!location.pathname.includes('/work/merch') && location.pathname !== '/work' && (
+      {!location.pathname.startsWith('/work') && (
         <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
           <Footer />
         </Suspense>
