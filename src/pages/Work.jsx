@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
@@ -311,14 +311,23 @@ const LogosContent = () => {
     );
 };
 const PostersContent = () => {
-    // Poster images from /Images/2025/POSTERS
-    const posters = [
-      "/Images/2025/POSTERS/post00.jpg",
-      "/Images/2025/POSTERS/food0.jpg",
-      "/Images/2025/POSTERS/post.jpg",
-      "/Images/2025/POSTERS/filter-announcer.jpg",
-      "/Images/2025/POSTERS/post0.jpg",
+    // Poster images with Dimensions for Masonry Layout
+    // Width is fixed by column width (TILE_W), Height is calculated by aspect ratio
+    const posterData = [
+      { src: "/Images/2025/POSTERS/post00.jpg", aspectRatio: 0.707 }, // Landscape
+      { src: "/Images/2025/POSTERS/food0.jpg", aspectRatio: 1.777 },  // Tall
+      { src: "/Images/2025/POSTERS/post.jpg", aspectRatio: 0.707 },
+      { src: "/Images/2025/POSTERS/filter-announcer.jpg", aspectRatio: 1.777 },
+      { src: "/Images/2025/POSTERS/post0.jpg", aspectRatio: 0.707 },
+      { src: "/Images/2025/POSTERS/snap1.jpg", aspectRatio: 1.25 },   // 4:5
+      { src: "/Images/2025/POSTERS/snap2.jpg", aspectRatio: 1.25 },
+      { src: "/Images/2025/POSTERS/ooo_final.png", aspectRatio: 1.777 },
+      { src: "/Images/2025/POSTERS/thank_you.png", aspectRatio: 1.777 },
     ];
+
+    const posterCount = posterData.length;
+    const oooIndex = 7;
+    const thankYouIndex = 8;
 
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
@@ -330,47 +339,127 @@ const PostersContent = () => {
 
     // --- DESKTOP INFINITE GRID STATE ---
     // Start offset at (0,0) or centered? (0,0) works for infinite.
-    const [offset, setOffset] = useState({ x: 0, y: 0 }); 
-    const [isDragging, setIsDragging] = useState(false);
-    const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+    // Use Ref for animation values to prevent React render stutter
+    const stateRef = useRef({
+        offset: { x: 0, y: 0 },
+        animTime: 0,
+        lastPos: { x: 0, y: 0 },
+        isDragging: false
+    });
+
+    // Force render state for the animation loop
+    const [tick, setTick] = useState(0);
     const [expandedSrc, setExpandedSrc] = useState(null);
     const containerRef = useRef(null);
 
     // Grid Params
     const TILE_W = 300;
-    const TILE_H = 420;
-    const GAP = 40;
+    // TILE_H is now variable per item
+    const GAP_X = 2; // Very tight horizontal spacing
+    const GAP_Y = 2; // Matches GAP_X as requested ("vertical spacing... same amount")
+    const ANIM_SPEED = 0.05; // Even smoother slow drift
+
+    // Unique Randomized Sequence Generator
+    // Guarantees no vertical duplicates and respects adjacency rules for specific posters
+    const randomizedSequence = useMemo(() => {
+        const seqLength = 100; // Long enough to avoid obvious patterns
+        const seq = [];
+        let last = -1;
+        
+        for (let i = 0; i < seqLength; i++) {
+            // Available indices: 0 to posterCount - 1
+            const candidates = Array.from({ length: posterCount }, (_, k) => k).filter(idx => {
+                // Rule 1: No immediate vertical duplicate
+                if (idx === last) return false;
+                
+                // Rule 2: ooo_final (7) and thank_you (8) should not be adjacent
+                if ((last === oooIndex && idx === thankYouIndex) || (last === thankYouIndex && idx === oooIndex)) return false;
+                
+                return true;
+            });
+            
+            // Fallback
+            if (candidates.length === 0) candidates.push((last + 1) % posterCount);
+            
+            const pick = candidates[Math.floor(Math.random() * candidates.length)];
+            seq.push(pick);
+            last = pick;
+        }
+        return seq;
+    }, [posterCount]);
+
+    // Pre-calculate Sequence Heights for Masonry
+    // Map sequence index -> cumulative top offset
+    const sequenceLayout = useMemo(() => {
+        const layout = [];
+        let currentY = 0;
+        for(let i = 0; i < randomizedSequence.length; i++) {
+            const idx = randomizedSequence[i];
+            const itemR = posterData[idx].aspectRatio;
+            const itemH = TILE_W * itemR;
+            
+            layout.push({
+                y: currentY,
+                height: itemH,
+                index: idx
+            });
+            
+            currentY += itemH + GAP_Y;
+        }
+        return { items: layout, totalHeight: currentY };
+    }, [randomizedSequence, posterData, TILE_W, GAP_Y]);
 
     // Gradient Control State
     const [gradientStart, setGradientStart] = useState(15); // Percentage
     const [gradientEnd, setGradientEnd] = useState(50); // Percentage
     
+    // Single Loop for Animation + Render
+    useEffect(() => {
+        if (isMobile) return;
+        
+        let frameId;
+        const loop = () => {
+            stateRef.current.animTime += ANIM_SPEED;
+            setTick(t => t + 1); // Trigger render at 60fps
+            frameId = requestAnimationFrame(loop);
+        };
+        
+        frameId = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(frameId);
+    }, [isMobile]);
+
     // Mouse/Touch Handlers for Desktop Pan
+    // These update refs directly to avoid fighting the render loop
     const handleMouseDown = (e) => {
         if(isMobile) return;
-        setIsDragging(true);
-        setLastPos({ x: e.clientX, y: e.clientY });
+        stateRef.current.isDragging = true;
+        stateRef.current.lastPos = { x: e.clientX, y: e.clientY };
         e.preventDefault(); // Prevent text selection
     };
 
     const handleMouseMove = (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - lastPos.x;
-        const dy = e.clientY - lastPos.y;
-        setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-        setLastPos({ x: e.clientX, y: e.clientY });
+        if (!stateRef.current.isDragging) return;
+        const dx = e.clientX - stateRef.current.lastPos.x;
+        const dy = e.clientY - stateRef.current.lastPos.y;
+        
+        stateRef.current.offset.x += dx;
+        stateRef.current.offset.y += dy;
+        stateRef.current.lastPos = { x: e.clientX, y: e.clientY };
+        // No setState here! The loop picks it up.
     };
 
     const handleMouseUp = () => {
-        setIsDragging(false);
+        stateRef.current.isDragging = false;
     };
 
     const handleWheel = (e) => {
-        // Optional: Map scroll wheel to pan as well for "scroll to explore"
+        // Optional: Map scroll wheel to pan
         const dx = -e.deltaX;
         const dy = -e.deltaY;
-        setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+        stateRef.current.offset.x += dx;
+        stateRef.current.offset.y += dy;
     };
+
 
     if (isMobile) {
         // Mobile: Horizontal Scroll Snap
@@ -462,69 +551,154 @@ const PostersContent = () => {
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       >
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      >
         <div className="w-full h-full">
         {/* Render visible tiles */}
         {(() => {
+             // Read current values from Ref
+             const currentOffset = stateRef.current.offset;
+             const currentAnimTime = stateRef.current.animTime;
+             const isDragging = stateRef.current.isDragging;
+
              // We render a grid relative to the offset.
-             // Tile (c, r) pos = (c * itemW + offset.x, r * itemH + offset.y)
+             // Tile (c, r) pos = (c * itemW + offset.x, masonry_y + offset.y)
              // We want to find min/max C and R such that tiles are visible.
              // Viewport W/H:
              // Since it's fixed w-screen h-screen, use window dimensions or ref
              const vpW = typeof window !== 'undefined' ? window.innerWidth : 1500;
              const vpH = typeof window !== 'undefined' ? window.innerHeight : 1000;
              
-             const itemW = TILE_W + GAP;
-             const itemH = TILE_H + GAP;
+             const itemW = TILE_W + GAP_X;
              
-             // Visible range in "grid coordinates"
+             // Visible range in columns
              // left_edge_x = c * itemW + offset.x > -TILE_W
-             // => c * itemW > -TILE_W - offset.x
-             // => c > (-TILE_W - offset.x) / itemW
-             
-             const minCol = Math.floor((-offset.x - TILE_W) / itemW);
-             const maxCol = Math.ceil((-offset.x + vpW) / itemW);
-             const minRow = Math.floor((-offset.y - TILE_H) / itemH);
-             const maxRow = Math.ceil((-offset.y + vpH) / itemH);
+             const minCol = Math.floor((-currentOffset.x - TILE_W) / itemW);
+             const maxCol = Math.ceil((-currentOffset.x + vpW) / itemW);
              
              const tiles = [];
              for (let c = minCol; c <= maxCol; c++) {
-                 for (let r = minRow; r <= maxRow; r++) {
-                     // Get Image Index deterministically based on grid coords
-                     // Use modulo to cycle through posters
-                     // (c + r) can be negative, so we handle that
-                     let index = (c + r) % posters.length;
-                     if (index < 0) index += posters.length;
+                 // Ambient Drift: Even columns move down, Odd columns move up
+                 // This happens constantly regardless of user interaction
+                 const colDrift = (c % 2 === 0 ? 1 : -1) * currentAnimTime;
+                 
+                 // Effective Vertical Offset for this column combines user drag (offset.y) plus ambient drift
+                 const effectiveOffsetY = currentOffset.y + colDrift;
+
+                 // Masonry Logic:
+                 // We need to render the Sequence repeatedly to cover the vertical space
+                 // Coordinate Y = (LoopIndex * TotalSeqHeight) + ItemY + visibleOffset
+                 
+                 // Find which "Loops" of the sequence are visible
+                 // Visible Range: 0 to vpH relative to screen
+                 // Item Top Relative to Screen: Y + effectiveOffsetY
+                 // Visible if: Y + effectiveOffsetY + Height > 0  AND  Y + effectiveOffsetY < vpH
+                 // => Y > -effectiveOffsetY - Height  AND  Y < vpH - effectiveOffsetY
+                 
+                 // Since TotalSeqHeight is large, we probably only span 1 or 2 loops.
+                 // Let's iterate loops that are potentially visible.
+                 
+                 const totalH = sequenceLayout.totalHeight;
+                 
+                 // Determine column offset into the random sequence
+                 const colSeqOffset = (Math.abs(c) * 17) % randomizedSequence.length;
+                 
+                 // Base Start Point for this column (Simulate infinite scroll by modulo offset)
+                 // Shift the sequence vertically based on column index for randomness
+                 // Instead of shifting the sequence index, we shift the Y position?
+                 // No, shifting sequence index is safer for masonry layout integrity.
+                 // We already shifted sequence logic via colSeqOffset ??
+                 // No, SequenceLayout is fixed. We just need to pick the items.
+                 // Wait, SequenceLayout is 1 array.
+                 // To randomise columns, we should pick a start 'index' in that array.
+                 // But the heights are variable! Index 5 starts at Y=500.
+                 // If we start at index 5, does Y become 0?
+                 // If we maintain the fixed sequence, the pattern repeats every 100 items.
+                 // That's fine.
+                 
+                 // To offset columns vertically so they don't align:
+                 // Add a random fixed vertical offset per column.
+                 
+                 const colRandomYOffset = (Math.sin(c * 123.45) * 5000) % totalH;
+
+                 // Loop start/end calc
+                 // GlobalY (infinite) relative to effectiveOffsetY = 0
+                 // visible_min_y = -effectiveOffsetY - 1000 (buffer)
+                 // visible_max_y = -effectiveOffsetY + vpH + 1000 (buffer)
+                 
+                 const visibleMinY = -effectiveOffsetY - 800; // Increased buffer for safety
+                 const visibleMaxY = -effectiveOffsetY + vpH + 800;
+                 
+                 // Calculate which "Macro Blocks" (seq repetitions) are visible
+                 const minBlock = Math.floor(visibleMinY / totalH);
+                 const maxBlock = Math.floor(visibleMaxY / totalH);
+                 
+                 for (let b = minBlock; b <= maxBlock; b++) {
+                     const blockY = b * totalH; // Y Start of this repetition
                      
-                     // Stagger/Variations?
-                     // Let's just keep it simple grid for now as requested.
+                     // Inside this block, check which items are visible
+                     // We can iterate all 100 items? 100 is small enough.
+                     // Or binary search? Linear scan 100 items is fast for JS.
                      
-                     tiles.push(
-                         <div
-                            key={`${c}-${r}`}
-                            onClick={() => {
-                                if(!isDragging) setExpandedSrc(posters[index]);
-                            }}
-                            className="absolute hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2"
-                            style={{
-                                left: c * itemW + offset.x,
-                                top: r * itemH + offset.y,
-                                width: TILE_W,
-                                height: TILE_H,
-                                // Debug: backgroundColor: 'rgba(255,0,0,0.1)'
-                            }}
-                         >
-                            <img 
-                                src={posters[index]} 
-                                className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
-                                loading="lazy"
-                            />
-                         </div>
-                     )
+                     for (let i = 0; i < sequenceLayout.items.length; i++) {
+                         // Apply Column Shift (Circular Shift of the sequence indices)
+                         // To make columns look different, we use (i + colSeqOffset) % length
+                         // BUT logic must match the layout!
+                         // If we change the order, the layout (y positions) calculated in sequenceLayout is invalid
+                         // because height depends on content.
+                         // Correct approach: Use the SAME sequence layout, but shift the Y-position of the entire column using `colRandomYOffset`.
+                         // AND maybe use different sequence orders per column?
+                         // If we want perfect masonry, we calculated `sequenceLayout` based on `randomizedSequence`.
+                         // `randomizedSequence` was 1 array.
+                         // If we want different columns, we'd need different sequences.
+                         // Compromise: Use the SINGLE sequence for all columns, but Offset it vertically heavily.
+                         // Since it's 100 items long with random distribution, just shifting Y is enough to mask the repetition across columns.
+                         
+                        const item = sequenceLayout.items[i];
+                        // Apply randomness offset (colRandomYOffset)
+                        // Wrapping inside the totalH?
+                        // Adjusted Item Y = (item.y + colRandomYOffset) % totalH.
+                        // But that breaks the stacking if it wraps.
+                        
+                        // Simply adding `colRandomYOffset` to the `blockY` logic is weird.
+                        // Let's stick to simple "Same Sequence, Different Start Block / Vertical Offset".
+                        // Actually, just `effectiveOffsetY` handles the drag.
+                        // We need a constrained randomness.
+                        // Let's just render the sequence as is, shifted by `colRandomYOffset`.
+                        
+                        const absoluteY = blockY + item.y + colRandomYOffset;
+                        
+                        // If we shift simply, we might get gaps at the wrap point?
+                        // No, because we render infinite blocks.
+                        // Layout: [Block][Block][Block]...
+                        // If we shift the whole column by 500px, it just slides the infinite strip. Safe.
+                         
+                        if (absoluteY + item.height > visibleMinY && absoluteY < visibleMaxY) {
+                             tiles.push(
+                                 <div
+                                    key={`c${c}-b${b}-i${i}`} // Unique key
+                                    onClick={() => {
+                                        if(!isDragging) setExpandedSrc(posterData[item.index].src);
+                                    }}
+                                    className="absolute will-change-transform" 
+                                    style={{
+                                        // Use translate3d for hardware accel
+                                        transform: `translate3d(${c * itemW + currentOffset.x}px, ${absoluteY + effectiveOffsetY}px, 0)`,
+                                        top: 0,
+                                        left: 0,
+                                        width: TILE_W,
+                                        height: item.height, // Variable Height!
+                                    }}
+                                 >
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <img 
+                                            src={posterData[item.index].src} 
+                                            className="w-full h-full block pointer-events-none select-none object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                 </div>
+                             );
+                        }
+                     }
                  }
              }
              return tiles;
@@ -622,10 +796,8 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               }`}
               style={{
                 // Move up higher when selected to replace the mini-nav area
-                // UPDATED: Adjusted to -110px to move it further up (was -120px, moving down slightly means less negative)
-                // Actually user said "BRING DOWN THE TEXT ... SLIGHTLY". So -120px -> -110px works.
-                // And "MOVE IT SLIGHTLY TO THE RIGHT". 0px -> 24px.
-                top: selectedItem ? '-106px' : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
+                // UPDATED: Adjusted to -210px to move it substantially higher (was -185px)
+                top: selectedItem ? '-210px' : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 left: selectedItem ? '24px' : '50%',
                 transform: selectedItem 
                   ? 'translate(0, 0) scale(0.85)' 
