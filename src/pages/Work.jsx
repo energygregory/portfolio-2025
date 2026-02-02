@@ -12,14 +12,24 @@ const LogosContent = () => {
       "/Images/2025/LOGOS/black.png",
       "/Images/2025/LOGOS/flyhigh.svg",
       "/Images/2025/LOGOS/GRUB2.png",
-      "/Images/2025/LOGOS/William Ru.png",
-      "/Images/2025/LOGOS/bubble logo.png",
-      "/Images/2025/LOGOS/no background black 2.png"
+      "/Images/2025/LOGOS/en garde.svg",
+      "/Images/2025/LOGOS/bubble logo 3.png",
+      "/Images/2025/LOGOS/del marque.png",
+      "/Images/2025/LOGOS/red logo full png without text.png"
     ];
 
-    // State for mobile long-press preview
+    // State for mobile long-press preview and desktop scaling
     const [pressedImage, setPressedImage] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
+    // Hardcoded scales per user request
+    const logoScales = [
+        1.4, 1.3, 1.8, 1.5, 1.15, // Row 1
+        1.5, 1.9, 1.7, 1.45, 1.85  // Row 2
+    ];
+    const globalScale = 1.2;
+    // Spacing control (Padding)
+    const [paddingX, setPaddingX] = useState(0); 
+    const [paddingY, setPaddingY] = useState(0);
 
     useEffect(() => {
        const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -39,17 +49,54 @@ const LogosContent = () => {
   
     return (
       <div className="w-full flex flex-col items-center">
-         {/* Grid with faint inner lines - Reduced opacity (75% of previous) */}
-         <div className="w-full grid grid-cols-3 gap-[1px] bg-neutral-900/[0.0375] dark:bg-white/[0.075]">
+         
+         {/* Spacing Control Sliders */}
+         <div className="hidden md:flex flex-row items-center justify-end w-full max-w-[1800px] px-8 py-4 gap-8">
+            <div className="flex flex-col items-end space-y-2">
+                <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Horizontal Spacing: {paddingX}px</span>
+                <input 
+                type="range" 
+                min="0" 
+                max="60" 
+                step="1" 
+                value={paddingX}
+                onChange={(e) => setPaddingX(parseInt(e.target.value))}
+                className="w-32 h-1 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                />
+            </div>
+            <div className="flex flex-col items-end space-y-2">
+                <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Vertical Spacing: {paddingY}px</span>
+                <input 
+                type="range" 
+                min="0" 
+                max="60" 
+                step="1" 
+                value={paddingY}
+                onChange={(e) => setPaddingY(parseInt(e.target.value))}
+                className="w-32 h-1 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                />
+            </div>
+         </div>
+
+         {/* Grid with faint inner lines - Fixed gap for constant line thickness */}
+         <div 
+             className="w-full grid grid-cols-3 md:grid-cols-5 gap-[1px] md:gap-[2px] bg-neutral-900/[0.0375] dark:bg-white/[0.075]"
+             style={{ 
+                 transform: `scale(${globalScale})`, 
+                 transformOrigin: 'top center'
+             }}
+         >
             {logos.map((src, i) => (
               <div 
                 key={i} 
-                className="relative aspect-square flex items-center justify-center bg-white dark:bg-black select-none touch-none"
+                className="relative group aspect-square md:aspect-[4/3] flex items-center justify-center bg-white dark:bg-black select-none touch-none"
                 onContextMenu={(e) => e.preventDefault()}
               >
-                   {/* Tap target wrapper - Fits content more closely but still allows interaction */}
+                  
+                   {/* Tap target wrapper - Padding applied here for spacing without affecting grid lines */}
                    <div 
-                      className="w-full h-full p-8 flex items-center justify-center"
+                      className="w-full h-full p-8 md:p-8 flex items-center justify-center"
+                      style={!isMobile ? { padding: `${32 + paddingY}px ${32 + paddingX}px` } : {}}
                       onTouchStart={(e) => {
                          // Stop propagation to prevent grid scrolling issues? 
                          // No, we want to allow scrolling if not pressed.
@@ -60,7 +107,7 @@ const LogosContent = () => {
                    >
                         {/* Light Mode: Mask with Black */}
                         <div 
-                            className="block dark:hidden w-full h-full bg-black pointer-events-none"
+                            className="block dark:hidden w-full h-full bg-black pointer-events-none transition-transform duration-200"
                             style={{
                             maskImage: `url('${src}')`,
                             maskSize: 'contain',
@@ -70,14 +117,14 @@ const LogosContent = () => {
                             WebkitMaskSize: 'contain',
                             WebkitMaskRepeat: 'no-repeat',
                             WebkitMaskPosition: 'center',
-                            // Reduce size of BRAND-ONE.svg specifically
-                            transform: src.includes("BRAND-ONE.svg") ? "scale(0.85)" : "none"
+                            // Apply individual scale only
+                            transform: `scale(${logoScales[i] || 1})`
                             }}
                         />
 
                         {/* Dark Mode: Mask with #4d4d4d */}
                         <div 
-                            className="hidden dark:block w-full h-full bg-[#4d4d4d] pointer-events-none"
+                            className="hidden dark:block w-full h-full bg-[#4d4d4d] pointer-events-none transition-transform duration-200"
                             style={{
                             maskImage: `url('${src}')`,
                             maskSize: 'contain',
@@ -87,17 +134,22 @@ const LogosContent = () => {
                             WebkitMaskSize: 'contain',
                             WebkitMaskRepeat: 'no-repeat',
                             WebkitMaskPosition: 'center',
-                            // Reduce size of BRAND-ONE.svg specifically
-                            transform: src.includes("BRAND-ONE.svg") ? "scale(0.85)" : "none"
+                            // Apply individual scale only
+                            transform: `scale(${logoScales[i] || 1})`
                             }}
                         />
                    </div>
               </div>
             ))}
             {/* Fill empty cells */}
-            {[...Array(3 - (logos.length % 3))].map((_, i) => logos.length % 3 !== 0 && (
-                <div key={`empty-${i}`} className="bg-white dark:bg-black" />
-            ))}
+            {(() => {
+                const cols = isMobile ? 3 : 5;
+                const remainder = logos.length % cols;
+                const emptyCells = remainder === 0 ? 0 : cols - remainder;
+                return [...Array(emptyCells)].map((_, i) => (
+                    <div key={`empty-${i}`} className="bg-white dark:bg-black" />
+                ));
+            })()}
          </div>
 
          {/* Mobile pressed image popup - fixed overlay */}
