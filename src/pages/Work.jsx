@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
 import Footer from "../components/Footer";
@@ -312,13 +313,12 @@ const LogosContent = () => {
 };
 const PostersContent = () => {
     // Poster images from /Images/2025/POSTERS
-    // Order based on visual fan arrangement (Left to Right)
     const posters = [
-      "/Images/2025/POSTERS/po$t00.jpg",
+      "/Images/2025/POSTERS/post00.jpg",
       "/Images/2025/POSTERS/food0.jpg",
-      "/Images/2025/POSTERS/po$t.jpg",
-      "/Images/2025/POSTERS/filter announcer.jpg",
-      "/Images/2025/POSTERS/po$t0.jpg",
+      "/Images/2025/POSTERS/post.jpg",
+      "/Images/2025/POSTERS/filter-announcer.jpg",
+      "/Images/2025/POSTERS/post0.jpg",
     ];
 
     const [isMobile, setIsMobile] = useState(false);
@@ -329,19 +329,55 @@ const PostersContent = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Desktop: Fan Layout with Interaction
-    // We maintain the fan look but allow clicking to cycle through items
-    const [activeIndex, setActiveIndex] = useState(2); // Start with center item (index 2)
+    // --- DESKTOP INFINITE GRID STATE ---
+    // Start offset at (0,0) or centered? (0,0) works for infinite.
+    const [offset, setOffset] = useState({ x: 0, y: 0 }); 
+    const [isDragging, setIsDragging] = useState(false);
+    const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+    const [expandedSrc, setExpandedSrc] = useState(null);
+    const containerRef = useRef(null);
+
+    // Grid Params
+    const TILE_W = 300;
+    const TILE_H = 420;
+    const GAP = 40;
+
+    // Gradient Control State
+    const [gradientStart, setGradientStart] = useState(15); // Percentage
+    const [gradientEnd, setGradientEnd] = useState(50); // Percentage
+    
+    // Mouse/Touch Handlers for Desktop Pan
+    const handleMouseDown = (e) => {
+        if(isMobile) return;
+        setIsDragging(true);
+        setLastPos({ x: e.clientX, y: e.clientY });
+        e.preventDefault(); // Prevent text selection
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - lastPos.x;
+        const dy = e.clientY - lastPos.y;
+        setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+        setLastPos({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    const handleWheel = (e) => {
+        // Optional: Map scroll wheel to pan as well for "scroll to explore"
+        const dx = -e.deltaX;
+        const dy = -e.deltaY;
+        setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+    };
 
     if (isMobile) {
         // Mobile: Horizontal Scroll Snap
         return (
-            <div className="w-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar" style={{ scrollPaddingLeft: '50%', scrollPaddingRight: '50%' }}>
-                <div className="flex gap-4 px-[50vw]"> 
-                 {/* px-[50vw] centers the first item initially if using center alignment logic, 
-                     but simpler approach is just padding. 
-                     Let's use a simple gap container with centering snap.
-                  */}
+            <div className="w-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar pointer-events-auto" style={{ scrollPaddingLeft: '50%', scrollPaddingRight: '50%' }}>
+                <div className="flex gap-4 px-[50vw]">  
                   {posters.map((src, i) => (
                       <div 
                         key={i} 
@@ -360,63 +396,144 @@ const PostersContent = () => {
         );
     }
 
-    return (
-      <div className="w-full flex items-center justify-center py-4 overflow-visible min-h-[500px]">
-        <div className="relative w-full max-w-[1400px] h-[500px] flex items-center justify-center">
-            {posters.map((src, i) => {
-                // Calculate position relative to active index
-                // We want the fan to stay centered, but the CONTENT rotates
-                // So if activeIndex changes, the card at that index must become the "center" card (0 deg)
-                
-                // Adjust index so it wraps around? Or hard limit?
-                // User said "SWIPEABLE". A nice way is to just let them cycle.
-                // But preserving the fan look "5 items fanned out" means we need slot positions.
-                
-                // Slots: -2, -1, 0, 1, 2
-                // We calculate the visual position based on the difference from activeIndex
-                let offset = i - activeIndex;
-                
-                // Optional: Wrapping behavior (infinite carousel) if desired, 
-                // but let's stick to simple "shift" first or just clamp?
-                // The user says "MAKE THEM SWIPEABLE". Cycling is best.
-                // Ensure offset is within reasonable bounds visually?
-                // If we have 5 items, and active is 0. offset is 0, 1, 2, 3, 4.
-                // We want to center the active one.
-                
-                // Fan calculations
-                const rotate = offset * 12; 
-                // Z-index: Active is highest. Further away = lower.
-                const zIndex = 100 - Math.abs(offset);
-                
-                // Opacity/Visibility: Hide items that go too far off?
-                // Or just let them fan out further.
+    // Expanded Modal (Desktop)
+    if (expandedSrc) {
+        return (
+            <div 
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-8 cursor-zoom-out animate-in fade-in duration-300"
+                onClick={() => setExpandedSrc(null)}
+            >
+                <img src={expandedSrc} className="max-w-full max-h-full object-contain shadow-2xl" />
+            </div>
+        )
+    }
 
-                return (
-                    <div 
-                        key={i}
-                        onClick={() => setActiveIndex(i)}
-                        className="absolute w-[300px] aspect-[0.7] cursor-pointer shadow-2xl transition-all duration-500 ease-out hover:scale-105 origin-center"
-                        style={{
-                            left: '50%',
-                            top: '50%',
-                            // Stack cards based on offset
-                            transform: `translate(-50%, -50%) translateX(${offset * 120}%) translateY(${Math.abs(offset) * 30}px) rotate(${rotate}deg)`,
-                            zIndex: zIndex,
-                            opacity: Math.abs(offset) > 3 ? 0 : 1, // Hide if too far
-                            pointerEvents: Math.abs(offset) > 3 ? 'none' : 'auto'
-                        }}
-                    >
-                         <img 
-                            src={src} 
-                            alt={`Poster ${i + 1}`}
-                            className="w-full h-full object-cover brightness-90 hover:brightness-100 transition-all duration-300 rounded-[2px]"
-                            loading="eager"
-                         />
-                    </div>
-                )
-            })}
+    // Infinite Grid Render via Portal to escape parent transforms/clipping
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
+      <>
+      {/* Gradient Controls (Dev Tool) */}
+      {!isMobile && (
+          <div className="fixed top-24 right-4 z-[100] bg-black/80 p-4 rounded text-white text-xs flex flex-col gap-2 w-48 backdrop-blur-md pointer-events-auto">
+              <div className="font-bold border-b border-white/20 pb-1 mb-1">Grid Fade Controls</div>
+              
+              <div className="flex flex-col gap-1">
+                  <label className="flex justify-between">
+                      <span>Start %</span>
+                      <span>{gradientStart}%</span>
+                  </label>
+                  <input 
+                      type="range" 
+                      min="0" max="100" step="1" 
+                      value={gradientStart} 
+                      onChange={(e) => setGradientStart(Number(e.target.value))}
+                      className="accent-white"
+                  />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                  <label className="flex justify-between">
+                      <span>End %</span>
+                      <span>{gradientEnd}%</span>
+                  </label>
+                  <input 
+                      type="range" 
+                      min="0" max="100" step="1" 
+                      value={gradientEnd} 
+                      onChange={(e) => setGradientEnd(Number(e.target.value))}
+                      className="accent-white"
+                  />
+              </div>
+          </div>
+      )}
+
+      <div 
+        ref={containerRef}
+        className="fixed inset-0 w-full h-full overflow-hidden cursor-grab active:cursor-grabbing select-none bg-transparent pointer-events-auto"
+        style={{ 
+            zIndex: 0, // 0 to sit behind z-10 content but above -z global background
+             // Dynamic Mask Image based on controls
+             maskImage: `linear-gradient(to bottom, transparent 0%, transparent ${gradientStart}%, black ${gradientEnd}%, black 100%)`,
+             WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, transparent ${gradientStart}%, black ${gradientEnd}%, black 100%)`
+        }} 
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+      >
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+      >
+        <div className="w-full h-full">
+        {/* Render visible tiles */}
+        {(() => {
+             // We render a grid relative to the offset.
+             // Tile (c, r) pos = (c * itemW + offset.x, r * itemH + offset.y)
+             // We want to find min/max C and R such that tiles are visible.
+             // Viewport W/H:
+             // Since it's fixed w-screen h-screen, use window dimensions or ref
+             const vpW = typeof window !== 'undefined' ? window.innerWidth : 1500;
+             const vpH = typeof window !== 'undefined' ? window.innerHeight : 1000;
+             
+             const itemW = TILE_W + GAP;
+             const itemH = TILE_H + GAP;
+             
+             // Visible range in "grid coordinates"
+             // left_edge_x = c * itemW + offset.x > -TILE_W
+             // => c * itemW > -TILE_W - offset.x
+             // => c > (-TILE_W - offset.x) / itemW
+             
+             const minCol = Math.floor((-offset.x - TILE_W) / itemW);
+             const maxCol = Math.ceil((-offset.x + vpW) / itemW);
+             const minRow = Math.floor((-offset.y - TILE_H) / itemH);
+             const maxRow = Math.ceil((-offset.y + vpH) / itemH);
+             
+             const tiles = [];
+             for (let c = minCol; c <= maxCol; c++) {
+                 for (let r = minRow; r <= maxRow; r++) {
+                     // Get Image Index deterministically based on grid coords
+                     // Use modulo to cycle through posters
+                     // (c + r) can be negative, so we handle that
+                     let index = (c + r) % posters.length;
+                     if (index < 0) index += posters.length;
+                     
+                     // Stagger/Variations?
+                     // Let's just keep it simple grid for now as requested.
+                     
+                     tiles.push(
+                         <div
+                            key={`${c}-${r}`}
+                            onClick={() => {
+                                if(!isDragging) setExpandedSrc(posters[index]);
+                            }}
+                            className="absolute hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2"
+                            style={{
+                                left: c * itemW + offset.x,
+                                top: r * itemH + offset.y,
+                                width: TILE_W,
+                                height: TILE_H,
+                                // Debug: backgroundColor: 'rgba(255,0,0,0.1)'
+                            }}
+                         >
+                            <img 
+                                src={posters[index]} 
+                                className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
+                                loading="lazy"
+                            />
+                         </div>
+                     )
+                 }
+             }
+             return tiles;
+        })()}
         </div>
       </div>
+      </>,
+      document.body
     );
 };
 const VisualDesignContent = () => <div className="p-4 text-center">Visual Design content gallery will go here</div>;
@@ -450,6 +567,25 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Lock Body Scroll when POSTERS is selected (Fixed Page View)
+  useEffect(() => {
+    if (selectedItem === 'POSTERS' && !isMobile) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh'; 
+      document.documentElement.style.overflow = 'hidden';
+      // Also ensure we are at the top? No, let user view stay.
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [selectedItem, isMobile]);
+
   // Notify parent when state changes (legacy support or side effects)
   useEffect(() => {
     onDetailViewChange(!!selectedItem);
@@ -482,7 +618,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
           return (
             <div 
               key={idx}
-              className={`absolute transition-all duration-700 ease-[0.23, 1, 0.32, 1] group cursor-pointer flex items-center gap-4 ${
+              className={`absolute transition-all duration-700 ease-[0.165,0.84,0.44,1] group cursor-pointer flex items-center gap-4 hover:z-50 pointer-events-auto ${
                 isOther ? 'opacity-0 pointer-events-none ease-in duration-300' : 'opacity-100'
               }`}
               style={{
@@ -541,6 +677,23 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
                     </h3>
                 </div>
               )}
+
+              {/* DESKTOP POSTERS INSTRUCTION */}
+              {!isMobile && isSelected && item === 'POSTERS' && (
+                <div 
+                  className="absolute left-0 top-full mt-2 opacity-100 transition-opacity duration-500 delay-300"
+                  style={{ width: 'max-content' }}
+                >
+                    <h3
+                      className="text-xs md:text-sm tracking-[0.15em] text-neutral-600 dark:text-neutral-400 whitespace-nowrap font-bold"
+                      style={{
+                        fontFamily: "'PT Mono', monospace",
+                      }}
+                    >
+                      SCROLL ANY DIRECTION TO EXPLORE, CLICK TO EXPAND
+                    </h3>
+                </div>
+              )}
             </div>
           );
         })}
@@ -551,6 +704,10 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
         className={`relative w-full flex-grow flex flex-col mt-4 sm:mt-12 transition-all duration-700 ease-out delay-200 ${
           selectedItem ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20 pointer-events-none absolute'
         }`}
+        style={{
+             // If POSTERS is selected on Desktop, we want to ensure the footer is pushed to the bottom but the container doesn't overflow
+             // Actually, 'flex-grow' helps. 
+        }}
       >
         {selectedItem && getContentForItem(selectedItem)}
       </div>

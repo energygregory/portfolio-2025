@@ -385,7 +385,7 @@ const getDeviceConfig = (dims, deviceMode) => {
 // Get current viewport dimensions (respects responsive testing tools)
 const getViewportDimensions = () => {
   if (typeof window === 'undefined') return { w: 1920, h: 1080 };
-
+  
   // Use visualViewport for more accurate mobile detection
   if (window.visualViewport) {
     return {
@@ -400,6 +400,23 @@ const getViewportDimensions = () => {
     h: window.innerHeight
   };
 };
+
+// Global background layer to ensure transparency works but we have a base color
+// Inserted into the DOM tree
+const GlobalBackground = () => (
+    <div 
+        className="fixed inset-0 -z-[2] w-full h-full pointer-events-none transition-colors duration-500"
+        style={{
+            backgroundColor: 'var(--bg-base, #000000)'
+            // Dark Mode Class handles variable switching normally, 
+            // but we hardcode to black for now as per index.css removal? 
+            // Actually, let's use the theme classes.
+        }} 
+    >
+        {/* Light mode white background */}
+        <div className="absolute inset-0 bg-neutral-100 dark:bg-black transition-colors duration-500" />
+    </div>
+);
 
 // Use the actual files in public/LOGOS (filenames used as-is).
 const portfolioLogos = [
@@ -448,7 +465,6 @@ function App() {
 
   console.log('App component is rendering');
 
-  // TRAFFIC COUNTER: Increment visits (once per session)
   useEffect(() => {
     const hasCounted = sessionStorage.getItem('visit_counted');
     // Only count if not running on localhost to avoid pollution (optional, but good practice)
@@ -736,14 +752,16 @@ function App() {
 
   return (
     <>
+      <GlobalBackground />
       <AnalyticsTracker />
       <div
         id="app-content"
           className={`min-h-screen relative flex flex-col overflow-x-hidden ${
             theme === "dark"
-              ? "bg-black text-white theme-dark"
-              : "bg-white text-black theme-light"
+              ? "text-white theme-dark"
+              : "text-black theme-light"
           }`}
+          style={{ backgroundColor: 'transparent' }}
       >
       <NavigationLoader theme={theme} onInitialLoad={() => {
         // Remove the initial HTML loader when React's NavigationLoader takes over
@@ -1096,7 +1114,7 @@ function App() {
       )}
         
         {/* Main content - above Asset1 */}
-        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'}`}>
+        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${location.pathname.startsWith('/work') ? 'pointer-events-none' : ''}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >
@@ -1171,7 +1189,9 @@ function App() {
       {/* Hide global footer on Merch page and Work page (which manages its own footer) */}
       {!location.pathname.includes('/work/merch') && (
         <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
-          <Footer />
+          <div className="fixed bottom-0 w-full z-50">
+            <Footer />
+          </div>
         </Suspense>
       )}
     </div>
