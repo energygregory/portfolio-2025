@@ -12,7 +12,7 @@ export default function About() {
   }, []);
 
   return (
-    <main className="min-h-screen px-0 py-16 font-mono no-scrollbar flex flex-col items-center pt-24 sm:pt-32">
+    <main className="min-h-screen px-0 py-16 font-mono no-scrollbar flex flex-col items-center pt-20 sm:pt-32">
       {/* Mobile Header: Matches Work Page Mini-Nav style exactly */}
       <div 
         className="w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:hidden"
@@ -33,7 +33,7 @@ export default function About() {
             who is greg?
           </h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mt-8 sm:mt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mt-4 sm:mt-0">
             {/* Text Content */}
             <div className="space-y-6 text-sm md:text-base leading-relaxed font-normal text-left">
               <p>

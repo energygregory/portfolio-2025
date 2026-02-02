@@ -21,15 +21,27 @@ const LogosContent = () => {
     // State for mobile long-press preview and desktop scaling
     const [pressedImage, setPressedImage] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
-    // Hardcoded scales per user request
-    const logoScales = [
-        1.4, 1.3, 1.8, 1.5, 1.15, // Row 1
-        1.5, 1.9, 1.7, 1.45, 1.85  // Row 2
-    ];
-    const globalScale = 1.2;
+    // Hardcoded scales per user request (Initial State)
+    const [logoScales, setLogoScales] = useState([
+        0.90, 1.00, 0.65, // Row 1
+        1.25, 1.20, 0.90, // Row 2
+        0.90, 1.65, 0.80, // Row 3
+        1.05              // Row 4
+    ]);
+    const [globalScale, setGlobalScale] = useState(0.95);
     // Spacing control (Padding)
-    const [paddingX, setPaddingX] = useState(0); 
+    const [paddingX, setPaddingX] = useState(9); 
     const [paddingY, setPaddingY] = useState(0);
+    // Grid Y Position
+    const [gridY, setGridY] = useState(-30);
+    // Mobile Controls Position (Hidden now)
+    const [controlsY, setControlsY] = useState(-160);
+
+    const handleScaleChange = (index, value) => {
+      const newScales = [...logoScales];
+      newScales[index] = parseFloat(value);
+      setLogoScales(newScales);
+    };
 
     useEffect(() => {
        const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -49,8 +61,86 @@ const LogosContent = () => {
   
     return (
       <div className="w-full flex flex-col items-center">
+
+         {/* Mobile Controls - Fixed Overlay (Hidden) */}
+         <div 
+            className="hidden fixed left-4 right-4 z-[100] flex-col items-center p-4 space-y-2 bg-neutral-100/80 dark:bg-neutral-900/80 backdrop-blur-md rounded-xl border border-black/10 dark:border-white/10 shadow-2xl"
+            style={{ bottom: `${controlsY}px` }}
+         >
+            <h3 className="text-[10px] font-bold uppercase tracking-widest mb-0 opacity-80">Mobile Controls</h3>
+            
+            {/* Global Scale */}
+            <div className="w-full flex flex-col items-center space-y-1">
+                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Global Scale: {globalScale.toFixed(2)}x</span>
+                <input 
+                type="range" 
+                min="0.5" 
+                max="2" 
+                step="0.05" 
+                value={globalScale}
+                onChange={(e) => setGlobalScale(parseFloat(e.target.value))}
+                className="w-full h-1 bg-gray-400/50 dark:bg-gray-600/50 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                />
+            </div>
+
+            {/* Grid Y Position */}
+            <div className="w-full flex flex-col items-center space-y-1">
+                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Grid Y: {gridY}px</span>
+                <input 
+                type="range" 
+                min="-200" 
+                max="200" 
+                step="10" 
+                value={gridY}
+                onChange={(e) => setGridY(parseInt(e.target.value))}
+                className="w-full h-1 bg-gray-400/50 dark:bg-gray-600/50 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                />
+            </div>
+
+            {/* Spacing Controls */}
+            <div className="w-full grid grid-cols-2 gap-2">
+                <div className="flex flex-col items-center space-y-1">
+                    <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest">H-Space: {paddingX}px</span>
+                    <input 
+                    type="range" 
+                    min="0" 
+                    max="60" 
+                    step="1" 
+                    value={paddingX}
+                    onChange={(e) => setPaddingX(parseInt(e.target.value))}
+                    className="w-full h-1 bg-gray-400/50 dark:bg-gray-600/50 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                    />
+                </div>
+                <div className="flex flex-col items-center space-y-1">
+                    <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest">V-Space: {paddingY}px</span>
+                    <input 
+                    type="range" 
+                    min="0" 
+                    max="60" 
+                    step="1" 
+                    value={paddingY}
+                    onChange={(e) => setPaddingY(parseInt(e.target.value))}
+                    className="w-full h-1 bg-gray-400/50 dark:bg-gray-600/50 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                    />
+                </div>
+            </div>
+
+            {/* Controls Position Slider */}
+            <div className="w-full flex flex-col items-center space-y-1 pt-2 border-t border-black/5 dark:border-white/5 mt-1">
+                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Controls Y: {controlsY}px</span>
+                <input 
+                type="range" 
+                min="-200" 
+                max="400" 
+                step="5" 
+                value={controlsY}
+                onChange={(e) => setControlsY(parseInt(e.target.value))}
+                className="w-full h-1 bg-gray-400/50 dark:bg-gray-600/50 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                />
+            </div>
+         </div>
          
-         {/* Spacing Control Sliders */}
+         {/* Desktop Spacing Control Sliders */}
          <div className="hidden md:flex flex-row items-center justify-end w-full max-w-[1800px] px-8 py-4 gap-8">
             <div className="flex flex-col items-end space-y-2">
                 <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Horizontal Spacing: {paddingX}px</span>
@@ -82,7 +172,7 @@ const LogosContent = () => {
          <div 
              className="w-full grid grid-cols-3 md:grid-cols-5 gap-[1px] md:gap-[2px] bg-neutral-900/[0.0375] dark:bg-white/[0.075]"
              style={{ 
-                 transform: `scale(${globalScale})`, 
+                 transform: `scale(${globalScale}) translateY(${gridY}px)`, 
                  transformOrigin: 'top center'
              }}
          >
@@ -92,11 +182,38 @@ const LogosContent = () => {
                 className="relative group aspect-square md:aspect-[4/3] flex items-center justify-center bg-white dark:bg-black select-none touch-none"
                 onContextMenu={(e) => e.preventDefault()}
               >
-                  
+                  {/* Individual Scale Slider - Desktop (Hover) */}
+                   <div 
+                        className={`
+                            absolute bottom-1 left-0 right-0 z-20 flex flex-col items-center justify-center
+                            md:opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-none space-y-1
+                            hidden md:flex mb-1 md:mb-2 
+                        `}
+                   >
+                        <span className="text-[8px] md:text-[10px] font-mono bg-black/50 text-white px-1 rounded backdrop-blur-sm">
+                            {(logoScales[i] || 1).toFixed(2)}x
+                        </span>
+                        <input 
+                            type="range" 
+                            min="0.5" 
+                            max="3" 
+                            step="0.05" 
+                            value={logoScales[i] || 1}
+                            onChange={(e) => handleScaleChange(i, e.target.value)}
+                            className="w-16 md:w-24 h-1 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white shadow-sm pointer-events-auto opacity-70 hover:opacity-100"
+                            onClick={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()} 
+                        />
+                   </div>
+
                    {/* Tap target wrapper - Padding applied here for spacing without affecting grid lines */}
                    <div 
                       className="w-full h-full p-8 md:p-8 flex items-center justify-center"
-                      style={!isMobile ? { padding: `${32 + paddingY}px ${32 + paddingX}px` } : {}}
+                      style={
+                         isMobile 
+                         ? { padding: `${Math.max(4, 32 + paddingY)}px ${Math.max(4, 32 + paddingX)}px` } // Mobile: apply dynamic padding
+                         : { padding: `${32 + paddingY}px ${32 + paddingX}px` } // Desktop: apply dynamic padding (previously hardcoded, aligned with mobile logic now)
+                      }
                       onTouchStart={(e) => {
                          // Stop propagation to prevent grid scrolling issues? 
                          // No, we want to allow scrolling if not pressed.
@@ -155,8 +272,7 @@ const LogosContent = () => {
          {/* Mobile pressed image popup - fixed overlay */}
          {pressedImage && (
             <div 
-              className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center p-8 backdrop-blur-sm"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0)' }}
+              className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center p-8 bg-white/90 dark:bg-black/90 transition-colors duration-200"
             >
               <div 
                 className="w-full max-w-[80vw] aspect-square flex items-center justify-center bg-transparent p-4 transition-transform duration-300 scale-110"
