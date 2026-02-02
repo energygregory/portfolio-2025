@@ -1186,11 +1186,10 @@ function App() {
         </div>
       </div> */}
 
-      {/* Hide global footer on Merch page and Work page (which manages its own footer) */}
-      {/* Also hide on Posters page as requested */}
-      {!location.pathname.includes('/work/merch') && !location.pathname.includes('/work/posters') && (
+      {/* Hide global footer on ALL Work pages (managed locally there) */}
+      {!location.pathname.startsWith('/work') && (
         <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
-          <div className="fixed bottom-0 w-full z-50">
+          <div className="w-full z-50 bg-inherit">
             <Footer />
           </div>
         </Suspense>

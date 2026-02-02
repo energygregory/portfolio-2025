@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
-import Footer from "../components/Footer";
 
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
@@ -312,38 +311,14 @@ const LogosContent = () => {
     );
 };
 const PostersContent = () => {
-    // Poster images with Dimensions for Masonry Layout
-    // Width is fixed by column width (TILE_W), Height is calculated by aspect ratio (H/W)
-    const posterData = [
-      { src: "/Images/2025/POSTERS/post00.jpg", aspectRatio: 0.707 },   // 2480/3508
-      { src: "/Images/2025/POSTERS/food0.jpg", aspectRatio: 1.778 },    // 1920/1080
-      { src: "/Images/2025/POSTERS/post.jpg", aspectRatio: 0.707 },     // 2480/3508
-      { src: "/Images/2025/POSTERS/filter-announcer.jpg", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/post0.jpg", aspectRatio: 0.707 },    // 2480/3508
-      { src: "/Images/2025/POSTERS/snap1.jpg", aspectRatio: 1.25 },     // 1349/1080
-      { src: "/Images/2025/POSTERS/snap2.jpg", aspectRatio: 1.25 },     // 1347/1080
-      { src: "/Images/2025/POSTERS/ooo_final.png", aspectRatio: 1.778 },// 1920/1080
-      { src: "/Images/2025/POSTERS/thank_you.png", aspectRatio: 1.778 },// 1920/1080
-      { src: "/Images/2025/POSTERS/50f5a5175916607.64bbce5a0894e.jpg", aspectRatio: 1.25 }, // 1350/1080
-      { src: "/Images/2025/POSTERS/FzT_IJUWwAEHrOK.jpeg", aspectRatio: 1.25 }, // 1350/1080
-      { src: "/Images/2025/POSTERS/afterparty.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/ypee.jpg", aspectRatio: 1.0 },      // 3000/3000
-      { src: "/Images/2025/POSTERS/JINJA main.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/anticipate.png", aspectRatio: 1.25 }, // 2700/2160 = 1.25
-      { src: "/Images/2025/POSTERS/final final.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/final flyer.png", aspectRatio: 1.25 }, // 1350/1080
-      { src: "/Images/2025/POSTERS/main flyer cod.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/pappylive1.png", aspectRatio: 1.25 }, // 1350/1080
-      { src: "/Images/2025/POSTERS/tyc1.png", aspectRatio: 1.25 }, // 1350/1080
+    // Poster images from /Images/2025/POSTERS
+    const posters = [
+      "/Images/2025/POSTERS/post00.jpg",
+      "/Images/2025/POSTERS/food0.jpg",
+      "/Images/2025/POSTERS/post.jpg",
+      "/Images/2025/POSTERS/filter-announcer.jpg",
+      "/Images/2025/POSTERS/post0.jpg",
     ];
-
-    const posterCount = posterData.length;
-    
-    // Indices for special rules (update these based on new array order if needed)
-    // ooo_final is index 7
-    // thank_you is index 8
-    const oooIndex = 7;
-    const thankYouIndex = 8;
 
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
@@ -370,97 +345,9 @@ const PostersContent = () => {
 
     // Grid Params
     const TILE_W = 300;
-    // TILE_H is now variable per item (H/W * TILE_W)
-    const GAP_X = 7; // Reduced spacing to 7px (Fixed)
-    const GAP_Y = 7; // Reduced spacing to 7px (Fixed)
+    const TILE_H = 420;
+    const GAP = 40;
     const ANIM_SPEED = 0.05; // Even smoother slow drift
-    
-    // Helper to check critical conflicts
-    const isConflict = (id1, id2) => {
-        if (id1 === id2) return true; // Direct duplicate
-        // No adjacent ooo_final and thank_you
-        if ((id1 === oooIndex && id2 === thankYouIndex) || (id1 === thankYouIndex && id2 === oooIndex)) return true;
-        return false;
-    };
-
-    // Generate MULTIPLE distinct layouts to prevent horizontal alignment
-    // STRATEGY: PARITY-BASED POOLS
-    // We split the 20 posters into two disjoint sets: Pool A (Evens) and Pool B (Odds).
-    // Even columns (0, 2, 4...) ONLY sample from Pool A.
-    // Odd columns (1, 3, 5...) ONLY sample from Pool B.
-    // This mathematically guarantees that no poster in Col N can ever appear in Col N-1 or Col N+1.
-    const columnLayouts = useMemo(() => {
-        const NUM_COLS_TO_GEN = 15; // Sufficient variants
-        const SEQ_LENGTH = 100;     // Length of sequence
-        
-        // Define Pools
-        // We have 20 items. 
-        // Pool A: indices 0-9
-        // Pool B: indices 10-19
-        // Special check: oooIndex (7) and thankYouIndex (8) are both in Pool A.
-        // We must handle their adjacency rule specifically within Pool A generation.
-        
-        const poolA = Array.from({ length: 10 }, (_, k) => k);      // 0..9
-        const poolB = Array.from({ length: 10 }, (_, k) => k + 10); // 10..19
-        
-        // Helper to generate a random sequence from a pool with constraints
-        const generateSequence = (pool) => {
-             const seq = [];
-             let last = -1;
-             for (let i = 0; i < SEQ_LENGTH; i++) {
-                 const candidates = pool.filter(idx => {
-                     // Rule 1: No vertical duplicate
-                     if (idx === last) return false;
-                     // Rule 2: Special rule (only matters if both are in this pool)
-                     if (isConflict(idx, last)) return false;
-                     return true;
-                 });
-                 
-                 // Shuffle candidates to ensure randomness each time (not just first valid)
-                 if (candidates.length > 0) {
-                     const pick = candidates[Math.floor(Math.random() * candidates.length)];
-                     seq.push(pick);
-                     last = pick;
-                 } else {
-                     // Fallback (should be impossible with 10 items)
-                     seq.push(pool[0]);
-                     last = pool[0];
-                 }
-             }
-             return seq;
-        };
-        
-        const layouts = [];
-        for (let c = 0; c < NUM_COLS_TO_GEN; c++) {
-            // Even columns -> Pool A, Odd columns -> Pool B
-            const isEven = c % 2 === 0;
-            const sourcePool = isEven ? poolA : poolB;
-            
-            // Generate sequence
-            // Note: Since each column is independently random within its pool, 
-            // and pools are disjoint, we don't need to check neighbors.
-            const indices = generateSequence(sourcePool);
-            
-            // Build layout object
-             const items = [];
-             let currentY = 0;
-             indices.forEach(idx => {
-                const itemR = posterData[idx].aspectRatio;
-                const itemH = TILE_W * itemR;
-                items.push({
-                   y: currentY,
-                   height: itemH,
-                   index: idx
-                });
-                currentY += itemH + GAP_Y;
-             });
-             layouts.push({ items, totalHeight: currentY });
-        }
-
-        return layouts;
-    }, [posterCount, TILE_W, GAP_Y]);
-
-    /* REMOVE OLD single randomizedSequence and sequenceLayout */
 
     // Gradient Control State
     const [gradientStart, setGradientStart] = useState(15); // Percentage
@@ -516,27 +403,22 @@ const PostersContent = () => {
 
     if (isMobile) {
         // Mobile: Horizontal Scroll Snap
-        // NOTE: posterData is an array of objects { src, aspectRatio }, so we map map it properly for mobile too
         return (
-            <div className="fixed inset-0 top-[100px] z-[50] w-full flex flex-col items-center bg-transparent pointer-events-auto"> 
-                 {/*  Use a fixed full-screen overlay for Posters mobile view to ensure visibility on top of everything */}
-                <div className="w-full h-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar" style={{ scrollPaddingLeft: '15%', scrollPaddingRight: '15%' }}>
-                    <div className="flex gap-4 px-8 items-center">  
-                    {posterData.map((item, i) => (
-                        <div 
-                            key={i} 
-                            className="relative flex-shrink-0 w-[80vw] max-w-[400px] aspect-[2/3] snap-center shadow-2xl rounded-sm overflow-hidden bg-black"
-                            style={{ aspectRatio: item.aspectRatio }}
-                        >
-                            <img 
-                                src={item.src} 
-                                alt={`Poster ${i + 1}`}
-                                className="w-full h-full object-contain"
-                                loading="lazy"
-                            />
-                        </div>
-                    ))}
-                    </div>
+            <div className="w-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar pointer-events-auto" style={{ scrollPaddingLeft: '50%', scrollPaddingRight: '50%' }}>
+                <div className="flex gap-4 px-[50vw]">  
+                  {posters.map((src, i) => (
+                      <div 
+                        key={i} 
+                        className="relative flex-shrink-0 w-[70vw] aspect-[2/3] snap-center shadow-lg rounded-sm overflow-hidden"
+                      >
+                           <img 
+                              src={src} 
+                              alt={`Poster ${i + 1}`}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                           />
+                      </div>
+                  ))}
                 </div>
             </div>
         );
@@ -609,6 +491,11 @@ const PostersContent = () => {
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       >
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+      >
         <div className="w-full h-full">
         {/* Render visible tiles */}
         {(() => {
@@ -618,17 +505,21 @@ const PostersContent = () => {
              const isDragging = stateRef.current.isDragging;
 
              // We render a grid relative to the offset.
-             // Tile (c, r) pos = (c * itemW + offset.x, masonry_y + offset.y)
+             // Tile (c, r) pos = (c * itemW + offset.x, r * itemH + offset.y)
              // We want to find min/max C and R such that tiles are visible.
              // Viewport W/H:
              // Since it's fixed w-screen h-screen, use window dimensions or ref
              const vpW = typeof window !== 'undefined' ? window.innerWidth : 1500;
              const vpH = typeof window !== 'undefined' ? window.innerHeight : 1000;
              
-             const itemW = TILE_W + GAP_X;
+             const itemW = TILE_W + GAP;
+             const itemH = TILE_H + GAP;
              
-             // Visible range in columns
+             // Visible range in "grid coordinates"
              // left_edge_x = c * itemW + offset.x > -TILE_W
+             // => c * itemW > -TILE_W - offset.x
+             // => c > (-TILE_W - offset.x) / itemW
+             
              const minCol = Math.floor((-currentOffset.x - TILE_W) / itemW);
              const maxCol = Math.ceil((-currentOffset.x + vpW) / itemW);
              
@@ -640,56 +531,46 @@ const PostersContent = () => {
                  
                  // Effective Vertical Offset for this column combines user drag (offset.y) plus ambient drift
                  const effectiveOffsetY = currentOffset.y + colDrift;
-                 
-                 // Select different layout variant for this column to prevent horizontal alignment
-                 // Use Positive Modulo to ensure negative indices map correctly
-                 // We have generated 15 distinct column layouts that loosely coordinate with neighbors
-                 const variantIdx = ((c % 15) + 15) % 15;
-                 const { items, totalHeight } = columnLayouts[variantIdx];
 
-                 // Visible Range:
-                 const visibleMinY = -effectiveOffsetY - 800;
-                 const visibleMaxY = -effectiveOffsetY + vpH + 800;
-                 
-                 const minBlock = Math.floor(visibleMinY / totalHeight);
-                 const maxBlock = Math.floor(visibleMaxY / totalHeight);
-                 
-                 for (let b = minBlock; b <= maxBlock; b++) {
-                     const blockY = b * totalHeight; 
+                 // Calculate min/max row for THIS particular column 
+                 // because they are drifting independently apart
+                 const minRow = Math.floor((-effectiveOffsetY - TILE_H) / itemH);
+                 const maxRow = Math.ceil((-effectiveOffsetY + vpH) / itemH);
+
+                 for (let r = minRow; r <= maxRow; r++) {
+                     // Get Image Index deterministically based on grid coords
+                     // Use modulo to cycle through posters
+                     // (c + r) can be negative, so we handle that
+                     let index = (c + r) % posters.length;
+                     if (index < 0) index += posters.length;
                      
-                     for (let i = 0; i < items.length; i++) {
-                        const item = items[i];
-                        const absoluteY = blockY + item.y;
-                        
-                        if (absoluteY + item.height > visibleMinY && absoluteY < visibleMaxY) {
-                             tiles.push(
-                                 <div
-                                    key={`c${c}-b${b}-i${i}`} // Unique key
-                                    onClick={() => {
-                                        if(!isDragging) setExpandedSrc(posterData[item.index].src);
-                                    }}
-                                    className="absolute will-change-transform" 
-                                    style={{
-                                        // Use translate3d for hardware accel
-                                        transform: `translate3d(${c * itemW + currentOffset.x}px, ${absoluteY + effectiveOffsetY}px, 0)`,
-                                        top: 0,
-                                        left: 0,
-                                        width: TILE_W,
-                                        height: item.height, // Variable Height!
-                                    }}
-                                 >
-                                    <div className="w-full h-full flex items-center justify-center bg-black">
-                                        {/* Use object-contain to ensure NO cutting, with black background filling gaps if any (though tiles fit generally) */}
-                                        <img 
-                                            src={posterData[item.index].src} 
-                                            className="w-full h-full block pointer-events-none select-none object-contain"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                 </div>
-                             );
-                        }
-                     }
+                     // Stagger/Variations?
+                     // Let's just keep it simple grid for now as requested.
+                     
+                     tiles.push(
+                         <div
+                            key={`${c}-${r}`}
+                            onClick={() => {
+                                if(!isDragging) setExpandedSrc(posters[index]);
+                            }}
+                            className="absolute will-change-transform" 
+                            style={{
+                                transform: `translate3d(${c * itemW + currentOffset.x}px, ${r * itemH + effectiveOffsetY}px, 0)`,
+                                top: 0,
+                                left: 0,
+                                width: TILE_W,
+                                height: TILE_H,
+                            }}
+                         >
+                            <div className="w-full h-full hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2">
+                                <img 
+                                    src={posters[index]} 
+                                    className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
+                                    loading="lazy"
+                                />
+                            </div>
+                         </div>
+                     )
                  }
              }
              return tiles;
@@ -701,26 +582,7 @@ const PostersContent = () => {
     );
 };
 const VisualDesignContent = () => <div className="p-4 text-center">Visual Design content gallery will go here</div>;
-const PackagingContent = () => {
-    const images = [
-        "/Images/2025/PACKAGING/Free 2 Plastic Pouch PSD Mockup.png",
-        "/Images/2025/PACKAGING/Group 3.png"
-    ];
-
-    return (
-        <div className="w-full flex flex-col items-center gap-12 px-4 pb-32 pt-12">
-            {images.map((src, i) => (
-                <div key={i} className="flex justify-center w-full">
-                    <img 
-                        src={src} 
-                        className="max-w-full md:max-w-4xl max-h-[85vh] w-auto h-auto object-contain shadow-2xl" 
-                        loading="lazy"
-                    />
-                </div>
-            ))}
-        </div>
-    );
-};
+const PackagingContent = () => <div className="p-4 text-center">Packaging Design content gallery will go here</div>;
 const TechpackContent = () => <div className="p-4 text-center">Techpack Design content gallery will go here</div>;
 const BrandContent = () => <div className="p-4 text-center">Brand Design content gallery will go here</div>;
 
@@ -805,20 +667,13 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
                 isOther ? 'opacity-0 pointer-events-none ease-in duration-300' : 'opacity-100'
               }`}
               style={{
-                // Move up moves to top left on desktop (-210px), but keeps relative position on mobile (maybe just 0px offset?)
-                // The user said: "ON MOBILE, BRING IT BACK TO THE LAST POSITION IT WAS FOR MOBILE"
-                // Previously, it was likely calculating top based on idx * ITEM_HEIGHT even when selected?
-                // Or simply moved to top: 0?
-                // Let's try resetting top to 0 or a small offset when selected on mobile.
-                top: selectedItem 
-                  ? (isMobile ? '-20px' : '-210px')  // Mobile: small adjustment. Desktop: big jump.
-                  : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
-                
+                // Move up higher when selected to replace the mini-nav area
+                // UPDATED: Adjusted to -210px to move it substantially higher (was -185px)
+                top: selectedItem ? '-210px' : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 left: selectedItem ? '24px' : '50%',
                 transform: selectedItem 
-                  ? (isMobile ? 'translate(0, 0) scale(0.7)' : 'translate(0, 0) scale(0.85)') // scaled down on mobile
+                  ? 'translate(0, 0) scale(0.85)' 
                   : 'translate(-50%, 0) scale(1)',
-                
                 transformOrigin: 'left center',
                 zIndex: isSelected ? 50 : 10
               }}
@@ -981,7 +836,7 @@ export default function Work() {
       
       {/* Mini nav - Adjusted z-index to sit on top of carousel */}
       <div 
-        className={`w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:sticky sm:top-32 sm:left-auto sm:translate-x-0 transition-opacity duration-500 ease-in-out ${isGraphicDetailView ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
+        className={`w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:sticky sm:top-32 sm:left-auto sm:translate-x-0 transition-opacity duration-500 ease-in-out ${isGraphicDetailView ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
           <button
@@ -1011,7 +866,7 @@ export default function Work() {
       {activeCategory === 'merch' && (
         // Full screen fixed background for the carousel
         // z-0 puts it behind the mini nav (z-[60])
-        <section className="fixed inset-0 w-full h-full z-0 flex items-start justify-start pointer-events-auto">
+        <section className="fixed inset-0 w-full h-full z-0 flex items-start justify-start">
             <BlurCarousel />
         </section>
       )}
@@ -1029,18 +884,10 @@ export default function Work() {
           </section>
         )}
 
-        {/* Footer for Graphic Design Section (Not Fixed) */}
-        {!isGraphicDetailView && (
-           <div className="w-full mt-auto mb-0 bg-transparent z-10 pointer-events-auto">
-             <Footer />
-           </div>
-        )}
-        {/* If detail view is active, we might want footer too, unless it's POSTERS? */}
-        {isGraphicDetailView && selectedGraphicItem !== 'POSTERS' && (
-             <div className="w-full mt-auto mb-0 bg-transparent z-10 pointer-events-auto">
-                <Footer />
-             </div>
-        )}
+        {/* Footer should be at the bottom of the flex container - Zero margins */}
+        <div className="w-full mt-auto mb-0 bg-transparent h-0 overflow-visible">
+          {/* Footer removed here, relying on App.jsx global footer */}
+        </div>
       </div>
     </main>
   );

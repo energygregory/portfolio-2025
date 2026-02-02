@@ -109,6 +109,26 @@ const CarouselItem = ({ src, containerRef, scrollTop, manualSize, verticalGap, x
     const itemRef = useRef(null);
     const [style, setStyle] = useState({ opacity: 0.2, filter: 'blur(8px)', transform: 'translateX(0) scale(0.8)' });
 
+    const handleClick = () => {
+        if (!itemRef.current || !containerRef.current) return;
+        
+        const container = containerRef.current;
+        const item = itemRef.current;
+        
+        // Calculate target to center this item
+        // targetScrollTop = itemTop - (containerH / 2) + (itemH / 2)
+        const containerH = container.clientHeight;
+        const itemH = item.offsetHeight;
+        const itemTop = item.offsetTop;
+        
+        const targetTop = itemTop - (containerH / 2) + (itemH / 2);
+        
+        container.scrollTo({
+            top: targetTop,
+            behavior: 'smooth'
+        });
+    };
+
     useEffect(() => {
         if (!itemRef.current || !containerRef.current) return;
         
@@ -190,7 +210,8 @@ const CarouselItem = ({ src, containerRef, scrollTop, manualSize, verticalGap, x
     return (
         <div 
             ref={itemRef}
-            className="snap-center shrink-0 w-full flex items-center justify-start transition-all duration-100 ease-out will-change-transform my-0 pl-0"
+            onClick={handleClick}
+            className="snap-center shrink-0 w-full flex items-center justify-start transition-all duration-100 ease-out will-change-transform my-0 pl-0 cursor-pointer"
             // Adjust container height to be tighter
             style={{...style, height: window.innerWidth < 640 ? (manualSize + verticalGap) + 'px' : '550px'}}
         >
