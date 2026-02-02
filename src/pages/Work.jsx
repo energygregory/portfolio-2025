@@ -805,13 +805,10 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
                 isOther ? 'opacity-0 pointer-events-none ease-in duration-300' : 'opacity-100'
               }`}
               style={{
-                // Move up moves to top left on desktop (-210px), but keeps relative position on mobile (maybe just 0px offset?)
-                // The user said: "ON MOBILE, BRING IT BACK TO THE LAST POSITION IT WAS FOR MOBILE"
-                // Previously, it was likely calculating top based on idx * ITEM_HEIGHT even when selected?
-                // Or simply moved to top: 0?
-                // Let's try resetting top to 0 or a small offset when selected on mobile.
+                // Move up moves to top left on desktop (-210px), but keeps relative position on mobile
+                // User requested to push it up further on mobile
                 top: selectedItem 
-                  ? (isMobile ? '-20px' : '-210px')  // Mobile: small adjustment. Desktop: big jump.
+                  ? (isMobile ? '-75px' : '-210px')  // Mobile: moderate adjustment. Desktop: big jump.
                   : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 
                 left: selectedItem ? '24px' : '50%',
