@@ -1187,7 +1187,8 @@ function App() {
       </div> */}
 
       {/* Hide global footer on Merch page and Work page (which manages its own footer) */}
-      {!location.pathname.includes('/work/merch') && (
+      {/* Also hide on Posters page as requested */}
+      {!location.pathname.includes('/work/merch') && !location.pathname.includes('/work/posters') && (
         <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
           <div className="fixed bottom-0 w-full z-50">
             <Footer />

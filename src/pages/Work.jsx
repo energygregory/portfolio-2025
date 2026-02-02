@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
-import Footer from "../components/Footer";
 
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
