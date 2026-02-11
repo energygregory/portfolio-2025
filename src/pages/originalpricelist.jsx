@@ -30,7 +30,7 @@ const exchangeRates = {
 };
 
 export default function PriceList() {
-  const [activeCategory, setActiveCategory] = useState("merch-design");
+  const [activeCategory, setActiveCategory] = useState("graphic-design");
   const [currencyKey, setCurrencyKey] = useState("GHS");
   const [detectedCurrencyKey, setDetectedCurrencyKey] = useState("GHS");
   const [showPolicyModal, setShowPolicyModal] = useState(false);
@@ -197,24 +197,21 @@ export default function PriceList() {
               ×
             </button>
             <h2 className="text-2xl font-bold mb-4 font-mono">POLICY/WORKING TERMS</h2>
-            <div className="space-y-4 text-sm leading-relaxed font-mono">
+            <div className="space-y-4 text-sm leading-relaxed font-mono uppercase">
               <p>
-                1. PAYMENT TERMS: A 50% deposit is required before work commences.
-                This deposit is non-refundable once design work has begun. The
-                remaining balance is due upon project completion before final file
-                delivery.
+                This is our policy document. Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+                labore et dolore magna aliqua.
               </p>
               <p>
-                2. REVISIONS: 4 rounds of revisions are included in the quoted
-                price. Additional revisions will incur an extra charge.
+                Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                dolor in reprehenderit in voluptate velit esse cillum dolore eu
+                fugiat nulla pariatur.
               </p>
               <p>
-                3. TIMELINE: Project timelines are estimates. Delays in client
-                feedback may affect delivery dates.
-              </p>
-              <p>
-                4. OWNERSHIP: Final designs become client property upon full
-                payment. I retain the right to display the work in my portfolio.
+                Excepteur sint occaecat cupidatat non proident, sunt in culpa
+                qui officia deserunt mollit anim id est laborum.
               </p>
             </div>
           </div>

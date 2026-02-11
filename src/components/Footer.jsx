@@ -19,13 +19,14 @@ export default function Footer() {
       content: (
         <>
           <p>
-            1. PAYMENT TERMS: A 50% non-refundable deposit is required to
-            commence work. The remaining balance is due upon project completion
-            before final file delivery.
+            1. PAYMENT TERMS: A 50% deposit is required before work commences.
+            This deposit is non-refundable once design work has begun. The
+            remaining balance is due upon project completion before final file
+            delivery.
           </p>
           <p>
-            2. REVISIONS: Three rounds of revisions are included in the quoted
-            price. Additional revisions will be charged at an hourly rate.
+            2. REVISIONS: 4 rounds of revisions are included in the quoted
+            price. Additional revisions will incur an extra charge.
           </p>
           <p>
             3. TIMELINE: Project timelines are estimates. Delays in client
