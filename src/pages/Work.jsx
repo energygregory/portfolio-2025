@@ -366,7 +366,6 @@ const PostersContent = () => {
     // Force render state for the animation loop
     const [tick, setTick] = useState(0);
     const [expandedSrc, setExpandedSrc] = useState(null);
-    const [hoveredPosterIndex, setHoveredPosterIndex] = useState(null);
     const containerRef = useRef(null);
 
     // Grid Params
@@ -528,16 +527,11 @@ const PostersContent = () => {
                             key={i} 
                             className="relative flex-shrink-0 w-[80vw] max-w-[400px] aspect-[2/3] snap-center shadow-2xl rounded-sm overflow-hidden bg-black"
                             style={{ aspectRatio: item.aspectRatio }}
-                            onMouseEnter={() => setHoveredPosterIndex(i)}
-                            onMouseLeave={() => setHoveredPosterIndex(null)}
                         >
                             <img 
                                 src={item.src} 
                                 alt={`Poster ${i + 1}`}
-                                className="w-full h-full object-contain transition-all duration-200"
-                                style={{
-                                    filter: hoveredPosterIndex === i ? 'grayscale(0%)' : 'grayscale(100%)'
-                                }}
+                                className="w-full h-full object-contain"
                                 loading="lazy"
                             />
                         </div>
@@ -674,8 +668,6 @@ const PostersContent = () => {
                                     onClick={() => {
                                         if(!isDragging) setExpandedSrc(posterData[item.index].src);
                                     }}
-                                    onMouseEnter={() => setHoveredPosterIndex(item.index)}
-                                    onMouseLeave={() => setHoveredPosterIndex(null)}
                                     className="absolute will-change-transform" 
                                     style={{
                                         // Use translate3d for hardware accel
@@ -690,10 +682,7 @@ const PostersContent = () => {
                                         {/* Use object-contain to ensure NO cutting, with black background filling gaps if any (though tiles fit generally) */}
                                         <img 
                                             src={posterData[item.index].src} 
-                                            className="w-full h-full block pointer-events-none select-none object-contain transition-all duration-200"
-                                            style={{
-                                                filter: hoveredPosterIndex === item.index ? 'grayscale(0%)' : 'grayscale(100%)'
-                                            }}
+                                            className="w-full h-full block pointer-events-none select-none object-contain"
                                             loading="lazy"
                                         />
                                     </div>
