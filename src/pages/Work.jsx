@@ -322,7 +322,7 @@ const PostersContent = () => {
       { src: "/Images/2025/POSTERS/post0.jpg", aspectRatio: 0.707 },    // 2480/3508
       { src: "/Images/2025/POSTERS/snap1.jpg", aspectRatio: 1.25 },     // 1349/1080
       { src: "/Images/2025/POSTERS/snap2.jpg", aspectRatio: 1.25 },     // 1347/1080
-      { src: "/Images/2025/POSTERS/ooo_final.png", aspectRatio: 1.778 },// 1920/1080
+      { src: "/Images/2025/POSTERS/final.png", aspectRatio: 1.778 },// 1920/1080
       { src: "/Images/2025/POSTERS/thank_you.png", aspectRatio: 1.778 },// 1920/1080
       { src: "/Images/2025/POSTERS/50f5a5175916607.64bbce5a0894e.jpg", aspectRatio: 1.25 }, // 1350/1080
       { src: "/Images/2025/POSTERS/FzT_IJUWwAEHrOK.jpeg", aspectRatio: 1.25 }, // 1350/1080
