@@ -259,6 +259,14 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
     return window.matchMedia('(max-width: 1366px)').matches;
   });
 
+  // Localhost detection: default false for SSR, set true on client when hostname is localhost
+  const [isLocalhost, setIsLocalhost] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const host = window.location.hostname;
+    setIsLocalhost(host === 'localhost' || host === '127.0.0.1');
+  }, []);
+
   // Listener for screen resize/orientation change to update isMobileOrTablet and isPhone
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -513,7 +521,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
             </div>
 
             {/* Scrolling marquee of 2025 images - moved inside the sticky container to prevent overlap */}
-            {showMarquee && (
+            {showMarquee && isLocalhost && (
               <div 
                 className={`transition-all duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${isMobileOrTablet ? 'w-full py-24 overflow-hidden relative' : 'absolute left-1/2 -translate-x-1/2 w-screen overflow-hidden'}`}
                 style={{ 
