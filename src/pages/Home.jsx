@@ -715,8 +715,8 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
           <div className="flex flex-col items-center gap-6 sm:gap-12 mb-8 sm:mb-32">
             {/* Row 1: Around, Tribe of God, Terzo, Sleekster, Legacy Drip, Asset 3 */}
             <div className="flex items-center justify-center gap-2 sm:gap-12 md:gap-16">
-              {/* Asset 1 (Around): Disable on desktop only for live website */}
-              {!(isMobileOrTablet === false && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') && (
+              {/* Asset 1 (Around): Disable on desktop only */}
+              {isMobileOrTablet || (
                 <div className="opacity-80">
                   <img src="/LOGOS/around.svg" alt="Around" className="h-3 sm:h-10 w-auto dark:invert" draggable={false} />
                 </div>
