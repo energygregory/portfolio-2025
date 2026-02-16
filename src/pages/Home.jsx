@@ -716,7 +716,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
             {/* Row 1: Around, Tribe of God, Terzo, Sleekster, Legacy Drip, Asset 3 */}
             <div className="flex items-center justify-center gap-2 sm:gap-12 md:gap-16">
               {/* Asset 1 (Around): Disable on desktop only */}
-              {!(window.innerWidth > 1024) && (
+              {isDesktop || (
                 <div className="opacity-80">
                   <img src="/LOGOS/around.svg" alt="Around" className="h-3 sm:h-10 w-auto dark:invert" draggable={false} />
                 </div>
