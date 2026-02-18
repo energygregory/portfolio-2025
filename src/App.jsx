@@ -1134,23 +1134,23 @@ function App() {
               {/* PUBLIC ROUTES (Accessible by link) */}
               <Route path="/pricelist" element={<PriceList />} />
 
-              {/* LOCALHOST ROUTES - Only accessible locally */}
-              {isLocalhost && (
-                <>
-                  <Route path="/work" element={<Work />} />
-                  <Route path="/work/:section" element={<Work />} />
-                  {/* <Route path="/work/graphic" element={<WorkGraphic />} /> */}
-                  {/* <Route path="/work/merch" element={<WorkMerch />} /> */}
-                  <Route path="/about" element={<About />} />
-                  <Route path="/around" element={<Around />} />
-                  <Route path="/flyhigh" element={<FlyHigh />} />
-                  <Route path="/legacydrip" element={<LegacyDrip />} />
-                  <Route path="/terzo" element={<Terzo />} />
-                  <Route path="/williamru" element={<WilliamRu />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/admin" element={<Admin theme={theme} />} />
-                </>
-              )}
+              {/* Site routes - make accessible on production too (previously gated to localhost) */}
+              <>
+                <Route path="/work" element={<Work />} />
+                <Route path="/work/:section" element={<Work />} />
+                {/* <Route path="/work/graphic" element={<WorkGraphic />} /> */}
+                {/* <Route path="/work/merch" element={<WorkMerch />} /> */}
+                <Route path="/about" element={<About />} />
+                <Route path="/around" element={<Around />} />
+                <Route path="/flyhigh" element={<FlyHigh />} />
+                <Route path="/legacydrip" element={<LegacyDrip />} />
+                <Route path="/terzo" element={<Terzo />} />
+                <Route path="/williamru" element={<WilliamRu />} />
+                <Route path="/contact" element={<Contact />} />
+
+                {/* Keep Admin restricted to localhost/dev for safety */}
+                {isLocalhost && <Route path="/admin" element={<Admin theme={theme} />} />}
+              </>
               
               {/* Redirect any other route to Home */}
               <Route path="*" element={<Home 
