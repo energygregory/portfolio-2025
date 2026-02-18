@@ -338,6 +338,93 @@ const PostersContent = () => {
     ];
 
     const posterCount = posterData.length;
+
+    // Preload strategy: prioritize first-visible posters, then background-load the rest
+    // without compressing or altering images to preserve full quality.
+    useEffect(() => {
+      let cancelled = false;
+      const PRIORITY_COUNT = 6; // number of images to prioritize for immediate load
+      const CONCURRENCY = 4; // background parallelism
+      const head = typeof document !== 'undefined' ? document.head : null;
+      const addedLinks = [];
+
+      // Add <link rel="preload"> for highest-priority images so browser gives them priority
+      for (let i = 0; i < Math.min(PRIORITY_COUNT, posterData.length); i++) {
+        try {
+          const url = posterData[i].src;
+          if (head) {
+            const l = document.createElement('link');
+            l.rel = 'preload';
+            l.as = 'image';
+            l.href = url;
+            l.crossOrigin = 'anonymous';
+            head.appendChild(l);
+            addedLinks.push(l);
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      // Helper to load a single image and decode it (keeps full quality)
+      const loadImage = (url) => new Promise((resolve, reject) => {
+        try {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            // decode() gives better guarantee the image is ready for painting
+            if (img.decode) {
+              img.decode().then(() => resolve(url)).catch(() => resolve(url));
+            } else {
+              resolve(url);
+            }
+          };
+          img.onerror = () => resolve(url); // resolve to avoid blocking other loads
+          img.src = url;
+        } catch (err) {
+          resolve(url);
+        }
+      });
+
+      // Background preload with limited concurrency
+      const backgroundPreload = async () => {
+        const urls = posterData.slice(PRIORITY_COUNT).map(p => p.src);
+        let idx = 0;
+        const workers = new Array(CONCURRENCY).fill(null).map(async () => {
+          while (!cancelled && idx < urls.length) {
+            const i = idx++;
+            const url = urls[i];
+            // Use requestIdleCallback when available to avoid janking
+            if (typeof requestIdleCallback !== 'undefined') {
+              await new Promise((r) => requestIdleCallback(r, { timeout: 200 }));
+            } else {
+              // small delay to yield
+              await new Promise(r => setTimeout(r, 20));
+            }
+            await loadImage(url);
+          }
+        });
+        await Promise.all(workers);
+      };
+
+      // Kick off background preload but defer a tick so UI can respond
+      if (typeof window !== 'undefined') {
+        // Defer to next animation frame to avoid blocking initial render
+        const id = window.requestAnimationFrame(() => {
+          backgroundPreload().catch(() => {});
+        });
+        return () => {
+          cancelled = true;
+          window.cancelAnimationFrame(id);
+          // remove added preload links
+          if (head) addedLinks.forEach(l => l.remove());
+        };
+      }
+      return () => {
+        cancelled = true;
+        if (head) addedLinks.forEach(l => l.remove());
+      };
+    }, [posterData]);
     
     // Indices for special rules (update these based on new array order if needed)
     // ooo_final is index 7
