@@ -972,7 +972,7 @@ function App() {
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute left-1/2 top-12 ${location.pathname === '/' ? 'z-20' : 'z-0'}`}
             style={{
-              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV})`,
+              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
               width: '140%',
               maxWidth: 'none',
               height: 'auto',
@@ -1012,10 +1012,14 @@ function App() {
               <input type="range" min="-10" max="30" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
               <input type="number" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} style={{width:'60px'}} />
             </div>
+            <div className="flex items-center gap-2" style={{marginTop:6}}>
+              <label style={{width:80,fontSize:12}}>Rotation</label>
+              <button onClick={() => handleConfigChange('assetRotation', ((liveConfig.assetRotation ?? 0) - 45) % 360)} style={{padding:'4px 8px', fontSize:11, cursor:'pointer'}}>↻ CCW</button>
+              <button onClick={() => handleConfigChange('assetRotation', ((liveConfig.assetRotation ?? 0) + 45) % 360)} style={{padding:'4px 8px', fontSize:11, cursor:'pointer'}}>CW ↻</button>
+              <span style={{fontSize:11, width:'40px', textAlign:'center'}}>{liveConfig.assetRotation ?? 0}°</span>
+            </div>
           </div>
         )}
-
-      {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP ONLY - HIDDEN */}
       {false && viewMode === 'desktop' && (
       <div 
         className=""
