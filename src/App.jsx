@@ -966,7 +966,7 @@ function App() {
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden flex flex-col" style={{ minHeight: '100vh' }}>
-        {(location.pathname === '/' || location.pathname === '/about' || ((location.pathname === '/work' || location.pathname.startsWith('/work/')) && viewMode === 'mobile')) && (
+        {(location.pathname === '/' || location.pathname === '/about' || location.pathname === '/contact' || ((location.pathname === '/work' || location.pathname.startsWith('/work/')) && viewMode === 'mobile')) && (
           <Asset1Svg
             theme={theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
@@ -991,6 +991,11 @@ function App() {
               <label style={{width:80,fontSize:12}}>Scale</label>
               <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} />
               <input type="number" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} style={{width:'60px'}} />
+            </div>
+            <div className="flex items-center gap-2" style={{marginBottom:6}}>
+              <label style={{width:80,fontSize:12}}>X pos</label>
+              <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
+              <input type="number" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{width:'60px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>Y pos</label>

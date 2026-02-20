@@ -1,80 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import AnimatedAsset1 from "../components/AnimatedAsset1";
 
-export default function Contact() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [errors, setErrors] = useState({});
+export default function About() {
+  const [isMobile, setIsMobile] = useState(false);
 
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(String(email).toLowerCase());
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
-
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!validateEmail(formData.email)) newErrors.email = 'Invalid email format';
-    if (!formData.message.trim()) newErrors.message = 'Message is required';
-    else if (formData.message.length > 1000) newErrors.message = 'Message too long (max 1000 chars)';
-
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
-      // Submit form (integrate with EmailJS later)
-      console.log('Form submitted:', formData);
-    }
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
-    <main className="min-h-screen px-6 py-16">
-      <h1 className="text-3xl font-mono">find me here</h1>
-      <p className="mt-4 text-neutral-400">
-        Replace this with your real contact content.
-      </p>
-      <form onSubmit={handleSubmit} className="mt-8 max-w-md">
-        <div className="mb-4">
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Name"
-            className="w-full p-2 border rounded"
-            maxLength="100"
-          />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+    <main className="min-h-screen px-0 py-16 font-mono no-scrollbar flex flex-col items-center pt-20 sm:pt-32">
+      {/* Mobile Header: Matches Work Page Mini-Nav style exactly */}
+      <div 
+        className="w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:hidden"
+      >
+        <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
+          <div
+            className="font-mono uppercase text-sm tracking-widest pb-3 px-2 relative top-[1px] text-black dark:text-white border-b-2 border-black dark:border-white"
+          >
+            FIND ME HERE
+          </div>
+        </nav>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 w-full">
+        {/* About Me Section */}
+        <div className="mb-16">
+          <h1 className="text-5xl font-bold mb-12 tracking-wider hidden sm:block uppercase">
+            FIND ME HERE
+          </h1>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mt-4 sm:mt-0">
+            {/* Text Content */}
+            <div className="space-y-6 text-sm md:text-base leading-relaxed font-normal text-left">
+              <p>
+                My name is <strong>Gregory</strong>, a Ghanaian self-taught
+                designer with 3 years of hands-on experience in merch design. I
+                started designing out of curiosity and built my craft through
+                constant experimentation, client and personal projects. Over the
+                years, I've learnt how to take an idea from rough sketches and
+                turn them into beautiful pieces. Every project I take on is
+                built with intention, clarity, and respect for the brand's
+                story. My focus is always on creating work that not only looks
+                good on screen, but feels authentic when produced and worn.
+              </p>
+
+              <p>
+                I draw a lot of inspiration from Virgil Abloh, Prince Gyesi, and
+                Kwame Adusei. Their work reminds me that design can be more than
+                visuals as it can shape culture, tell stories, and redefine how
+                people see fashion and identity.
+              </p>
+            </div>
+
+            {/* Photo */}
+            <div className="flex justify-center lg:justify-end">
+              {/* Image removed as requested */}
+            </div>
+          </div>
         </div>
-        <div className="mb-4">
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="w-full p-2 border rounded"
-            maxLength="254"
-          />
-          {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-        </div>
-        <div className="mb-4">
-          <textarea
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            placeholder="Message"
-            className="w-full p-2 border rounded"
-            rows="5"
-            maxLength="1000"
-          />
-          {errors.message && <p className="text-red-500 text-sm">{errors.message}</p>}
-        </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
-      </form>
+      </div>
     </main>
   );
 }

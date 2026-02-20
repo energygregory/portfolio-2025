@@ -790,8 +790,8 @@ const PackagingContent = () => {
         </div>
     );
 };
-const TechpackContent = () => <div className="p-4 text-center">Techpack Design content gallery will go here</div>;
-const BrandContent = () => <div className="p-4 text-center">Brand Design content gallery will go here</div>;
+const TechpackContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Techpack Design content gallery will go here</div>;
+const BrandContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Brand Design content gallery will go here</div>;
 
 const getContentForItem = (item) => {
   switch(item) {
@@ -854,10 +854,10 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
   const mobileHeightAdjustment = isMobile ? ITEM_HEIGHT : 0;
 
   return (
-    <div className="relative w-full min-h-[50vh] transition-all duration-700 ease-in-out">
+    <div className="relative w-full flex-grow flex flex-col transition-all duration-700 ease-in-out">
       {/* List Items / Header Title */}
       <div 
-        className="relative w-full"
+        className="relative w-full flex-shrink-0"
         style={{ 
           height: selectedItem ? '0px' : `${(items.length * ITEM_HEIGHT) + 100 - mobileHeightAdjustment}px`,
           transition: 'height 500ms ease-in-out'
@@ -956,11 +956,10 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
       {/* Content Area - Fades in below the header - Full width & Flexible height */}
       <div 
         className={`relative w-full flex-grow flex flex-col mt-4 sm:mt-12 transition-all duration-700 ease-out delay-200 ${
-          selectedItem ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20 pointer-events-none absolute'
+          selectedItem ? 'opacity-100 translate-y-0 relative' : 'opacity-0 translate-y-20 pointer-events-none absolute'
         }`}
         style={{
-             // If POSTERS is selected on Desktop, we want to ensure the footer is pushed to the bottom but the container doesn't overflow
-             // Actually, 'flex-grow' helps. 
+             minHeight: selectedItem ? '50vh' : '0'
         }}
       >
         {selectedItem && getContentForItem(selectedItem)}
@@ -1043,7 +1042,7 @@ export default function Work() {
   return (
     // Fixed page size for Merch (h-screen overflow-hidden) to prevent body scroll
     // Graphic Design allows scrolling
-    <main className={`transition-colors duration-500 font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'w-full flex-grow'}`}>
+    <main className={`transition-colors duration-500 min-h-screen font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'w-full'}`}>
       
       {/* Mini nav - Adjusted z-index to sit on top of carousel */}
       <div 
@@ -1085,7 +1084,7 @@ export default function Work() {
       {/* Main Content Area with Flex Grow to push footer down */}
       <div className={`w-full flex-grow flex flex-col items-center ${activeCategory === 'merch' ? 'hidden' : ''}`}>
         {activeCategory === 'graphic' && (
-          <section className="w-full max-w-4xl mt-4 mb-20 px-6 flex-grow">
+          <section className="w-full max-w-4xl mt-4 mb-0 px-6 flex-grow flex flex-col">
             <GraphicDesignSection 
               items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN']} 
               onDetailViewChange={setIsGraphicDetailView}

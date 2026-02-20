@@ -521,7 +521,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
             </div>
 
             {/* Scrolling marquee of 2025 images - moved inside the sticky container to prevent overlap */}
-            {showMarquee && isLocalhost && (
+            {showMarquee && (
               <div 
                 className={`transition-all duration-500 ease-in-out cursor-pointer active:cursor-grabbing ${isMobileOrTablet ? 'w-full py-24 overflow-hidden relative' : 'absolute left-1/2 -translate-x-1/2 w-screen overflow-hidden'}`}
                 style={{ 
