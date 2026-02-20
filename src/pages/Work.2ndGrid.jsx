@@ -316,7 +316,6 @@ const PostersContent = () => {
       "/Images/2025/POSTERS/post00.jpg",
       "/Images/2025/POSTERS/food0.jpg",
       "/Images/2025/POSTERS/post.jpg",
-      "/Images/2025/POSTERS/filter-announcer.jpg",
       "/Images/2025/POSTERS/post0.jpg",
     ];
 
@@ -340,7 +339,7 @@ const PostersContent = () => {
 
     // Force render state for the animation loop
     const [tick, setTick] = useState(0);
-    const [expandedSrc, setExpandedSrc] = useState(null);
+    // expandedSrc removed — using hover-to-colour instead of click expansion
     const containerRef = useRef(null);
 
     // Grid Params
@@ -350,8 +349,19 @@ const PostersContent = () => {
     const ANIM_SPEED = 0.05; // Even smoother slow drift
 
     // Gradient Control State
-    const [gradientStart, setGradientStart] = useState(15); // Percentage
-    const [gradientEnd, setGradientEnd] = useState(50); // Percentage
+    // Gradient (hardcoded for desktop + iPad per request)
+    const GRADIENT_START = 10;
+    const GRADIENT_END = 42;
+
+    // Tablet detection: treat iPad widths as tablet (no hover-to-colour)
+    const [isTablet, setIsTablet] = useState(false);
+    useEffect(() => {
+      const m = window.matchMedia('(min-width: 641px) and (max-width: 1024px)');
+      const handler = (e) => setIsTablet(e.matches);
+      setIsTablet(m.matches);
+      if (m.addEventListener) m.addEventListener('change', handler); else m.addListener(handler);
+      return () => { if (m.removeEventListener) m.removeEventListener('change', handler); else m.removeListener(handler); };
+    }, []);
     
     // Single Loop for Animation + Render
     useEffect(() => {
@@ -424,57 +434,14 @@ const PostersContent = () => {
         );
     }
 
-    // Expanded Modal (Desktop)
-    if (expandedSrc) {
-        return (
-            <div 
-                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-8 cursor-zoom-out animate-in fade-in duration-300"
-                onClick={() => setExpandedSrc(null)}
-            >
-                <img src={expandedSrc} className="max-w-full max-h-full object-contain shadow-2xl" />
-            </div>
-        )
-    }
+    // Expanded modal removed — hover-to-colour replaces click expansion
 
     // Infinite Grid Render via Portal to escape parent transforms/clipping
     if (typeof document === 'undefined') return null;
 
     return createPortal(
       <>
-      {/* Gradient Controls (Dev Tool) */}
-      {!isMobile && (
-          <div className="fixed top-24 right-4 z-[100] bg-black/80 p-4 rounded text-white text-xs flex flex-col gap-2 w-48 backdrop-blur-md pointer-events-auto">
-              <div className="font-bold border-b border-white/20 pb-1 mb-1">Grid Fade Controls</div>
-              
-              <div className="flex flex-col gap-1">
-                  <label className="flex justify-between">
-                      <span>Start %</span>
-                      <span>{gradientStart}%</span>
-                  </label>
-                  <input 
-                      type="range" 
-                      min="0" max="100" step="1" 
-                      value={gradientStart} 
-                      onChange={(e) => setGradientStart(Number(e.target.value))}
-                      className="accent-white"
-                  />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                  <label className="flex justify-between">
-                      <span>End %</span>
-                      <span>{gradientEnd}%</span>
-                  </label>
-                  <input 
-                      type="range" 
-                      min="0" max="100" step="1" 
-                      value={gradientEnd} 
-                      onChange={(e) => setGradientEnd(Number(e.target.value))}
-                      className="accent-white"
-                  />
-              </div>
-          </div>
-      )}
+      {/* Gradient controls removed — hardcoded to GRADIENT_START / GRADIENT_END */}
 
       <div 
         ref={containerRef}
@@ -482,15 +449,10 @@ const PostersContent = () => {
         style={{ 
             zIndex: 0, // 0 to sit behind z-10 content but above -z global background
              // Dynamic Mask Image based on controls
-             maskImage: `linear-gradient(to bottom, transparent 0%, transparent ${gradientStart}%, black ${gradientEnd}%, black 100%)`,
-             WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, transparent ${gradientStart}%, black ${gradientEnd}%, black 100%)`
+             maskImage: `linear-gradient(to bottom, transparent 0%, transparent ${GRADIENT_START}%, black ${GRADIENT_END}%, black 100%)`,
+             WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, transparent ${GRADIENT_START}%, black ${GRADIENT_END}%, black 100%)`
         }} 
         onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      >
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
@@ -548,31 +510,27 @@ const PostersContent = () => {
                      // Let's just keep it simple grid for now as requested.
                      
                      tiles.push(
-                         <div
-                            key={`${c}-${r}`}
-                            onClick={() => {
-                                if(!isDragging) setExpandedSrc(posters[index]);
-                            }}
-                            className="absolute will-change-transform" 
-                            style={{
-                                transform: `translate3d(${c * itemW + currentOffset.x}px, ${r * itemH + effectiveOffsetY}px, 0)`,
-                                top: 0,
-                                left: 0,
-                                width: TILE_W,
-                                height: TILE_H,
-                            }}
-                         >
-                            <div className="w-full h-full hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2">
-                                <img 
-                                    src={posters[index]} 
-                                    className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
-                                    loading="lazy"
-                                />
-                            </div>
+                       <div
+                         key={`${c}-${r}`}
+                         className="absolute will-change-transform"
+                         style={{
+                           transform: `translate3d(${c * itemW + currentOffset.x}px, ${r * itemH + effectiveOffsetY}px, 0)`,
+                           top: 0,
+                           left: 0,
+                           width: TILE_W,
+                           height: TILE_H,
+                         }}
+                       >
+                         <div className="w-full h-full hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2">
+                           <img
+                             src={posters[index]}
+                             className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
+                             loading="lazy"
+                           />
                          </div>
-                     )
-                 }
-             }
+                       </div>
+                     );
+             
              return tiles;
         })()}
         </div>
@@ -733,7 +691,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
                         fontFamily: "'PT Mono', monospace",
                       }}
                     >
-                      SCROLL ANY DIRECTION TO EXPLORE, CLICK TO EXPAND
+                      SCROLL ANY DIRECTION TO EXPLORE, HOVER TO COLOUR
                     </h3>
                 </div>
               )}

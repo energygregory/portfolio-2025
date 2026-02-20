@@ -316,7 +316,6 @@ const PostersContent = () => {
       "/Images/2025/POSTERS/post00.jpg",
       "/Images/2025/POSTERS/food0.jpg",
       "/Images/2025/POSTERS/post.jpg",
-      "/Images/2025/POSTERS/filter-announcer.jpg",
       "/Images/2025/POSTERS/post0.jpg",
     ];
 
@@ -333,7 +332,7 @@ const PostersContent = () => {
     const [offset, setOffset] = useState({ x: 0, y: 0 }); 
     const [isDragging, setIsDragging] = useState(false);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
-    const [expandedSrc, setExpandedSrc] = useState(null);
+    // expandedSrc removed — using hover-to-colour instead of click expansion
     const containerRef = useRef(null);
 
     // Grid Params
@@ -341,45 +340,23 @@ const PostersContent = () => {
     const TILE_H = 420;
     const GAP = 40;
 
-    // Gradient Control State
-    const [gradientStart, setGradientStart] = useState(15); // Percentage
-    const [gradientEnd, setGradientEnd] = useState(50); // Percentage
+    // Gradient (hardcoded for desktop + iPad per request)
+    const GRADIENT_START = 10;
+    const GRADIENT_END = 42;
+
+    // Tablet detection: treat iPad widths as tablet (no hover-to-colour)
+    const [isTablet, setIsTablet] = useState(false);
+    useEffect(() => {
+      const m = window.matchMedia('(min-width: 641px) and (max-width: 1024px)');
+      const handler = (e) => setIsTablet(e.matches);
+      setIsTablet(m.matches);
+      if (m.addEventListener) m.addEventListener('change', handler); else m.addListener(handler);
+      return () => { if (m.removeEventListener) m.removeEventListener('change', handler); else m.removeListener(handler); };
+    }, []);
     
     // Mouse/Touch Handlers for Desktop Pan
     const handleMouseDown = (e) => {
-        if(isMobile) return;
-        setIsDragging(true);
-        setLastPos({ x: e.clientX, y: e.clientY });
-        e.preventDefault(); // Prevent text selection
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - lastPos.x;
-        const dy = e.clientY - lastPos.y;
-        setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-        setLastPos({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-
-    const handleWheel = (e) => {
-        // Optional: Map scroll wheel to pan as well for "scroll to explore"
-        const dx = -e.deltaX;
-        const dy = -e.deltaY;
-        setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-    };
-
-    if (isMobile) {
-        // Mobile: Horizontal Scroll Snap
-        return (
-            <div className="w-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar pointer-events-auto" style={{ scrollPaddingLeft: '50%', scrollPaddingRight: '50%' }}>
-                <div className="flex gap-4 px-[50vw]">  
-                  {posters.map((src, i) => (
-                      <div 
-                        key={i} 
+          {/* Gradient controls removed — hardcoded to GRADIENT_START / GRADIENT_END */}
                         className="relative flex-shrink-0 w-[70vw] aspect-[2/3] snap-center shadow-lg rounded-sm overflow-hidden"
                       >
                            <img 
@@ -395,17 +372,7 @@ const PostersContent = () => {
         );
     }
 
-    // Expanded Modal (Desktop)
-    if (expandedSrc) {
-        return (
-            <div 
-                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-8 cursor-zoom-out animate-in fade-in duration-300"
-                onClick={() => setExpandedSrc(null)}
-            >
-                <img src={expandedSrc} className="max-w-full max-h-full object-contain shadow-2xl" />
-            </div>
-        )
-    }
+    // Expanded modal removed — hover-to-colour replaces click expansion
 
     // Infinite Grid Render via Portal to escape parent transforms/clipping
     if (typeof document === 'undefined') return null;
@@ -413,39 +380,7 @@ const PostersContent = () => {
     return createPortal(
       <>
       {/* Gradient Controls (Dev Tool) */}
-      {!isMobile && (
-          <div className="fixed top-24 right-4 z-[100] bg-black/80 p-4 rounded text-white text-xs flex flex-col gap-2 w-48 backdrop-blur-md pointer-events-auto">
-              <div className="font-bold border-b border-white/20 pb-1 mb-1">Grid Fade Controls</div>
-              
-              <div className="flex flex-col gap-1">
-                  <label className="flex justify-between">
-                      <span>Start %</span>
-                      <span>{gradientStart}%</span>
-                  </label>
-                  <input 
-                      type="range" 
-                      min="0" max="100" step="1" 
-                      value={gradientStart} 
-                      onChange={(e) => setGradientStart(Number(e.target.value))}
-                      className="accent-white"
-                  />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                  <label className="flex justify-between">
-                      <span>End %</span>
-                      <span>{gradientEnd}%</span>
-                  </label>
-                  <input 
-                      type="range" 
-                      min="0" max="100" step="1" 
-                      value={gradientEnd} 
-                      onChange={(e) => setGradientEnd(Number(e.target.value))}
-                      className="accent-white"
-                  />
-              </div>
-          </div>
-      )}
+        {/* Gradient controls removed — hardcoded to GRADIENT_START / GRADIENT_END */}
 
       <div 
         ref={containerRef}
@@ -453,15 +388,10 @@ const PostersContent = () => {
         style={{ 
             zIndex: 0, // 0 to sit behind z-10 content but above -z global background
              // Dynamic Mask Image based on controls
-             maskImage: `linear-gradient(to bottom, transparent 0%, transparent ${gradientStart}%, black ${gradientEnd}%, black 100%)`,
-             WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, transparent ${gradientStart}%, black ${gradientEnd}%, black 100%)`
+             maskImage: `linear-gradient(to bottom, transparent 0%, transparent ${GRADIENT_START}%, black ${GRADIENT_END}%, black 100%)`,
+             WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, transparent ${GRADIENT_START}%, black ${GRADIENT_END}%, black 100%)`
         }} 
         onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      >
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
@@ -504,11 +434,9 @@ const PostersContent = () => {
                      // Let's just keep it simple grid for now as requested.
                      
                      tiles.push(
-                         <div
-                            key={`${c}-${r}`}
-                            onClick={() => {
-                                if(!isDragging) setExpandedSrc(posters[index]);
-                            }}
+                     <div
+                       key={`${c}-${r}`}
+                            
                             className="absolute hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2"
                             style={{
                                 left: c * itemW + offset.x,
@@ -689,7 +617,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
                         fontFamily: "'PT Mono', monospace",
                       }}
                     >
-                      SCROLL ANY DIRECTION TO EXPLORE, CLICK TO EXPAND
+                      SCROLL ANY DIRECTION TO EXPLORE, HOVER TO COLOUR
                     </h3>
                 </div>
               )}

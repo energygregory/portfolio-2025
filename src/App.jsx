@@ -983,6 +983,38 @@ function App() {
           />
         )}
 
+        {/* Home-only Asset1 controls (desktop + iPad) */}
+        {location.pathname === '/' && (viewMode === 'desktop' || isTablet) && (
+          <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px'}}>
+            <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>
+            <div className="flex items-center gap-2" style={{marginBottom:6}}>
+              <label style={{width:80,fontSize:12}}>Scale</label>
+              <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} />
+              <input type="number" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} style={{width:'60px'}} />
+            </div>
+            <div className="flex items-center gap-2" style={{marginBottom:6}}>
+              <label style={{width:80,fontSize:12}}>Y pos</label>
+              <input type="range" min="-8000" max="2000" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
+              <input type="number" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{width:'80px'}} />
+            </div>
+            <div className="flex items-center gap-2" style={{marginBottom:6}}>
+              <label style={{width:80,fontSize:12}}>Thickness</label>
+              <input type="range" min="0" max="20" step="0.1" value={liveConfig.assetOutlineThickness ?? 0.8} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
+              <input type="number" step="0.1" value={liveConfig.assetOutlineThickness ?? 0.8} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'60px'}} />
+            </div>
+            <div className="flex items-center gap-2" style={{marginBottom:6}}>
+              <label style={{width:80,fontSize:12}}>X stretch</label>
+              <input type="range" min="-10" max="30" step="0.01" value={liveConfig.assetH ?? 1} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} />
+              <input type="number" step="0.01" value={liveConfig.assetH ?? 1} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} style={{width:'60px'}} />
+            </div>
+            <div className="flex items-center gap-2">
+              <label style={{width:80,fontSize:12}}>Y stretch</label>
+              <input type="range" min="-10" max="30" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
+              <input type="number" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} style={{width:'60px'}} />
+            </div>
+          </div>
+        )}
+
       {/* DEBUG PANEL - FIXED BOTTOM CENTER - DESKTOP ONLY - HIDDEN */}
       {false && viewMode === 'desktop' && (
       <div 
