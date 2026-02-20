@@ -994,12 +994,12 @@ function App() {
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>X pos</label>
-              <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
+              <input type="range" min="-8000" max="8000" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
               <input type="number" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{width:'60px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>Y pos</label>
-              <input type="range" min="-8000" max="2000" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
+              <input type="range" min="-8000" max="8000" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
               <input type="number" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{width:'80px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
@@ -1078,12 +1078,12 @@ function App() {
           <div style={{fontWeight: 'bold', marginTop: '10px'}}>Asset 1</div>
           <div className="flex items-center gap-2">
             <label>X pos: </label>
-            <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
+            <input type="range" min="-5000" max="5000" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
             <input type="number" step="1" value={liveConfig.assetX} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
           <div className="flex items-center gap-2">
             <label>Y pos: </label>
-            <input type="range" min="-5000" max="2000" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
+            <input type="range" min="-8000" max="8000" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
             <input type="number" step="1" value={liveConfig.assetY} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{width:'60px', color:'black'}} />
           </div>
           <div className="flex items-center gap-2">

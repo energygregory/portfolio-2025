@@ -1,4 +1,5 @@
 import React from 'react';
+
 export default function Landing() {
   return (
     <div style={{
@@ -35,7 +36,7 @@ export default function Landing() {
         justifyContent: 'center'
       }}>
         <a
-          href="https://instagram.com"
+          href="https://instagram.com/0021.studio"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Instagram"
@@ -53,7 +54,7 @@ export default function Landing() {
         </a>
 
         <a
-          href="https://behance.net"
+          href="https://behance.net/grega"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Behance"
@@ -71,7 +72,7 @@ export default function Landing() {
         </a>
 
         <a
-          href="https://twitter.com"
+          href="https://x.com/energygregory"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="X (Twitter)"

@@ -616,33 +616,37 @@ const PostersContent = () => {
 
 
     if (isMobile) {
-        // Mobile: Horizontal Scroll Snap
-        // NOTE: posterData is an array of objects { src, aspectRatio }, so we map map it properly for mobile too
+        // Mobile: Fanned "Deck" Layout
+        // No snap, no swipe-like feel (standard scroll physics but overlapping)
+        // High overlap (-ml) to create stack effect
         return (
             <div className="fixed inset-0 top-[100px] z-[50] w-full flex flex-col items-center bg-transparent pointer-events-auto"> 
-                 {/*  Use a fixed full-screen overlay for Posters mobile view to ensure visibility on top of everything */}
-                <div className="w-full h-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar" style={{ scrollPaddingLeft: '15%', scrollPaddingRight: '15%' }}>
-                    <div className="flex gap-4 px-8 items-center">  
-                    {posterData.map((item, i) => (
-                        <div 
-                            key={i} 
-                            className="relative flex-shrink-0 w-[80vw] max-w-[400px] aspect-[2/3] snap-center shadow-2xl rounded-sm overflow-hidden bg-black"
-                            style={{ aspectRatio: item.aspectRatio }}
-                            onMouseEnter={() => setHoveredPosterIndex(i)}
-                            onMouseLeave={() => setHoveredPosterIndex(null)}
-                        >
-                            <img 
-                                src={item.src} 
-                                alt={`Poster ${i + 1}`}
-                                className="w-full h-full object-contain transition-all duration-200"
-                                style={{
-                                  filter: hoveredPosterIndex === i ? 'grayscale(0%)' : 'grayscale(100%)'
+                <div className="w-full h-full flex items-center overflow-x-auto no-scrollbar pb-12 pt-12 pl-[15vw] pr-[50vw]">
+                    <div className="flex items-center" style={{ height: '60vh' }}>  
+                    {posterData.map((item, i) => {
+                        // Random-ish rotation based on index to look like a messy pile
+                        const rotate = (i % 5 - 2) * 3; 
+                        return (
+                            <div 
+                                key={i} 
+                                className="relative flex-shrink-0 w-[60vw] max-w-[300px] shadow-2xl rounded-sm overflow-hidden bg-black transition-transform duration-300"
+                                style={{ 
+                                    aspectRatio: item.aspectRatio,
+                                    // Heavy negative margin to stack them
+                                    marginLeft: i === 0 ? 0 : '-45vw', 
+                                    transform: `rotate(${rotate}deg)`,
+                                    zIndex: i
                                 }}
-                                fetchPriority={i < PRIORITY_COUNT ? 'high' : undefined}
-                                loading={i < PRIORITY_COUNT ? 'eager' : 'lazy'}
-                            />
-                        </div>
-                    ))}
+                            >
+                                <img 
+                                    src={item.src} 
+                                    alt={`Poster ${i + 1}`}
+                                    className="w-full h-full object-contain pointer-events-none"
+                                    loading={i < PRIORITY_COUNT ? 'eager' : 'lazy'}
+                                />
+                            </div>
+                        );
+                    })}
                     </div>
                 </div>
             </div>
