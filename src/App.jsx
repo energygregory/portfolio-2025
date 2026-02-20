@@ -972,7 +972,7 @@ function App() {
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute left-1/2 top-12 ${location.pathname === '/' ? 'z-20' : 'z-0'}`}
             style={{
-              transform: `translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
+              transform: `scale(${liveConfig.assetScale ?? 1}) translateX(calc(-50% + ${liveConfig.assetX}px)) translateY(${liveConfig.assetY}px) scaleX(${liveConfig.assetH}) scaleY(${liveConfig.assetV}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
               width: '140%',
               maxWidth: 'none',
               height: 'auto',
