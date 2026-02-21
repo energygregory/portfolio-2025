@@ -601,8 +601,10 @@ function App() {
   // Apply hardcoded desktop Home settings for specific viewports
   useEffect(() => {
     if (location.pathname === '/' && viewMode === 'desktop') {
+      console.log('[Hardcode Check] Current dimensions:', screenDimensions);
       // 2133x1002 viewport hardcodes
       if (screenDimensions === '2133x1002') {
+        console.log('[Hardcode Applied] 2133x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.41,
@@ -616,6 +618,7 @@ function App() {
       }
       // 2083x1002 viewport hardcodes
       else if (screenDimensions === '2083x1002') {
+        console.log('[Hardcode Applied] 2083x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.41,
@@ -634,6 +637,7 @@ function App() {
       }
       // 1926x1002 viewport hardcodes
       else if (screenDimensions === '1926x1002') {
+        console.log('[Hardcode Applied] 1926x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.41,
@@ -652,6 +656,7 @@ function App() {
       }
       // 1756x1002 viewport hardcodes
       else if (screenDimensions === '1756x1002') {
+        console.log('[Hardcode Applied] 1756x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.41,
@@ -670,6 +675,7 @@ function App() {
       }
       // 1661x1002 viewport hardcodes
       else if (screenDimensions === '1661x1002') {
+        console.log('[Hardcode Applied] 1661x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.41,
@@ -688,6 +694,7 @@ function App() {
       }
       // 1604x1002 viewport hardcodes
       else if (screenDimensions === '1604x1002') {
+        console.log('[Hardcode Applied] 1604x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.41,
@@ -706,6 +713,7 @@ function App() {
       }
       // 1312x1002 viewport hardcodes
       else if (screenDimensions === '1312x1002') {
+        console.log('[Hardcode Applied] 1312x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.41,
@@ -724,6 +732,7 @@ function App() {
       }
       // 1263x1002 viewport hardcodes
       else if (screenDimensions === '1263x1002') {
+        console.log('[Hardcode Applied] 1263x1002');
         setLiveConfig(prev => ({
           ...prev,
           assetScale: 0.3,
@@ -978,7 +987,7 @@ function App() {
             }
             style={{ pointerEvents: isNavLocked ? 'none' : 'auto', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Work {isNavLocked && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>}
+            Work
           </NavLink>
           <NavLink
             to="/about"
@@ -988,7 +997,7 @@ function App() {
             }
             style={{ pointerEvents: isNavLocked ? 'none' : 'auto', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            About {isNavLocked && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>}
+            About
           </NavLink>
           <NavLink
             to="/contact"
@@ -998,7 +1007,7 @@ function App() {
             }
             style={{ pointerEvents: isNavLocked ? 'none' : 'auto', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Contact {isNavLocked && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2.5 h-2.5 sm:w-3 sm:h-3 ml-1 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>}
+            Contact
           </NavLink>
         </nav>
       </header>
@@ -1056,7 +1065,7 @@ function App() {
             }
             style={{ pointerEvents: isNavLocked ? 'none' : 'auto', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Work {isNavLocked && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>}
+            Work
           </NavLink>
           <NavLink
             to="/about"
@@ -1066,7 +1075,7 @@ function App() {
             }
             style={{ pointerEvents: isNavLocked ? 'none' : 'auto', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            About {isNavLocked && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>}
+            About
           </NavLink>
           <NavLink
             to="/contact"
@@ -1076,7 +1085,7 @@ function App() {
             }
             style={{ pointerEvents: isNavLocked ? 'none' : 'auto', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800, fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
           >
-            Contact {isNavLocked && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="inline w-2 h-2 ml-0.5 align-middle"><path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /></svg>}
+            Contact
           </NavLink>
         </nav>
       </header>
@@ -1128,9 +1137,9 @@ function App() {
           />
         )}
 
-        {/* Home-only Asset1 controls (desktop + iPad) */}
+        {/* Home-only Asset1 controls (desktop + iPad) - HIDDEN */}
         {location.pathname === '/' && (viewMode === 'desktop' || isTablet) && (
-          <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px'}}>
+          <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: 'none'}}>
             <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>
             {/* Browser window size detection */}
             <div style={{fontSize:11, marginBottom:8}}>
