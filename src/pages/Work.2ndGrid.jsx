@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
+import ResponsiveImage from "../components/ResponsiveImage.jsx";
 
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
@@ -412,23 +413,67 @@ const PostersContent = () => {
 
 
     if (isMobile) {
-        // Mobile: Horizontal Scroll Snap
+        // Mobile: Duplicate posters row above the main row
         return (
             <div className="w-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar pointer-events-auto" style={{ scrollPaddingLeft: '50%', scrollPaddingRight: '50%' }}>
-                <div className="flex gap-4 px-[50vw]">  
-                  {posters.map((src, i) => (
-                      <div 
-                        key={i} 
-                        className="relative flex-shrink-0 w-[70vw] aspect-[2/3] snap-center shadow-lg rounded-sm overflow-hidden"
-                      >
-                           <img 
-                              src={src} 
-                              alt={`Poster ${i + 1}`}
-                              className="w-full h-full object-cover"
+                <div className="flex flex-col gap-0 px-[50vw] items-center" style={{ width: '100%' }}>
+                    {(() => {
+                      const [portraitList, setPortraitList] = React.useState([]);
+                      const [landscapeList, setLandscapeList] = React.useState([]);
+
+                      React.useEffect(() => {
+                        let mounted = true;
+                        Promise.all(posters.map(src => new Promise(resolve => {
+                          const img = new Image();
+                          img.src = src;
+                          img.onload = () => resolve({ src, w: img.naturalWidth, h: img.naturalHeight });
+                          img.onerror = () => resolve({ src, w: 1, h: 1 });
+                        }))).then(results => {
+                          if (!mounted) return;
+                          const portraits = results.filter(r => (r.w / r.h) < 1).map(r => r.src);
+                          const landscapes = results.filter(r => (r.w / r.h) >= 1).map(r => r.src);
+                          setPortraitList(portraits);
+                          setLandscapeList(landscapes);
+                        });
+                        return () => { mounted = false; };
+                      }, [posters]);
+
+                      return (
+                        <>
+                        <div className="flex gap-4 mb-12 z-40" style={{ width: '100%' }}>
+                        {portraitList.map((src, i) => {
+                          const rotate = (i % 5 - 2) * 3;
+                          return (
+                            <ResponsiveImage
+                              key={`dup-${i}`}
+                              src={src}
+                              alt={`Poster duplicate ${i + 1}`}
+                              className="flex-shrink-0 w-[50vw] max-w-[260px] object-cover"
                               loading="lazy"
-                           />
-                      </div>
-                  ))}
+                              style={{ marginLeft: i === 0 ? 0 : '-45vw', transform: `rotate(${rotate}deg)`, zIndex: 1000 - i, display: 'block' }}
+                            />
+                          );
+                        })}
+                        </div>
+
+                        <div className="flex gap-4 z-30 mt-6" style={{ width: '100%' }}>
+                        {landscapeList.map((src, i) => {
+                          const rotate = (i % 5 - 2) * 3;
+                          return (
+                            <ResponsiveImage
+                              key={`main-${i}`}
+                              src={src}
+                              alt={`Poster ${i + 1}`}
+                              className="flex-shrink-0 w-[60vw] max-w-[300px] object-cover"
+                              loading="lazy"
+                              style={{ marginLeft: i === 0 ? 0 : '-45vw', transform: `rotate(${rotate}deg)`, zIndex: i, display: 'block' }}
+                            />
+                          );
+                        })}
+                        </div>
+                        </>
+                      );
+                    })()}
                 </div>
             </div>
         );
@@ -521,8 +566,8 @@ const PostersContent = () => {
                            height: TILE_H,
                          }}
                        >
-                         <div className="w-full h-full hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2">
-                           <img
+                           <div className="w-full h-full hover:scale-[1.02] transition-transform duration-300 ease-out flex items-center justify-center p-2">
+                           <ResponsiveImage
                              src={posters[index]}
                              className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
                              loading="lazy"

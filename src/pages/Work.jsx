@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
 import Footer from "../components/Footer";
+import ResponsiveImage from "../components/ResponsiveImage.jsx";
 
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
@@ -616,41 +617,67 @@ const PostersContent = () => {
 
 
     if (isMobile) {
-        // Mobile: Fanned "Deck" Layout
-        // No snap, no swipe-like feel (standard scroll physics but overlapping)
-        // High overlap (-ml) to create stack effect
-        return (
-            <div className="fixed inset-0 top-[100px] z-[50] w-full flex flex-col items-center bg-transparent pointer-events-auto"> 
-                <div className="w-full h-full flex items-center overflow-x-auto no-scrollbar pb-12 pt-12 pl-[15vw] pr-[50vw]">
-                    <div className="flex items-center" style={{ height: '60vh' }}>  
-                    {posterData.map((item, i) => {
-                        // Random-ish rotation based on index to look like a messy pile
-                        const rotate = (i % 5 - 2) * 3; 
-                        return (
-                            <div 
-                                key={i} 
-                                className="relative flex-shrink-0 w-[60vw] max-w-[300px] shadow-2xl rounded-sm overflow-hidden bg-black transition-transform duration-300"
-                                style={{ 
-                                    aspectRatio: item.aspectRatio,
-                                    // Heavy negative margin to stack them
-                                    marginLeft: i === 0 ? 0 : '-45vw', 
-                                    transform: `rotate(${rotate}deg)`,
-                                    zIndex: i
-                                }}
-                            >
-                                <img 
-                                    src={item.src} 
-                                    alt={`Poster ${i + 1}`}
-                                    className="w-full h-full object-contain pointer-events-none"
-                                    loading={i < PRIORITY_COUNT ? 'eager' : 'lazy'}
-                                />
+      // Mobile: Duplicate the poster row and place the duplicate above the main row
+      return (
+        <div className="fixed inset-0 top-[100px] z-[50] w-full flex flex-col items-center bg-transparent pointer-events-auto"> 
+          <div className="w-full h-full flex items-center overflow-x-auto no-scrollbar pb-12 pt-12 pl-[15vw] pr-[50vw]">
+            <div className="flex flex-col items-center" style={{ height: '80vh' }}>
+                        {/* Split posters: portraits on top, landscapes on bottom */}
+                        {(() => {
+                          const portraits = posterData.filter(p => (Number(p.aspectRatio) || 1) < 1);
+                          const landscapes = posterData.filter(p => (Number(p.aspectRatio) || 1) >= 1);
+                          return (
+                            <>
+                            <div className="flex items-center mb-12 z-40" style={{ height: '60vh' }}>
+                              {portraits.map((item, i) => {
+                                const rotate = (i % 5 - 2) * 3;
+                                const origIndex = posterData.findIndex(p => p.src === item.src);
+                                return (
+                                  <ResponsiveImage
+                                    key={`dup-${i}`}
+                                    src={item.src}
+                                    alt={`Poster duplicate ${i + 1}`}
+                                    className="flex-shrink-0 w-[50vw] max-w-[260px] object-contain pointer-events-none transition-transform duration-300"
+                                    loading={origIndex >= 0 && origIndex < PRIORITY_COUNT ? 'eager' : 'lazy'}
+                                    style={{
+                                      marginLeft: i === 0 ? 0 : '-45vw',
+                                      transform: `rotate(${rotate}deg)`,
+                                      zIndex: 1000 - i,
+                                      display: 'block'
+                                    }}
+                                  />
+                                );
+                              })}
                             </div>
-                        );
-                    })}
-                    </div>
-                </div>
+
+                            <div className="flex items-center z-30 mt-6" style={{ height: '60vh' }}>
+                              {landscapes.map((item, i) => {
+                                const rotate = (i % 5 - 2) * 3;
+                                const origIndex = posterData.findIndex(p => p.src === item.src);
+                                return (
+                                  <ResponsiveImage
+                                    key={`main-${i}`}
+                                    src={item.src}
+                                    alt={`Poster ${i + 1}`}
+                                    className="flex-shrink-0 w-[60vw] max-w-[300px] object-contain pointer-events-none transition-transform duration-300"
+                                    loading={origIndex >= 0 && origIndex < PRIORITY_COUNT ? 'eager' : 'lazy'}
+                                    style={{
+                                      marginLeft: i === 0 ? 0 : '-45vw',
+                                      transform: `rotate(${rotate}deg)`,
+                                      zIndex: i,
+                                      display: 'block'
+                                    }}
+                                  />
+                                );
+                              })}
+                            </div>
+                            </>
+                          );
+                        })()}
             </div>
-        );
+          </div>
+        </div>
+      );
     }
 
     // Expanded modal removed — hover-to-colour replaces click expansion
@@ -749,8 +776,8 @@ const PostersContent = () => {
                                  >
                                     <div className="w-full h-full flex items-center justify-center bg-black">
                                         {/* Use object-contain to ensure NO cutting, with black background filling gaps if any (though tiles fit generally) */}
-                                        <img 
-                                          src={posterData[item.index].src} 
+                                        <ResponsiveImage
+                                          src={posterData[item.index].src}
                                           className="w-full h-full block pointer-events-none select-none object-contain transition-all duration-200"
                                           style={{
                                             filter: isTablet ? 'none' : (hoveredPosterIndex === item.index ? 'grayscale(0%)' : 'grayscale(100%)')

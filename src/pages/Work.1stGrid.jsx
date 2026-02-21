@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
+import ResponsiveImage from "../components/ResponsiveImage.jsx";
 
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
@@ -210,28 +211,73 @@ const LogosContent = () => {
                    <div 
                       className="w-full h-full p-8 md:p-8 flex items-center justify-center"
                       style={
-                         isMobile 
-                         ? { padding: `${Math.max(4, 32 + paddingY)}px ${Math.max(4, 32 + paddingX)}px` } // Mobile: apply dynamic padding
-                         : { padding: `${32 + paddingY}px ${32 + paddingX}px` } // Desktop: apply dynamic padding (previously hardcoded, aligned with mobile logic now)
-                      }
-                      onTouchStart={(e) => {
-                         // Stop propagation to prevent grid scrolling issues? 
-                         // No, we want to allow scrolling if not pressed.
-                         handleTouchStart(src, e);
-                      }}
-                      onTouchEnd={handleTouchEnd}
-                      onTouchCancel={handleTouchEnd}
-                   >
-                        {/* Light Mode: Mask with Black */}
-                        <div 
-                            className="block dark:hidden w-full h-full bg-black pointer-events-none transition-transform duration-200"
-                            style={{
-                            maskImage: `url('${src}')`,
-                            maskSize: 'contain',
-                            maskRepeat: 'no-repeat',
-                            maskPosition: 'center',
-                            WebkitMaskImage: `url('${src}')`,
-                            WebkitMaskSize: 'contain',
+                        if (isMobile) {
+                          // Mobile: duplicate row above main row for posters
+                          return (
+                            <div className="w-full flex items-center py-12 px-0 overflow-x-auto snap-x snap-mandatory no-scrollbar pointer-events-auto" style={{ scrollPaddingLeft: '50%', scrollPaddingRight: '50%' }}>
+                              <div className="flex flex-col gap-0 px-[50vw] items-center" style={{ width: '100%' }}>
+                              {(() => {
+                                // Determine orientation by loading images and grouping
+                                const [portraitList, setPortraitList] = React.useState([]);
+                                const [landscapeList, setLandscapeList] = React.useState([]);
+
+                                React.useEffect(() => {
+                                  let mounted = true;
+                                  Promise.all(posters.map(src => new Promise(resolve => {
+                                    const img = new Image();
+                                    img.src = src;
+                                    img.onload = () => resolve({ src, w: img.naturalWidth, h: img.naturalHeight });
+                                    img.onerror = () => resolve({ src, w: 1, h: 1 });
+                                  }))).then(results => {
+                                    if (!mounted) return;
+                                    const portraits = results.filter(r => (r.w / r.h) < 1).map(r => r.src);
+                                    const landscapes = results.filter(r => (r.w / r.h) >= 1).map(r => r.src);
+                                    setPortraitList(portraits);
+                                    setLandscapeList(landscapes);
+                                  });
+                                  return () => { mounted = false; };
+                                }, [posters]);
+
+                                return (
+                                  <>
+                                  <div className="flex gap-4 mb-12 z-40" style={{ width: '100%' }}>
+                                    {portraitList.map((src, i) => {
+                                      const rotate = (i % 5 - 2) * 3;
+                                      return (
+                                        <ResponsiveImage
+                                          key={`dup-${i}`}
+                                          src={src}
+                                          alt={`Poster duplicate ${i + 1}`}
+                                          className="flex-shrink-0 w-[50vw] max-w-[260px] object-cover"
+                                          loading="lazy"
+                                          style={{ marginLeft: i === 0 ? 0 : '-45vw', transform: `rotate(${rotate}deg)`, zIndex: 1000 - i, display: 'block' }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+
+                                  <div className="flex gap-4 z-30 mt-6" style={{ width: '100%' }}>
+                                    {landscapeList.map((src, i) => {
+                                      const rotate = (i % 5 - 2) * 3;
+                                      return (
+                                        <ResponsiveImage
+                                          key={`main-${i}`}
+                                          src={src}
+                                          alt={`Poster ${i + 1}`}
+                                          className="flex-shrink-0 w-[60vw] max-w-[300px] object-cover"
+                                          loading="lazy"
+                                          style={{ marginLeft: i === 0 ? 0 : '-45vw', transform: `rotate(${rotate}deg)`, zIndex: i, display: 'block' }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                  </>
+                                );
+                              })()}
+                          </div>
+                            </div>
+                          );
+                        }
                             WebkitMaskRepeat: 'no-repeat',
                             WebkitMaskPosition: 'center',
                             // Apply individual scale only
@@ -359,12 +405,12 @@ const PostersContent = () => {
           {/* Gradient controls removed — hardcoded to GRADIENT_START / GRADIENT_END */}
                         className="relative flex-shrink-0 w-[70vw] aspect-[2/3] snap-center shadow-lg rounded-sm overflow-hidden"
                       >
-                           <img 
-                              src={src} 
-                              alt={`Poster ${i + 1}`}
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                           />
+                          <ResponsiveImage
+                            src={src}
+                            alt={`Poster ${i + 1}`}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
                       </div>
                   ))}
                 </div>
@@ -446,10 +492,10 @@ const PostersContent = () => {
                                 // Debug: backgroundColor: 'rgba(255,0,0,0.1)'
                             }}
                          >
-                            <img 
-                                src={posters[index]} 
-                                className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
-                                loading="lazy"
+                            <ResponsiveImage
+                              src={posters[index]}
+                              className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
+                              loading="lazy"
                             />
                          </div>
                      )

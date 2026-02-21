@@ -598,6 +598,151 @@ function App() {
     setLiveConfig(currentConfig);
   }, [currentConfig]);
 
+  // Apply hardcoded desktop Home settings for specific viewports
+  useEffect(() => {
+    if (location.pathname === '/' && viewMode === 'desktop') {
+      // 2133x1002 viewport hardcodes
+      if (screenDimensions === '2133x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.41,
+          assetX: -2037,
+          assetY: -5387,
+          assetOutlineThickness: 0.4,
+          assetH: 1.12,
+          assetV: 1.07,
+          assetRotation: 90
+        }));
+      }
+      // 2083x1002 viewport hardcodes
+      else if (screenDimensions === '2083x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.41,
+          assetX: -1965,
+          assetY: -5311,
+          assetOutlineThickness: 0.4,
+          assetH: 1.13,
+          assetV: 1.11,
+          assetRotation: 90,
+          heroScale: 1.33,
+          heroY: 147,
+          widgetY: 200,
+          marqueeY: 24,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1926x1002 viewport hardcodes
+      else if (screenDimensions === '1926x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.41,
+          assetX: -1859,
+          assetY: -4809,
+          assetOutlineThickness: 0.4,
+          assetH: 1.14,
+          assetV: 1.18,
+          assetRotation: 90,
+          heroScale: 1.44,
+          heroY: 147,
+          widgetY: 200,
+          marqueeY: 49,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1756x1002 viewport hardcodes
+      else if (screenDimensions === '1756x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.41,
+          assetX: -1712,
+          assetY: -4313,
+          assetOutlineThickness: 0.4,
+          assetH: 1.12,
+          assetV: 1.28,
+          assetRotation: 90,
+          heroScale: 1.33,
+          heroY: 147,
+          widgetY: 200,
+          marqueeY: 24,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1661x1002 viewport hardcodes
+      else if (screenDimensions === '1661x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.41,
+          assetX: -1609,
+          assetY: -4013,
+          assetOutlineThickness: 0.4,
+          assetH: 1.12,
+          assetV: 1.4,
+          assetRotation: 90,
+          heroScale: 1.33,
+          heroY: 147,
+          widgetY: 200,
+          marqueeY: 49,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1604x1002 viewport hardcodes
+      else if (screenDimensions === '1604x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.41,
+          assetX: -1540,
+          assetY: -3835,
+          assetOutlineThickness: 0.4,
+          assetH: 1.13,
+          assetV: 1.36,
+          assetRotation: 90,
+          heroScale: 1.33,
+          heroY: 147,
+          widgetY: 200,
+          marqueeY: 24,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1312x1002 viewport hardcodes
+      else if (screenDimensions === '1312x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.41,
+          assetX: -1246,
+          assetY: -2949,
+          assetOutlineThickness: 0.4,
+          assetH: 1.12,
+          assetV: 1.72,
+          assetRotation: 90,
+          heroScale: 1.44,
+          heroY: 225,
+          widgetY: 200,
+          marqueeY: 224,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1263x1002 viewport hardcodes
+      else if (screenDimensions === '1263x1002') {
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.3,
+          assetX: -1970,
+          assetY: -3837,
+          assetOutlineThickness: 0.4,
+          assetH: 1.55,
+          assetV: 2.47,
+          assetRotation: 90,
+          heroScale: 1.18,
+          heroY: 257,
+          widgetY: 200,
+          marqueeY: 181,
+          marqueeItemScale: 0.35
+        }));
+      }
+    }
+  }, [location.pathname, viewMode, screenDimensions]);
+
   const handleConfigChange = (key, value) => {
     setLiveConfig(prev => ({ ...prev, [key]: value }));
   };
@@ -947,8 +1092,8 @@ function App() {
             margin: '0 auto',
             width: '100%',
             opacity: assetHidden ? 0 : 1,
-            transition: 'opacity 300ms ease',
-            willChange: 'opacity',
+            transition: 'opacity 300ms ease, transform 500ms ease-in-out, top 500ms ease-in-out',
+            willChange: 'opacity, transform, top',
             transform: `scale(${liveConfig.widgetScale})`,
             transformOrigin: 'center',
             zIndex: 50,
@@ -977,7 +1122,7 @@ function App() {
               maxWidth: 'none',
               height: 'auto',
               opacity: (location.pathname === '/' && assetHidden) ? 0 : 1,
-              transition: 'opacity 300ms ease, transform 300ms ease',
+              transition: 'opacity 300ms ease, transform 500ms ease-in-out',
               willChange: 'opacity, transform',
             }}
           />
@@ -987,6 +1132,11 @@ function App() {
         {location.pathname === '/' && (viewMode === 'desktop' || isTablet) && (
           <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px'}}>
             <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>
+            {/* Browser window size detection */}
+            <div style={{fontSize:11, marginBottom:8}}>
+              <div>Viewport: {screenDimensions}</div>
+              <div style={{opacity:0.8, fontSize:10}}> DPR: {liveConfig.forcedDPR ?? (typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1)}</div>
+            </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>Scale</label>
               <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} />
@@ -1022,6 +1172,41 @@ function App() {
               <button onClick={() => handleConfigChange('assetRotation', ((liveConfig.assetRotation ?? 0) - 45) % 360)} style={{padding:'4px 8px', fontSize:11, cursor:'pointer'}}>↻ CCW</button>
               <button onClick={() => handleConfigChange('assetRotation', ((liveConfig.assetRotation ?? 0) + 45) % 360)} style={{padding:'4px 8px', fontSize:11, cursor:'pointer'}}>CW ↻</button>
               <span style={{fontSize:11, width:'40px', textAlign:'center'}}>{liveConfig.assetRotation ?? 0}°</span>
+            </div>
+
+            {/* Animated logo scale quick control */}
+            <div className="flex items-center gap-2" style={{marginTop:8}}>
+              <label style={{width:80,fontSize:12}}>Logo Scale</label>
+              <input type="range" min="0.2" max="2" step="0.01" value={liveConfig.heroScale ?? 1} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} />
+              <input type="number" step="0.01" value={liveConfig.heroScale ?? 1} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} style={{width:'60px'}} />
+            </div>
+
+            {/* Logo Y position control */}
+            <div className="flex items-center gap-2" style={{marginTop:6}}>
+              <label style={{width:80,fontSize:12}}>Logo Y</label>
+              <input type="range" min="-500" max="500" step="1" value={liveConfig.heroY ?? 0} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} />
+              <input type="number" step="1" value={liveConfig.heroY ?? 0} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} style={{width:'60px'}} />
+            </div>
+
+            {/* Now Playing Y position - quick control in small panel */}
+            <div className="flex items-center gap-2" style={{marginTop:8}}>
+              <label style={{width:80,fontSize:12}}>Widget Y</label>
+              <input type="range" min="-200" max="200" step="1" value={liveConfig.widgetY ?? 0} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
+              <input type="number" step="1" value={liveConfig.widgetY ?? 0} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} style={{width:'60px'}} />
+            </div>
+
+            {/* Marquee Y quick control */}
+            <div className="flex items-center gap-2" style={{marginTop:6}}>
+              <label style={{width:80,fontSize:12}}>Marquee Y</label>
+              <input type="range" min="0" max="300" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} />
+              <input type="number" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} style={{width:'60px'}} />
+            </div>
+
+            {/* Marquee Item Size (scales items without changing gap) */}
+            <div className="flex items-center gap-2" style={{marginTop:6}}>
+              <label style={{width:80,fontSize:12}}>Marquee Item Size</label>
+              <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeItemScale', parseFloat(e.target.value))} />
+              <input type="number" step="0.01" value={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeItemScale', parseFloat(e.target.value))} style={{width:'60px'}} />
             </div>
           </div>
         )}
@@ -1170,6 +1355,7 @@ function App() {
                 showMarquee={showMarquee}
                 marqueeY={liveConfig.marqueeY ?? 96}
                 marqueeScale={liveConfig.marqueeScale ?? 1}
+                marqueeItemScale={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1}
               />} />
               
               {/* PUBLIC ROUTES (Accessible by link) */}
@@ -1196,6 +1382,7 @@ function App() {
               {/* Redirect any other route to Home */}
               <Route path="*" element={<Home 
                 marqueeScale={liveConfig.marqueeScale ?? 1}
+                marqueeItemScale={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1}
                 theme={theme} 
                 heroScale={liveConfig.heroScale ?? 1} 
                 heroY={liveConfig.heroY ?? 0} 

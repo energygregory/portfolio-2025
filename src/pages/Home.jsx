@@ -242,7 +242,7 @@ const portfolioLogos = [
   },
 ];
 
-export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8, showMarquee = true, marqueeY = 96, marqueeScale = 1, marqueeSpeed = 60, selectedDevice = '' }) {
+export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animatedOutlineWidth = 3.8, showMarquee = true, marqueeY = 96, marqueeScale = 1, marqueeSpeed = 60, marqueeItemScale = undefined, selectedDevice = '' }) {
   console.log('Home component is rendering');
   
   // Initialize with actual media query values to avoid stale state
@@ -496,9 +496,10 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
               maxWidth: isMobileOrTablet ? '90vw' : '800px', 
               maxHeight: isMobileOrTablet ? '80vw' : '800px',
               height: isMobileOrTablet ? 'auto' : '70vh',
-              willChange: 'transform',
+              willChange: 'transform, opacity',
               backfaceVisibility: 'hidden',
               transform: 'translateZ(0)',
+              transition: 'transform 500ms ease-in-out, opacity 500ms ease-in-out',
             }}
           >
             <div className="w-full flex justify-center px-2">
@@ -557,19 +558,20 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
                   }}
                 >
                   {[...images2025, ...images2025].map((src, idx) => {
-                     // Calculate logical size: Default w-48 is 192px. Multiply by scale.
+                     // Calculate logical size: Default w-48 is 192px. Multiply by item scale.
                      const baseSize = isPhone ? 48 : 192;
-                     const size = baseSize * marqueeScale;
+                     const size = baseSize * (marqueeItemScale ?? marqueeScale);
                      
                      return (
                       <img 
                         key={idx}
                         src={src} 
                         alt="" 
-                        className="object-contain flex-shrink-0 transition-transform duration-300"
+                        className="object-contain flex-shrink-0"
                         style={{ 
                           width: `${size}px`,
-                          height: `${size}px`
+                          height: `${size}px`,
+                          transition: 'width 500ms ease-in-out, height 500ms ease-in-out'
                         }}
                         draggable={false}
                         decoding="async"
@@ -892,7 +894,7 @@ function HeroLogoSequence({ theme = 'dark', heroScale = 1, heroY = 0, animatedOu
   return (
     <div style={{ width: '100%', maxWidth: 360, margin: '0 auto', pointerEvents: 'none' }}>
       {/* Render AnimatedLogo always visible, outline-only, correct stroke color */}
-      <div className="flex flex-col items-center gap-3" style={{ transform: `translateZ(0) translateY(${heroY}px) scale(${heroScale})`, transformOrigin: '50% 50%' }}>
+      <div className="flex flex-col items-center gap-3" style={{ transform: `translateZ(0) translateY(${heroY}px) scale(${heroScale})`, transformOrigin: '50% 50%', transition: 'transform 500ms ease-in-out' }}>
         <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} strokeWidth={animatedOutlineWidth} />
         <h3
           className="text-center text-[7px] sm:text-[9px] tracking-[0.15em] text-neutral-600 dark:text-neutral-400 whitespace-nowrap"
