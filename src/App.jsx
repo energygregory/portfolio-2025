@@ -458,9 +458,9 @@ function App() {
     (
       window.location.hostname === 'localhost' || 
       window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '' ||
       window.location.hostname.startsWith('192.168.') ||
-      window.location.hostname.startsWith('10.') ||
-      window.location.protocol === 'http:' // simple heuristic for dev
+      window.location.hostname.startsWith('10.')
     );
 
   console.log('App component is rendering');
@@ -1142,9 +1142,9 @@ function App() {
           />
         )}
 
-        {/* Home-only Asset1 controls (desktop + iPad) - HIDDEN */}
+        {/* Home-only Asset1 controls (desktop + iPad) - localhost only */}
         {location.pathname === '/' && (viewMode === 'desktop' || isTablet) && (
-          <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: 'none'}}>
+          <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: isLocalhost ? 'block' : 'none'}}>
             <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>
             {/* Browser window size detection */}
             <div style={{fontSize:11, marginBottom:8}}>

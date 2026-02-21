@@ -313,6 +313,17 @@ const LogosContent = () => {
     );
 };
 const PostersContent = () => {
+    // Localhost detection (extended to include local network IPs for mobile testing)
+    const isLocalhost = typeof window !== 'undefined' && 
+        (window.location.hostname === 'localhost' || 
+         window.location.hostname === '127.0.0.1' || 
+         window.location.hostname === '' ||
+         window.location.hostname.startsWith('192.168.') ||
+         window.location.hostname.startsWith('10.'));
+    
+    // State for the strict poster stack interaction
+    const [currentIndex, setCurrentIndex] = useState(0);
+
     // Poster images with Dimensions for Masonry Layout
     // Width is fixed by column width (TILE_W), Height is calculated by aspect ratio (H/W)
     const posterData = [
@@ -616,8 +627,102 @@ const PostersContent = () => {
     };
 
 
+    /* 
+     * STRICT POSTER-ONLY ARRANGEMENT (React Implementation)
+     * No containers/boxes. Styles applied directly to poster elements.
+     * Central poster centered at 100% opacity.
+     * Side posters fanning out, reduced opacity, scaled down, sitting underneath.
+     */
     if (isMobile) {
-      // Mobile: Duplicate the poster row and place the duplicate above the main row
+      if (isLocalhost) {
+        const handlePosterClick = (index) => {
+          setCurrentIndex(index);
+        };
+
+        const handleTouchStart = (e) => {
+          stateRef.current.startX = e.touches[0].clientX;
+        };
+
+        const handleTouchEnd = (e) => {
+          const deltaX = stateRef.current.startX - e.changedTouches[0].clientX;
+          if (deltaX > 50 && currentIndex < posterData.length - 1) {
+            setCurrentIndex(prev => prev + 1);
+          } else if (deltaX < -50 && currentIndex > 0) {
+            setCurrentIndex(prev => prev - 1);
+          }
+        };
+
+        return (
+          <div 
+            className="fixed inset-0 top-0 z-[50] w-full h-full flex items-center justify-center bg-transparent pointer-events-auto overflow-hidden"
+            style={{ 
+              perspective: '1200px',
+              touchAction: 'none'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {posterData.map((poster, index) => {
+              const offset = index - currentIndex;
+              const absOffset = Math.abs(offset);
+              
+              // Only render posters within a visible range to save resources/DOM clutter
+              if (absOffset > 5) return null;
+
+              const isActive = offset === 0;
+              // z-index: Main is on top (100). Further away = lower z-index.
+              const zIndex = 100 - absOffset;
+              // Opacity: Main 100%, near 70%, far 40% (approx by formula)
+              const opacity = isActive ? 1 : Math.max(0.2, 0.8 - (absOffset * 0.2));
+              // Scale: Main 1.1 (or 1), others 0.8
+              const scale = isActive ? 1.1 : 0.8;
+              
+              // TranslateX: Fan out. 
+              // The user script used: offset * 45 (percent?)
+              // Let's use percentage relative to viewport width or just px.
+              // Logic: offset * 45% of translation.
+              // Since they are absolute centered, translateX moves them left/right.
+              const translateX = offset * 45; // %
+              
+              // TranslateZ: Push back side posters
+              const translateZ = absOffset * -150; // px
+              
+              const rotateY = 0; // The prompt didn't strictly specify rotation, typically strictly vertical meant flat? 
+              // User script snippet: transform: `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})` 
+              // It does NOT have rotateY.
+
+              return (
+                <ResponsiveImage
+                  key={index}
+                  src={poster.src}
+                  alt={`Poster ${index}`}
+                  className="absolute object-contain transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  style={{
+                    width: '75vw',
+                    height: 'auto',
+                    maxHeight: '80vh',
+                    zIndex: zIndex,
+                    opacity: opacity,
+                    transform: `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})`,
+                    // Box shadow only on active, no borders/boxes
+                    boxShadow: isActive ? '0 20px 50px rgba(0,0,0,0.5)' : 'none',
+                    pointerEvents: 'auto',
+                    left: '12.5%', // (100 - 75) / 2 = 12.5% to center horizontally with w=75vw
+                    right: '12.5%',
+                  }}
+                  onClick={() => handlePosterClick(index)}
+                  loading={Math.abs(index - currentIndex) < 2 ? "eager" : "lazy"}
+                />
+              );
+            })}
+          </div>
+        );
+      }
+      
+      // OLD Mobile: Duplicate the poster row (fallback for non-localhost/prod for now as requested?)
+      // User said: "On mobile only, implement this for the posters page... using only the posters allowed..."
+      // AND "bring back the sliders for localhost... on mobile localhost, implement this"
+      // So I will keep the existing prod implementation below for now, as requested.
       return (
         <div className="fixed inset-0 top-[100px] z-[50] w-full flex flex-col items-center bg-transparent pointer-events-auto"> 
           <div className="w-full h-full flex items-center overflow-x-auto no-scrollbar pb-12 pt-12 pl-[15vw] pr-[50vw]">
