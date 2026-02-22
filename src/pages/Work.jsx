@@ -142,7 +142,8 @@ const LogosContent = () => {
             </div>
          </div>
          
-         {/* Desktop Spacing Control Sliders */}
+         {/* Desktop Spacing Control Sliders (REMOVED per user request) */}
+         {/* 
          <div className="hidden md:flex flex-row items-center justify-end w-full max-w-[1800px] px-8 py-4 gap-8">
             <div className="flex flex-col items-end space-y-2">
                 <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Horizontal Spacing: {paddingX}px</span>
@@ -169,6 +170,8 @@ const LogosContent = () => {
                 />
             </div>
          </div>
+         */}
+
 
          {/* Grid with faint inner lines - Fixed gap for constant line thickness */}
          <div 
@@ -1010,10 +1013,10 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
                 isOther ? 'opacity-0 pointer-events-none ease-in duration-300' : 'opacity-100'
               }`}
               style={{
-                // Move up moves to top left on desktop (-210px), but keeps relative position on mobile
-                // User requested to push it up further on mobile
+                // Move up moves to top left on desktop (-160px), but keeps relative position on mobile
+                // User requested vertical distance from navbar line on desktop
                 top: selectedItem 
-                  ? (isMobile ? '-75px' : '-210px')  // Mobile: moderate adjustment. Desktop: big jump.
+                  ? (isMobile ? '-75px' : '-160px')  // Mobile: moderate adjustment. Desktop: reduced negative offset to avoid hugging nav line.
                   : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 
                 left: selectedItem ? '24px' : '50%',

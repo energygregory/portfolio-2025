@@ -600,7 +600,10 @@ function App() {
 
   // Apply hardcoded desktop Home settings for specific viewports
   useEffect(() => {
-    if (location.pathname === '/' && viewMode === 'desktop') {
+    // Apply for Home, Work, About, Contact on desktop as requested
+    const isTargetPage = ['/', '/work', '/about', '/contact'].includes(location.pathname);
+    
+    if (isTargetPage && viewMode === 'desktop') {
       console.log('[Hardcode Check] Current dimensions:', screenDimensions);
       // 2133x1002 viewport hardcodes
       if (screenDimensions === '2133x1002') {
@@ -747,6 +750,82 @@ function App() {
           widgetY: 200,
           marqueeY: 181,
           marqueeItemScale: 0.35
+        }));
+      }
+      // 1920x902 viewport hardcodes
+      else if (screenDimensions === '1920x902') {
+        console.log('[Hardcode Applied] 1920x902');
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.39,
+          assetX: 48,
+          assetY: -1341,
+          assetOutlineThickness: 0.8,
+          assetH: 1.2,
+          assetV: 1.16,
+          assetRotation: 90,
+          heroScale: 1.24,
+          heroY: 115,
+          widgetY: 200,
+          marqueeY: 49,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 851x707 viewport hardcodes
+      else if (screenDimensions === '851x707') {
+        console.log('[Hardcode Applied] 851x707');
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.37,
+          assetX: 19,
+          assetY: -1865,
+          assetOutlineThickness: 0.8,
+          assetH: 1.26,
+          assetV: 2.05,
+          assetRotation: 90,
+          heroScale: 0.81,
+          heroY: 115,
+          widgetY: 147,
+          marqueeY: 49,
+          marqueeItemScale: 0.25
+        }));
+      }
+      // 1193x641 viewport hardcodes
+      else if (screenDimensions === '1193x641') {
+        console.log('[Hardcode Applied] 1193x641');
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.37,
+          assetX: 35,
+          assetY: -1586,
+          assetOutlineThickness: 0.8,
+          assetH: 1.2,
+          assetV: 1.47,
+          assetRotation: 90,
+          heroScale: 0.94,
+          heroY: 115,
+          widgetY: 147,
+          marqueeY: 49,
+          marqueeItemScale: 0.28
+        }));
+      }
+      // 1479x902 viewport hardcodes
+      else if (screenDimensions === '1479x902') {
+        console.log('[Hardcode Applied] 1479x902');
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.39,
+          assetX: 35,
+          assetY: -1352,
+          assetOutlineThickness: 0.8,
+          assetH: 1.2,
+          assetV: 1.47,
+          assetRotation: 90,
+          heroScale: 1.24,
+          heroY: 115,
+          widgetY: 200,
+          marqueeY: 49,
+          marqueeItemScale: 0.4
         }));
       }
     }
@@ -1120,11 +1199,14 @@ function App() {
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden flex flex-col" style={{ minHeight: '100vh' }}>
-        {(location.pathname === '/' || location.pathname === '/about' || location.pathname === '/contact' || ((location.pathname === '/work' || location.pathname.startsWith('/work/')) && viewMode === 'mobile')) && (
+        {(
+          location.pathname === '/' || 
+          ((location.pathname.startsWith('/work/')) && viewMode === 'mobile')
+        ) && (
           <Asset1Svg
             theme={theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
-            className={`pointer-events-none absolute ${location.pathname === '/' ? 'z-20' : 'z-0'}`}
+            className="pointer-events-none absolute z-20"
             style={{
               left: '50%',
               top: viewMode === 'desktop' ? '50%' : '48px',
@@ -1135,7 +1217,7 @@ function App() {
               width: '140%',
               maxWidth: 'none',
               height: 'auto',
-              opacity: (location.pathname === '/' && assetHidden) ? 0 : 1,
+              opacity: (location.pathname === '/' && assetHidden) ? 0 : 1, // Only hide on scroll for Home
               transition: 'opacity 300ms ease, transform 500ms ease-in-out',
               willChange: 'opacity, transform',
             }}
