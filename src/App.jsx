@@ -830,6 +830,63 @@ function App() {
           marqueeItemScale: 0.4
         }));
       }
+      // 1234x1002 viewport hardcodes
+      else if (screenDimensions === '1234x1002') {
+        console.log('[Hardcode Applied] 1234x1002');
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.47,
+          assetX: 25,
+          assetY: -1594,
+          assetOutlineThickness: 0.5,
+          assetH: 1,
+          assetV: 1.67,
+          assetRotation: 90,
+          heroScale: 1.27,
+          heroY: 188,
+          widgetY: 119,
+          marqueeY: 230,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1312x751 viewport hardcodes
+      else if (screenDimensions === '1312x751') {
+        console.log('[Hardcode Applied] 1312x751');
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.47,
+          assetX: 25,
+          assetY: -1629,
+          assetOutlineThickness: 0.5,
+          assetH: 1,
+          assetV: 1.15,
+          assetRotation: 90,
+          heroScale: 0.9,
+          heroY: 150,
+          widgetY: 119,
+          marqueeY: 104,
+          marqueeItemScale: 0.4
+        }));
+      }
+      // 1641x751 viewport hardcodes
+      else if (screenDimensions === '1641x751') {
+        console.log('[Hardcode Applied] 1641x751');
+        setLiveConfig(prev => ({
+          ...prev,
+          assetScale: 0.46,
+          assetX: 25,
+          assetY: -1395,
+          assetOutlineThickness: 0.5,
+          assetH: 1,
+          assetV: 0.92,
+          assetRotation: 90,
+          heroScale: 0.9,
+          heroY: 78,
+          widgetY: 119,
+          marqueeY: 4,
+          marqueeItemScale: 0.4
+        }));
+      }
     }
   }, [location.pathname, viewMode, screenDimensions]);
 
