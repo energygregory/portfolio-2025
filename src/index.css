@@ -3,6 +3,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* GLOBAL TEXT RESIZE (Except for specific classes) */
+  html {
+    /* Scale down base font size to decrease text size sitewide */
+    font-size: 13px; /* Reduced from browser default ~16px */
+  }
+
+  /* Exclusions: Restore size for Footer and specific excluded classes */
+  footer, .text-no-resize {
+    /* Set back to what would be equivalent to 1rem at 16px base, or use specific px */
+    font-size: initial; 
+  }
+  
+  /* Footer specifically */
+  footer {
+     font-size: 16px; 
+  }
+}
+
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -691,5 +710,6 @@ body {
   color: #000000 !important;
   font-weight: 800 !important;
 }
+.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

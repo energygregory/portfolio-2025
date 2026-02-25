@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
 import Footer from "../components/Footer";
 import ResponsiveImage from "../components/ResponsiveImage.jsx";
+import AnimatedAsset1 from "../components/AnimatedAsset1.jsx";
 
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
@@ -316,13 +317,17 @@ const LogosContent = () => {
     );
 };
 const PostersContent = () => {
-    // Localhost detection (extended to include local network IPs for mobile testing)
-    const isLocalhost = typeof window !== 'undefined' && 
-        (window.location.hostname === 'localhost' || 
-         window.location.hostname === '127.0.0.1' || 
-         window.location.hostname === '' ||
-         window.location.hostname.startsWith('192.168.') ||
-         window.location.hostname.startsWith('10.'));
+
+     // Responsive values
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        // Check if mobile
+        const checkMobile = () => setIsMobile(window.innerWidth < 640);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
     
     // State for the strict poster stack interaction
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -330,25 +335,32 @@ const PostersContent = () => {
     // Poster images with Dimensions for Masonry Layout
     // Width is fixed by column width (TILE_W), Height is calculated by aspect ratio (H/W)
     const posterData = [
-      { src: "/Images/2025/POSTERS/post00.jpg", aspectRatio: 0.707 },   // 2480/3508
-      { src: "/Images/2025/POSTERS/full.png", aspectRatio: 1.0 },      // full.png (square)
-      { src: "/Images/2025/POSTERS/post.jpg", aspectRatio: 0.707 },     // 2480/3508
-      { src: "/Images/2025/POSTERS/post0.jpg", aspectRatio: 0.707 },    // 2480/3508
-      { src: "/Images/2025/POSTERS/snap1.jpg", aspectRatio: 1.25 },     // 1349/1080
-      { src: "/Images/2025/POSTERS/snap2.jpg", aspectRatio: 1.25 },     // 1347/1080
-      { src: "/Images/2025/POSTERS/final.png", aspectRatio: 1.778 },// 1920/1080
-      { src: "/Images/2025/POSTERS/thank_you.png", aspectRatio: 1.778 },// 1920/1080
-      { src: "/Images/2025/POSTERS/50f5a5175916607.64bbce5a0894e.jpg", aspectRatio: 1.25 }, // 1350/1080
-      { src: "/Images/2025/POSTERS/FzT_IJUWwAEHrOK.jpeg", aspectRatio: 1.25 }, // 1350/1080
-      { src: "/Images/2025/POSTERS/afterparty.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/ypee.jpg", aspectRatio: 1.0 },      // 3000/3000
-      { src: "/Images/2025/POSTERS/JINJA main.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/gb%20%26%20gr.png", aspectRatio: 1.0 },   // gb & gr.png (square)
-      { src: "/Images/2025/POSTERS/anticipate.png", aspectRatio: 1.25 }, // 2700/2160 = 1.25
-      { src: "/Images/2025/POSTERS/final final.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/main flyer cod.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/tyc1.png", aspectRatio: 1.25 },
+      { src: "/Images/2025/POSTERS/full.png", aspectRatio: 1.0 },      // Square
+      { src: "/Images/2025/POSTERS/post.jpg", aspectRatio: 1.414 },     // Portrait A4
+      { src: "/Images/2025/POSTERS/post0.jpg", aspectRatio: 1.414 },    // Portrait A4
+      { src: "/Images/2025/POSTERS/snap1.jpg", aspectRatio: 1.25 },     // Portrait
+      { src: "/Images/2025/POSTERS/snap2.jpg", aspectRatio: 1.25 },     // Portrait
+      { src: "/Images/2025/POSTERS/final.png", aspectRatio: 1.778 },    // Portrait 9:16
+      { src: "/Images/2025/POSTERS/thank_you.png", aspectRatio: 1.778 },// Portrait 9:16
+      { src: "/Images/2025/POSTERS/50f5a5175916607.64bbce5a0894e.jpg", aspectRatio: 1.25 }, // Portrait
+      { src: "/Images/2025/POSTERS/FzT_IJUWwAEHrOK.jpeg", aspectRatio: 1.25 }, // Portrait
+      { src: "/Images/2025/POSTERS/afterparty.png", aspectRatio: 1.778 }, // Portrait 9:16
+      { src: "/Images/2025/POSTERS/ypee.jpg", aspectRatio: 1.0 },      // Square
+      { src: "/Images/2025/POSTERS/JINJA main.png", aspectRatio: 1.778 }, // Portrait 9:16
+      { src: "/Images/2025/POSTERS/gb%20%26%20gr.png", aspectRatio: 1.0 },   // Square
+      { src: "/Images/2025/POSTERS/anticipate.png", aspectRatio: 1.25 }, // Portrait
+      { src: "/Images/2025/POSTERS/final final.png", aspectRatio: 1.778 }, // Portrait 9:16
+      { src: "/Images/2025/POSTERS/main flyer cod.png", aspectRatio: 1.778 }, // Portrait 9:16
+      { src: "/Images/2025/POSTERS/tyc1.png", aspectRatio: 1.25 }, // Portrait
+      { src: "/Images/2025/POSTERS/filter-announcer.jpg", aspectRatio: 1.778 }, // Portrait 9:16
+      { src: "/Images/2025/POSTERS/final flyer.png", aspectRatio: 1.25 }, // Portrait
+      { src: "/Images/2025/POSTERS/food0.jpg", aspectRatio: 1.778 }, // Portrait 9:16
+      { src: "/Images/2025/POSTERS/ooo_final.png", aspectRatio: 1.778 }, // Portrait 9:16
+      { src: "/Images/2025/POSTERS/pappylive1.png", aspectRatio: 1.25 }, // Portrait
     ];
+    // The only landscape might be none? Or user said "landscape posters excluded".
+    // I'll assume they are all portrait for now based on the file list mostly being 1080x1350, 1080x1920 etc.
+
 
     const posterCount = posterData.length;
     const PRIORITY_COUNT = 10;
@@ -439,19 +451,15 @@ const PostersContent = () => {
       };
     }, [posterData]);
     
-    // Indices for special rules (update these based on new array order if needed)
-    // ooo_final is index 7
-    // thank_you is index 8
-    const oooIndex = 7;
-    const thankYouIndex = 8;
+    // --- MOBILE 3D CAROUSEL STATE ---
+    const mobileContainerRef = useRef(null);
+    const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
 
-    const [isMobile, setIsMobile] = useState(false);
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
+    // Filter landscapes - Assuming H/W > 1 is portrait
+    const portraitPosters = useMemo(() => posterData.filter(p => p.aspectRatio >= 0.8), [posterData]); 
+
+    // Mobile scroll snapping logic removed to allow STRICT POSTER-ONLY ARRANGEMENT to take precedence
+    // if (isMobile) { ... } block removed
 
     // --- DESKTOP INFINITE GRID STATE ---
     // Start offset at (0,0) or centered? (0,0) works for infinite.
@@ -476,17 +484,23 @@ const PostersContent = () => {
     const GAP_Y = 7; // Reduced spacing to 7px (Fixed)
     const ANIM_SPEED = 0.05; // Even smoother slow drift
     
+    // Find special indices for conflict checking (ooo_final and thank_you)
+    const oooIndex = posterData.findIndex(p => p.src.includes('ooo_final'));
+    const thankYouIndex = posterData.findIndex(p => p.src.includes('thank_you'));
+
     // Helper to check critical conflicts
     const isConflict = (id1, id2) => {
         if (id1 === id2) return true; // Direct duplicate
-        // No adjacent ooo_final and thank_you
-        if ((id1 === oooIndex && id2 === thankYouIndex) || (id1 === thankYouIndex && id2 === oooIndex)) return true;
+        // No adjacent ooo_final and thank_you (only if both found)
+        if (oooIndex !== -1 && thankYouIndex !== -1) {
+             if ((id1 === oooIndex && id2 === thankYouIndex) || (id1 === thankYouIndex && id2 === oooIndex)) return true;
+        }
         return false;
     };
 
     // Generate MULTIPLE distinct layouts to prevent horizontal alignment
     // STRATEGY: PARITY-BASED POOLS
-    // We split the 20 posters into two disjoint sets: Pool A (Evens) and Pool B (Odds).
+    // We split the posters into two disjoint sets: Pool A (Evens) and Pool B (Odds).
     // Even columns (0, 2, 4...) ONLY sample from Pool A.
     // Odd columns (1, 3, 5...) ONLY sample from Pool B.
     // This mathematically guarantees that no poster in Col N can ever appear in Col N-1 or Col N+1.
@@ -494,15 +508,13 @@ const PostersContent = () => {
         const NUM_COLS_TO_GEN = 15; // Sufficient variants
         const SEQ_LENGTH = 100;     // Length of sequence
         
-        // Define Pools
-        // We have 20 items. 
-        // Pool A: indices 0-9
-        // Pool B: indices 10-19
-        // Special check: oooIndex (7) and thankYouIndex (8) are both in Pool A.
-        // We must handle their adjacency rule specifically within Pool A generation.
-        
-        const poolA = Array.from({ length: 9 }, (_, k) => k);      // 0..8
-        const poolB = Array.from({ length: 9 }, (_, k) => k + 9); // 9..17
+        // Define Pools dynamically
+        const total = posterData.length;
+        const half = Math.ceil(total / 2); // Split roughly half
+        // Pool A: 0 to half-1
+        const poolA = Array.from({ length: half }, (_, k) => k);
+        // Pool B: half to total-1
+        const poolB = Array.from({ length: total - half }, (_, k) => k + half);
         
         // Helper to generate a random sequence from a pool with constraints
         const generateSequence = (pool) => {
@@ -523,7 +535,7 @@ const PostersContent = () => {
                      seq.push(pick);
                      last = pick;
                  } else {
-                     // Fallback (should be impossible with 10 items)
+                     // Fallback 
                      seq.push(pool[0]);
                      last = pool[0];
                  }
@@ -637,16 +649,23 @@ const PostersContent = () => {
      * Side posters fanning out, reduced opacity, scaled down, sitting underneath.
      */
     if (isMobile) {
-      if (isLocalhost) {
+        // STRICT POSTER ARRANGEMENT for ALL mobile users
         const handlePosterClick = (index) => {
           setCurrentIndex(index);
         };
+        
+        // Mobile Posters Control State (Local inside component to avoid prop drilling if possible)
+        const [posterY, setPosterY] = useState(0);
+        const [posterScale, setPosterScale] = useState(1);
 
         const handleTouchStart = (e) => {
-          stateRef.current.startX = e.touches[0].clientX;
+          if (e.touches && e.touches[0]) {
+             stateRef.current.startX = e.touches[0].clientX;
+          }
         };
 
         const handleTouchEnd = (e) => {
+          if (!stateRef.current.startX || !e.changedTouches || !e.changedTouches[0]) return;
           const deltaX = stateRef.current.startX - e.changedTouches[0].clientX;
           if (deltaX > 50 && currentIndex < posterData.length - 1) {
             setCurrentIndex(prev => prev + 1);
@@ -656,11 +675,27 @@ const PostersContent = () => {
         };
 
         return (
+          <>
+          {/* Mobile Overlay Controls for Posters */}
+          <div className="fixed bottom-24 left-4 right-4 z-[200] flex flex-col gap-2 p-4 bg-white/15 dark:bg-black/15 backdrop-blur-md rounded-xl border border-black/10 dark:border-white/10 shadow-2xl">
+             <div className="text-xs font-bold mb-2 text-center uppercase tracking-widest">Poster Controls</div>
+             <div className="flex justify-between text-[10px] items-center">
+                <span>Y Pos: {posterY}</span>
+                <input type="range" min="-300" max="300" step="1" value={posterY} onChange={(e) => setPosterY(parseInt(e.target.value))} className="w-24"/>
+             </div>
+             <div className="flex justify-between text-[10px] items-center">
+                <span>Scale: {posterScale.toFixed(2)}</span>
+                <input type="range" min="0.5" max="2" step="0.05" value={posterScale} onChange={(e) => setPosterScale(parseFloat(e.target.value))} className="w-24"/>
+             </div>
+          </div>
+
           <div 
             className="fixed inset-0 top-0 z-[50] w-full h-full flex items-center justify-center bg-transparent pointer-events-auto overflow-hidden"
             style={{ 
               perspective: '1200px',
-              touchAction: 'none'
+              touchAction: 'none',
+              // Apply adjusting transforms to the container
+              transform: `translateY(${posterY}px) scale(${posterScale})`
             }}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
@@ -681,111 +716,43 @@ const PostersContent = () => {
               const scale = isActive ? 1.1 : 0.8;
               
               // TranslateX: Fan out. 
-              // The user script used: offset * 45 (percent?)
-              // Let's use percentage relative to viewport width or just px.
-              // Logic: offset * 45% of translation.
-              // Since they are absolute centered, translateX moves them left/right.
               const translateX = offset * 45; // %
               
               // TranslateZ: Push back side posters
               const translateZ = absOffset * -150; // px
               
-              const rotateY = 0; // The prompt didn't strictly specify rotation, typically strictly vertical meant flat? 
-              // User script snippet: transform: `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})` 
-              // It does NOT have rotateY.
-
               return (
-                <ResponsiveImage
+                <div 
                   key={index}
-                  src={poster.src}
-                  alt={`Poster ${index}`}
-                  className="absolute object-contain transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  className="absolute inset-0 flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                   style={{
-                    width: '75vw',
-                    height: 'auto',
-                    maxHeight: '80vh',
                     zIndex: zIndex,
                     opacity: opacity,
                     transform: `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})`,
-                    // Box shadow only on active, no borders/boxes
-                    boxShadow: isActive ? '0 20px 50px rgba(0,0,0,0.5)' : 'none',
-                    pointerEvents: 'auto',
-                    left: '12.5%', // (100 - 75) / 2 = 12.5% to center horizontally with w=75vw
-                    right: '12.5%',
+                    pointerEvents: 'none', // Wrapper shouldn't block clicks
                   }}
-                  onClick={() => handlePosterClick(index)}
-                  loading={Math.abs(index - currentIndex) < 2 ? "eager" : "lazy"}
-                />
+                >
+                  <ResponsiveImage
+                    src={poster.src}
+                    alt={`Poster ${index}`}
+                    className="max-h-[70vh] w-[60vw] h-auto object-contain"
+                    style={{
+                      // Box shadow only on active, no borders/boxes
+                      boxShadow: isActive ? '0 20px 50px rgba(0,0,0,0.5)' : 'none',
+                      pointerEvents: 'auto',
+                      filter: isActive ? 'none' : 'grayscale(100%)',
+                     // Adding transition for filter to match the rest of the transitions
+                      transition: 'filter 0.5s ease',
+                    }}
+                    onClick={() => handlePosterClick(index)}
+                    loading={Math.abs(index - currentIndex) < 2 ? "eager" : "lazy"}
+                  />
+                </div>
               );
             })}
           </div>
+          </>
         );
-      }
-      
-      // OLD Mobile: Duplicate the poster row (fallback for non-localhost/prod for now as requested?)
-      // User said: "On mobile only, implement this for the posters page... using only the posters allowed..."
-      // AND "bring back the sliders for localhost... on mobile localhost, implement this"
-      // So I will keep the existing prod implementation below for now, as requested.
-      return (
-        <div className="fixed inset-0 top-[100px] z-[50] w-full flex flex-col items-center bg-transparent pointer-events-auto"> 
-          <div className="w-full h-full flex items-center overflow-x-auto no-scrollbar pb-12 pt-12 pl-[15vw] pr-[50vw]">
-            <div className="flex flex-col items-center" style={{ height: '80vh' }}>
-                        {/* Split posters: portraits on top, landscapes on bottom */}
-                        {(() => {
-                          const portraits = posterData.filter(p => (Number(p.aspectRatio) || 1) < 1);
-                          const landscapes = posterData.filter(p => (Number(p.aspectRatio) || 1) >= 1);
-                          return (
-                            <>
-                            <div className="flex items-center mb-12 z-40" style={{ height: '60vh' }}>
-                              {portraits.map((item, i) => {
-                                const rotate = (i % 5 - 2) * 3;
-                                const origIndex = posterData.findIndex(p => p.src === item.src);
-                                return (
-                                  <ResponsiveImage
-                                    key={`dup-${i}`}
-                                    src={item.src}
-                                    alt={`Poster duplicate ${i + 1}`}
-                                    className="flex-shrink-0 w-[50vw] max-w-[260px] object-contain pointer-events-none transition-transform duration-300"
-                                    loading={origIndex >= 0 && origIndex < PRIORITY_COUNT ? 'eager' : 'lazy'}
-                                    style={{
-                                      marginLeft: i === 0 ? 0 : '-45vw',
-                                      transform: `rotate(${rotate}deg)`,
-                                      zIndex: 1000 - i,
-                                      display: 'block'
-                                    }}
-                                  />
-                                );
-                              })}
-                            </div>
-
-                            <div className="flex items-center z-30 mt-6" style={{ height: '60vh' }}>
-                              {landscapes.map((item, i) => {
-                                const rotate = (i % 5 - 2) * 3;
-                                const origIndex = posterData.findIndex(p => p.src === item.src);
-                                return (
-                                  <ResponsiveImage
-                                    key={`main-${i}`}
-                                    src={item.src}
-                                    alt={`Poster ${i + 1}`}
-                                    className="flex-shrink-0 w-[60vw] max-w-[300px] object-contain pointer-events-none transition-transform duration-300"
-                                    loading={origIndex >= 0 && origIndex < PRIORITY_COUNT ? 'eager' : 'lazy'}
-                                    style={{
-                                      marginLeft: i === 0 ? 0 : '-45vw',
-                                      transform: `rotate(${rotate}deg)`,
-                                      zIndex: i,
-                                      display: 'block'
-                                    }}
-                                  />
-                                );
-                              })}
-                            </div>
-                            </>
-                          );
-                        })()}
-            </div>
-          </div>
-        </div>
-      );
     }
 
     // Expanded modal removed — hover-to-colour replaces click expansion
@@ -930,22 +897,217 @@ const PackagingContent = () => {
     );
 };
 const TechpackContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Techpack Design content gallery will go here</div>;
-const BrandContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Brand Design content gallery will go here</div>;
+const RecentsContent = ({ liveConfig }) => {
+    // Determine which config to use (mobile view mode logic is up in App, here we typically just render)
+    // However, liveConfig contains assetX/Y which are global.
+    // We should use those. If they are undefined, fallback to defaults.
+    
+    // NOTE: liveConfig.assetX etc are primarily for the Home page asset. 
+    // The user requested: "the changes i make will affect the asset 1 on other pages"
+    // So we use liveConfig values here.
+    
+    const posX = liveConfig?.assetX ?? 0;
+    const posY = liveConfig?.assetY ?? 0;
+    const scaleX = liveConfig?.assetH ?? 1;
+    const scaleY = liveConfig?.assetV ?? 1;
 
-const getContentForItem = (item) => {
+    const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 640 : false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 640);
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const videoRef = useRef(null);
+    useEffect(() => {
+        if (isMobile && videoRef.current) {
+            // Force play on mount to ensure autoplay works on Safari/iOS
+            const playVideo = async () => {
+                try {
+                    videoRef.current.muted = true; // Critical for autoplay policy
+                    await videoRef.current.play();
+                } catch (err) {
+                    console.log("Autoplay failed:", err);
+                }
+            };
+            playVideo();
+        }
+    }, [isMobile]);
+
+    if (isMobile) {
+        return (
+            <div className="w-full flex-grow flex flex-col items-center justify-center relative h-[80vh]">
+                <video 
+                    ref={videoRef}
+                    src="/recents/Untitledd.mp4" 
+                    className="w-full max-w-[90vw] max-h-[70vh] object-contain shadow-2xl"
+                    playsInline
+                    webkit-playsinline="true"
+                    preload="auto"
+                    autoPlay
+                    muted
+                    loop
+                    controls
+                    controlsList="nodownload nofullscreen noremoteplayback"
+                >
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-full flex-grow flex flex-col items-center justify-center relative overflow-hidden h-[60vh] sm:h-auto">
+            
+            {/* Asset 1 Container with transforms */}
+            <div 
+                className="w-full max-w-[80vw] sm:max-w-md aspect-square flex items-center justify-center"
+                style={{
+                    transform: `translate(${posX}px, ${posY}px) scale(${scaleX}, ${scaleY})`,
+                    transition: 'transform 0.1s linear'
+                }}
+            >
+                <AnimatedAsset1 className="w-full h-full text-black dark:text-white" />
+            </div>
+
+            {/* No controls here - they are on Home page only */}
+        </div>
+    );
+};
+const BrandContent = () => {
+    // State for PDF/Image viewer
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [activeProject, setActiveProject] = useState(null); // 'ATA' or 'EDUC8AFRICA'
+    
+    // Hardcoded Image lists for the two projects
+    // Ideally these would come from a data file or API
+    const brandProjects = {
+       'ATA': [
+           // Assuming these exist or will exist - user said "content of the pdf"
+           // I'll add placeholders effectively or try to find them if they exist
+           // using the thumbnail path as a hint
+           "/Images/2025/Brand design/brand guidelines-2.jpg", // Page 1?
+           // Add more if known, otherwise just show the one we have for now and assume user will add more
+       ],
+       'EDUC8AFRICA': [
+           "/Images/2025/Brand design/Educ8Africa New Proposed Identity.jpg" 
+       ]
+    };
+    
+    // Actually, I should check if I can find the files. 
+    // The user mentioned "starting from the first page to the last".
+    // I likely need to assume there are multiple images.
+    // For now, I will simulate the viewer opening with the main image.
+    
+    const openViewer = (project) => {
+        setActiveProject(project);
+        setViewerOpen(true);
+        // Lock scroll
+        document.body.style.overflow = 'hidden';
+    };
+    
+    const closeViewer = () => {
+        setViewerOpen(false);
+        setActiveProject(null);
+        document.body.style.overflow = '';
+    };
+
+    return (
+      <>
+      <div className="w-full max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-start justify-items-center">
+        <div 
+            className="flex flex-col items-center gap-4 group cursor-pointer"
+            onClick={() => openViewer('ATA')}
+        >
+          {/* Reduced rounded corners (rounded-sm or smaller) */}
+          <div className="relative transition-transform duration-500 hover:scale-[1.02] hover:shadow-xl rounded-[4px] overflow-hidden">
+            <ResponsiveImage 
+              src="/Images/2025/Brand design/brand guidelines-2_thumb.jpg" 
+              className="w-full max-w-[90vw] md:max-w-full h-auto"
+              alt="Brand Guidelines"
+            />
+          </div>
+        </div>
+  
+        <div 
+            className="flex flex-col items-center gap-4 group cursor-pointer"
+            onClick={() => openViewer('EDUC8AFRICA')}
+        >
+          {/* Reduced rounded corners */}
+          <div className="relative transition-transform duration-500 hover:scale-[1.02] hover:shadow-xl rounded-[4px] overflow-hidden">
+             <ResponsiveImage 
+              src="/Images/2025/Brand design/Educ8Africa New Proposed Identity_thumb.jpg" 
+              className="w-full max-w-[90vw] md:max-w-full h-auto"
+              alt="Educ8Africa Identity"
+             />
+          </div>
+        </div>
+      </div>
+
+      {/* Full Screen Viewer Payload */}
+      {viewerOpen && (
+          <div className="fixed inset-0 z-[100] bg-white dark:bg-black overflow-y-auto">
+              {/* Custom Header replacing the main nav */}
+              <div className="sticky top-0 left-0 w-full p-4 flex items-center bg-white/80 dark:bg-black/80 backdrop-blur-md z-[101] border-b border-black/10 dark:border-white/10">
+                  <button 
+                    onClick={() => {
+                        setViewerOpen(false);
+                        setActiveProject(null);
+                        document.body.style.overflow = '';
+                    }} // Using inline function to ensure it works
+                    className="group flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  >
+                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-black dark:text-white group-hover:-translate-x-1 transition-transform">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                     </svg>
+                  </button>
+                  <h2 className="ml-4 font-bold text-xl tracking-widest text-black dark:text-white uppercase" 
+                      style={{ fontFamily: '"PT Mono", monospace' }}>
+                      {activeProject}
+                  </h2>
+              </div>
+              
+              {/* Content - Vertical Scroll */}
+              <div className="w-full min-h-screen flex flex-col items-center p-4 sm:p-8 gap-8 pb-32">
+                 {/* Main Image */}
+                 <div className="w-full max-w-4xl shadow-2xl relative">
+                     <ResponsiveImage 
+                        src={activeProject === 'ATA' ? "/Images/2025/Brand design/brand guidelines-2.jpg" : "/Images/2025/Brand design/Educ8Africa New Proposed Identity.jpg"}
+                        className="w-full h-auto"
+                        loading="eager"
+                     />
+                 </div>
+                 
+                 {/* 
+                    If we had the full list of extracted pages, we would map them here:
+                    {projectPages[activeProject].map((pg, i) => (
+                        <div key={i} className="w-full max-w-4xl shadow-2xl relative"><img src={pg} ... /></div>
+                    ))}
+                 */}
+              </div>
+          </div>
+      )}
+      </>
+    );
+  };
+
+const getContentForItem = (item, liveConfig) => {
   switch(item) {
     case 'LOGOS': return <LogosContent />;
     case 'POSTERS': return <PostersContent />;
     case 'VISUAL DESIGN': return <VisualDesignContent />;
     case 'PACKAGING DESIGN': return <PackagingContent />;
     case 'TECHPACK DESIGN': return <TechpackContent />;
+    case 'RECENTS': return <RecentsContent liveConfig={liveConfig} />;
     case 'BRAND DESIGN': return <BrandContent />;
     default: return null;
   }
 };
 
-const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSelectedItem }) => {
+const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSelectedItem, liveConfig }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
+  const navigate = useNavigate(); // For logo redirect on Recents mobile view
 
   // Responsive values
   const [isMobile, setIsMobile] = useState(false);
@@ -984,13 +1146,16 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
 
   // Height for the list view to maintain spacing
   // Desktop: 120px gap
-  // Mobile: 105px gap
-  const ITEM_HEIGHT = isMobile ? 105 : 120; 
+  // Mobile: 105px gap -> Reduced by 1.3 factor -> ~80px
+  const ITEM_HEIGHT = isMobile ? 80 : 120; 
   const TOP_OFFSET = isMobile ? -20 : 40;   
 
   // On mobile, we subtract one ITEM_HEIGHT from calculation effectively "hiding" the added height of the last item
   // This keeps the footer where it was relative to the second-to-last item (Techpack)
   const mobileHeightAdjustment = isMobile ? ITEM_HEIGHT : 0;
+  
+  // Extra reduction for Recents spacing - increased to 120 to significantly reduce the gap
+  const recentsGapReduction = 120; 
 
   return (
     <div className="relative w-full flex-grow flex flex-col transition-all duration-700 ease-in-out">
@@ -998,7 +1163,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
       <div 
         className="relative w-full flex-shrink-0"
         style={{ 
-          height: selectedItem ? '0px' : `${(items.length * ITEM_HEIGHT) + 100 - mobileHeightAdjustment}px`,
+          height: selectedItem ? '0px' : `${(items.length * ITEM_HEIGHT) + 100 - mobileHeightAdjustment - recentsGapReduction}px`,
           transition: 'height 500ms ease-in-out'
         }}
       >
@@ -1041,17 +1206,57 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               </div>
 
               <h2 
-                className={`text-4xl sm:text-6xl font-light text-[#e5e5e5] dark:text-[#4d4d4d] transition-colors duration-300 z-20 whitespace-nowrap ${
+                className={`font-light text-[#e5e5e5] dark:text-[#4d4d4d] transition-colors duration-300 z-20 whitespace-nowrap ${
+                  // RECENTS: smaller text (text-xs sm:text-sm) - no top margin to ensure exact equal vertical distance with other items
+                  item === 'RECENTS' ? 'text-xs sm:text-sm tracking-widest' : 'text-4xl sm:text-6xl'
+                } ${
                   (hoveredIdx === idx || isSelected) ? 'text-black dark:text-[#e5e5e5]' : ''
                 } ${
                   (!selectedItem && hoveredIdx !== null && hoveredIdx !== idx) ? 'blur-[1px] opacity-30 text-[#e5e5e5] dark:text-[#4d4d4d]' : ''
+                } ${
+                  // HIDE RECENTS TEXT ON MOBILE IF SELECTED (to leave just the arrow and content)
+                  (isMobile && isSelected && item === 'RECENTS') ? 'opacity-0 pointer-events-none' : ''
                 }`}
                 style={{ 
                  fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
                 }}
               >
-                {item}
+                {item === 'RECENTS' ? 'RECENTS' : item}
               </h2>
+
+              {/* RECENTS MOBILE HEADER: LOGO */}
+              {isMobile && isSelected && item === 'RECENTS' && (
+                  <div
+                    className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center opacity-100 transition-opacity duration-300 z-[60]"
+                    style={{ 
+                        // Align roughly with the arrow
+                        top: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        // Width for logo
+                        width: '80px' 
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Use SPA transition
+                        navigate('/'); 
+                    }}
+                  >
+                      {/* Logo - using SVG. Mask technique to control color (Black in Light, White in Dark) */}
+                      <div 
+                         className="w-full h-8 bg-black dark:bg-white transition-colors duration-300"
+                         style={{
+                             maskImage: 'url("/LOGOS/newlogo.svg")',
+                             maskSize: 'contain',
+                             maskRepeat: 'no-repeat',
+                             maskPosition: 'center',
+                             WebkitMaskImage: 'url("/LOGOS/newlogo.svg")',
+                             WebkitMaskSize: 'contain',
+                             WebkitMaskRepeat: 'no-repeat',
+                             WebkitMaskPosition: 'center',
+                         }}
+                      />
+                  </div>
+              )}
 
               {/* TAP AND HOLD TEXT (Mobile only - visible when LOGOS is selected) */}
               {isMobile && isSelected && item === 'LOGOS' && (
@@ -1101,13 +1306,13 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
              minHeight: selectedItem ? '50vh' : '0'
         }}
       >
-        {selectedItem && getContentForItem(selectedItem)}
+        {selectedItem && getContentForItem(selectedItem, liveConfig)}
       </div>
     </div>
   );
 };
 
-export default function Work() {
+export default function Work({ liveConfig }) {
   const { section } = useParams();
   const navigate = useNavigate();
   
@@ -1129,7 +1334,7 @@ export default function Work() {
     if (section) {
        const sectionUpper = section.toUpperCase();
        // Check if section matches any graphic items. If so, select it.
-       const validItems = ['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN'];
+       const validItems = ['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN', 'RECENTS'];
        // We might need to handle spaces in URL: visual-design -> VISUAL DESIGN
        const cleanSection = sectionUpper.replace(/-/g, ' ');
        
@@ -1181,7 +1386,7 @@ export default function Work() {
   return (
     // Fixed page size for Merch (h-screen overflow-hidden) to prevent body scroll
     // Graphic Design allows scrolling
-    <main className={`transition-colors duration-500 min-h-screen font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'w-full'}`}>
+    <main className={`transition-colors duration-500 min-h-screen font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'w-full'} ${activeCategory === 'graphic' ? 'justify-center' : ''}`}>
       
       {/* Mini nav - Adjusted z-index to sit on top of carousel */}
       <div 
@@ -1209,7 +1414,7 @@ export default function Work() {
             Graphic Design
           </button>
         </nav>
-        <span className="uppercase tracking-[0] text-[10px] text-neutral-500 mt-1">Selected Works</span>
+        <span className="uppercase tracking-[0] text-[10px] sm:text-xs text-neutral-500 mt-1">Selected Works</span>
       </div>
 
       {activeCategory === 'merch' && (
@@ -1225,25 +1430,28 @@ export default function Work() {
         {activeCategory === 'graphic' && (
           <section className="w-full max-w-4xl mt-4 mb-0 px-6 flex-grow flex flex-col">
             <GraphicDesignSection 
-              items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN']} 
+              items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN', 'RECENTS']} 
               onDetailViewChange={setIsGraphicDetailView}
               selectedItem={selectedGraphicItem}
               setSelectedItem={handleGraphicSelection}
+              liveConfig={liveConfig}
             />
           </section>
         )}
 
         {/* Footer for Graphic Design Section (Not Fixed) */}
-        {!isGraphicDetailView && (
-           <div className="w-full mt-auto mb-0 bg-transparent z-10 pointer-events-auto">
+        {/* Only show ONE footer instance */}
+        {/* Show footer if:
+            1. We are NOT in a detail view (main list)
+            2. We ARE in a detail view, but it's NOT 'POSTERS', 'RECENTS', or 'BRAND DESIGN' (which has its own viewer)
+               Actually 'BRAND DESIGN' uses the main layout until clicked, then opens a modal. So footer is fine there.
+               'POSTERS' is fixed height, maybe no footer? Or absolute.
+               'RECENTS' has no footer.
+        */}
+        {(!isGraphicDetailView || (isGraphicDetailView && selectedGraphicItem !== 'RECENTS' && selectedGraphicItem !== 'POSTERS')) && (
+           <div className={`w-full mt-auto mb-0 bg-transparent z-10 pointer-events-auto ${activeCategory === 'merch' ? 'hidden' : ''}`}>
              <Footer />
            </div>
-        )}
-        {/* If detail view is active, we might want footer too, unless it's POSTERS? */}
-        {isGraphicDetailView && selectedGraphicItem !== 'POSTERS' && (
-             <div className="w-full mt-auto mb-0 bg-transparent z-10 pointer-events-auto">
-                <Footer />
-             </div>
         )}
       </div>
     </main>

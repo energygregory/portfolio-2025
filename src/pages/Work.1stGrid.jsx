@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import BlurCarousel from "../components/BlurCarousel";
 import ResponsiveImage from "../components/ResponsiveImage.jsx";
+import PDFThumbnail from "../components/PDFThumbnail.jsx";
 
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
@@ -512,7 +513,40 @@ const PostersContent = () => {
 const VisualDesignContent = () => <div className="p-4 text-center">Visual Design content gallery will go here</div>;
 const PackagingContent = () => <div className="p-4 text-center">Packaging Design content gallery will go here</div>;
 const TechpackContent = () => <div className="p-4 text-center">Techpack Design content gallery will go here</div>;
-const BrandContent = () => <div className="p-4 text-center">Brand Design content gallery will go here</div>;
+
+const BrandContent = () => {
+  return (
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-start justify-items-center">
+      <div className="flex flex-col items-center gap-4 group">
+        <div className="relative transition-transform duration-500 hover:scale-[1.02] hover:shadow-2xl rounded-lg overflow-hidden">
+          <PDFThumbnail 
+            fileUrl="/Images/2025/Brand design/brand guidelines-2.pdf" 
+            pageNumber={5}
+            width={600}
+            className="w-full max-w-[90vw] md:max-w-full h-auto"
+          />
+        </div>
+        <h3 className="font-['PT_Mono'] text-lg tracking-widest text-neutral-600 dark:text-neutral-400 mt-4 group-hover:text-black dark:group-hover:text-white transition-colors">
+          BRAND GUIDELINES
+        </h3>
+      </div>
+
+      <div className="flex flex-col items-center gap-4 group">
+        <div className="relative transition-transform duration-500 hover:scale-[1.02] hover:shadow-2xl rounded-lg overflow-hidden">
+          <PDFThumbnail 
+            fileUrl="/Images/2025/Brand design/Educ8Africa New Proposed Identity.pdf" 
+            pageNumber={4}
+            width={600}
+            className="w-full max-w-[90vw] md:max-w-full h-auto"
+           />
+        </div>
+        <h3 className="font-['PT_Mono'] text-lg tracking-widest text-neutral-600 dark:text-neutral-400 mt-4 group-hover:text-black dark:group-hover:text-white transition-colors">
+          EDUC8AFRICA IDENTITY
+        </h3>
+      </div>
+    </div>
+  );
+};
 
 const getContentForItem = (item) => {
   switch(item) {

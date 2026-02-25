@@ -52,7 +52,7 @@ export default function WorkNav() {
           <nav className="flex gap-4 sm:gap-12 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
             <button
               onClick={() => navigate('/work/merch')}
-              className={`font-mono uppercase text-xs sm:text-sm tracking-widest pb-2 px-2 transition-colors relative top-[1px] ${
+              className={`font-mono uppercase text-xs sm:text-sm tracking-widest pb-2 px-2 transition-colors relative top-[1px] text-no-resize ${
                 isMerch
                   ? 'text-black dark:text-white border-b-2 border-black dark:border-white' 
                   : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300'
@@ -62,7 +62,7 @@ export default function WorkNav() {
             </button>
             <button
               onClick={() => navigate('/work/graphic')}
-              className={`font-mono uppercase text-xs sm:text-sm tracking-widest pb-2 px-2 transition-colors relative top-[1px] ${
+              className={`font-mono uppercase text-xs sm:text-sm tracking-widest pb-2 px-2 transition-colors relative top-[1px] text-no-resize ${
                 isGraphic
                   ? 'text-black dark:text-white border-b-2 border-black dark:border-white' 
                   : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300'

@@ -712,7 +712,7 @@ export default function Home({ theme = "dark", heroScale = 1, heroY = 0, animate
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <h3
-            className="text-center text-[10px] sm:text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400 mb-6 sm:mb-12"
+            className="text-center text-[10px] sm:text-sm tracking-[0.3em] text-neutral-600 dark:text-neutral-400 mb-6 sm:mb-12 text-no-resize"
             style={{
               fontFamily:
                 "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
@@ -897,7 +897,7 @@ function HeroLogoSequence({ theme = 'dark', heroScale = 1, heroY = 0, animatedOu
       <div className="flex flex-col items-center gap-3" style={{ transform: `translateZ(0) translateY(${heroY}px) scale(${heroScale})`, transformOrigin: '50% 50%', transition: 'transform 500ms ease-in-out' }}>
         <AnimatedLogo start={true} className="w-full h-auto" style={{ color: strokeColor, opacity: 1 }} strokeWidth={animatedOutlineWidth} />
         <h3
-          className="text-center text-[7px] sm:text-[9px] tracking-[0.15em] text-neutral-600 dark:text-neutral-400 whitespace-nowrap"
+          className="text-center text-[7px] sm:text-[9px] tracking-[0.15em] text-neutral-600 dark:text-neutral-400 whitespace-nowrap text-no-resize"
           style={{
             fontFamily:
               "'PT Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",

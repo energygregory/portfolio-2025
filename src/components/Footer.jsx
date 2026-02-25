@@ -176,13 +176,14 @@ export default function Footer() {
     <footer
       className={`${
         isDark ? "bg-[#2a2a2a] text-white" : "bg-gray-100 text-black"
-      } w-full relative z-[20] overflow-hidden pb-0 border-t-0`}
+      } w-full relative z-[20] overflow-hidden pb-0 border-t-0 text-no-resize`}
       style={{
         fontFamily:
           "'PT Mono', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
         fontWeight: isDark ? 800 : 950,
         textTransform: "uppercase",
         letterSpacing: "0.06em",
+        fontSize: '16px'
       }}
     >
       {/* Dither Background */}

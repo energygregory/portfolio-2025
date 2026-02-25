@@ -1,66 +1,128 @@
-import React, { useState, useEffect } from "react";
-import AnimatedAsset1 from "../components/AnimatedAsset1";
+import React, { useState } from "react";
 
-export default function About() {
-  const [isMobile, setIsMobile] = useState(false);
+export default function Contact() {
+  const [showRating, setShowRating] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hasRated, setHasRated] = useState(false);
 
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const handleRate = (score) => {
+    setRating(score);
+    // Simulate submission after a brief delay
+    setTimeout(() => {
+        setHasRated(true);
+        // Reset after showing thank you
+        setTimeout(() => {
+            setShowRating(false);
+            setRating(0);
+            setHasRated(false);
+        }, 2000);
+    }, 500);
+  };
 
   return (
-    <main className="min-h-screen px-0 py-16 font-mono no-scrollbar flex flex-col items-center pt-20 sm:pt-32">
-      {/* Mobile Header: Matches Work Page Mini-Nav style exactly */}
-      <div 
-        className="w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:hidden"
-      >
-        <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
-          <div
-            className="font-mono uppercase text-sm tracking-widest pb-3 px-2 relative top-[1px] text-black dark:text-white border-b-2 border-black dark:border-white"
-          >
-            FIND ME HERE
-          </div>
-        </nav>
-      </div>
+    <main className="min-h-screen px-6 py-16 font-mono no-scrollbar flex flex-col items-center justify-center pt-20 sm:pt-32">
+      <div className="w-full max-w-4xl relative h-[60vh] flex flex-col justify-between">
+        
+        {/* Top Center */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2">
+             <a 
+                href="mailto:gregory.gfx1@gmail.com"
+                className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors"
+                >
+                MAIL
+            </a>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-6 w-full">
-        {/* About Me Section */}
-        <div className="mb-16">
-          <h1 className="text-5xl font-bold mb-12 tracking-wider hidden sm:block uppercase">
-            FIND ME HERE
-          </h1>
+        {/* Row 2: Instagram (Left) - Pinterest (Right) */}
+        <div className="absolute top-[20%] left-[15%]">
+            <a 
+                href="https://instagram.com/0021.studio"
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors"
+            >
+                INSTAGRAM
+            </a>
+        </div>
+        <div className="absolute top-[20%] right-[15%]">
+            <a 
+                href="https://pinterest.com/energygregory"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors"
+            >
+                PINTEREST
+            </a>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mt-4 sm:mt-0">
-            {/* Text Content */}
-            <div className="space-y-6 text-sm md:text-base leading-relaxed font-normal text-left">
-              <p>
-                My name is <strong>Gregory</strong>, a Ghanaian self-taught
-                designer with 3 years of hands-on experience in merch design. I
-                started designing out of curiosity and built my craft through
-                constant experimentation, client and personal projects. Over the
-                years, I've learnt how to take an idea from rough sketches and
-                turn them into beautiful pieces. Every project I take on is
-                built with intention, clarity, and respect for the brand's
-                story. My focus is always on creating work that not only looks
-                good on screen, but feels authentic when produced and worn.
-              </p>
+        {/* Row 3: Twiter (Left) - Behance (Right) */}
+        <div className="absolute top-[45%] left-0">
+            <a 
+                href="https://twitter.com/energygregory"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors"
+            >
+                TWITTER (X)
+            </a>
+        </div>
+        <div className="absolute top-[45%] right-0">
+            <a 
+                href="https://behance.net/grega"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors"
+            >
+                BEHANCE
+            </a>
+        </div>
 
-              <p>
-                I draw a lot of inspiration from Virgil Abloh, Prince Gyesi, and
-                Kwame Adusei. Their work reminds me that design can be more than
-                visuals as it can shape culture, tell stories, and redefine how
-                people see fashion and identity.
-              </p>
+        {/* Row 4: Rate Site (Left) - Visitor Book (Right) */}
+        <div className="absolute top-[70%] left-[15%]">
+            <div className="relative group">
+                <button 
+                    onClick={() => setShowRating(!showRating)}
+                    className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors"
+                >
+                    {hasRated ? "THANKS FOR RATING" : "RATE THE SITE"}
+                </button>
+                
+                {showRating && !hasRated && (
+                    <div className="absolute top-full lg:left-0 left-1/2 lg:translate-x-0 -translate-x-1/2 mt-2 flex gap-1 bg-white dark:bg-black p-2 rounded shadow-lg border border-neutral-200 dark:border-neutral-800 z-10 whitespace-nowrap">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                                key={star}
+                                onClick={() => handleRate(star)}
+                                onMouseEnter={() => setRating(star)}
+                                onMouseLeave={() => setRating(0)}
+                                className="text-lg leading-none focus:outline-none transition-transform hover:scale-110"
+                            >
+                                {star <= rating ? "★" : "☆"}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
+        </div>
+        <div className="absolute top-[70%] right-[15%]">
+            <a 
+                href="#"
+                className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors cursor-not-allowed"
+                onClick={(e) => e.preventDefault()}
+            >
+                VISITOR BOOK
+            </a>
+        </div>
 
-            {/* Photo */}
-            <div className="flex justify-center lg:justify-end">
-              {/* Image removed as requested */}
-            </div>
-          </div>
+        {/* Bottom Center */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+             <a 
+                href="#"
+                className="uppercase tracking-[0] text-[10px] text-neutral-500 hover:text-black dark:hover:text-white transition-colors cursor-not-allowed"
+                onClick={(e) => e.preventDefault()}
+                >
+                SHOP
+            </a>
         </div>
       </div>
     </main>

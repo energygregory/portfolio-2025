@@ -20,7 +20,7 @@ export default function ResponsiveImage({ src, alt = '', className = '', loading
   const sizesAttr = sizes || '(max-width: 640px) 60vw, 30vw';
 
   return (
-    <picture>
+    <picture className="contents">
       <source type="image/avif" srcSet={avifSrcset} sizes={sizesAttr} />
       <source type="image/webp" srcSet={webpSrcset} sizes={sizesAttr} />
       <img src={src} srcSet={jpgSrcset} sizes={sizesAttr} alt={alt} className={className} loading={loading} decoding="async" {...imgProps} />
