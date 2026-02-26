@@ -13,13 +13,33 @@ export default function About() {
 
   return (
     <main className="min-h-screen px-0 py-16 font-mono no-scrollbar flex flex-col items-center pt-20 sm:pt-32">
-      {/* Mobile Header: Matches Work Page Mini-Nav style exactly */}
+      {/* Mobile Header: Glass backdrop from border-b line upward to top */}
+      <div className="fixed top-0 left-0 right-0 z-[59] sm:hidden" style={{ height: '56px' }}>
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            backdropFilter: 'blur(60px) saturate(2) brightness(1.15)',
+            WebkitBackdropFilter: 'blur(60px) saturate(2) brightness(1.15)',
+            backgroundColor: 'rgba(255,255,255,0.5)',
+            maskImage: 'linear-gradient(to bottom, black 65%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 65%, transparent 100%)'
+          }}
+        />
+        <div 
+          className="absolute inset-0 dark:block hidden"
+          style={{ 
+            backdropFilter: 'blur(60px) saturate(2) brightness(0.85)',
+            WebkitBackdropFilter: 'blur(60px) saturate(2) brightness(0.85)',
+            backgroundColor: 'rgba(0,0,0,0.55)',
+            maskImage: 'linear-gradient(to bottom, black 65%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 65%, transparent 100%)'
+          }}
+        />
+      </div>
       <div 
         className="w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:hidden"
       >
-        {/* Glass backdrop — spans full width from top of page down through the nav border */}
-        <div className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md" style={{ height: 'calc(20px + 100%)', zIndex: -1 }} />
-        <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-none relative">
+        <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 relative">
           <div
             className="font-mono uppercase text-sm tracking-widest pb-3 px-2 relative top-[1px] text-black dark:text-white border-b-2 border-black dark:border-white"
           >
@@ -30,7 +50,7 @@ export default function About() {
 
       <div className="max-w-7xl mx-auto px-6 w-full">
         {/* About Me Section */}
-        <div className="mb-16">
+        <div className="mb-4">
           <h1 className="text-5xl font-bold mb-12 tracking-wider hidden sm:block">
             who is greg?
           </h1>
@@ -61,9 +81,9 @@ export default function About() {
             {/* Photo */}
             <div className="flex justify-center lg:justify-end">
               <img
-                src="/Images/2025/IMG_0801%203.heic"
+                src="/Images/2025/IMG_0801%203.jpg"
                 alt="Gregory"
-                className="w-full max-w-[300px] md:max-w-md rounded-lg shadow-lg"
+                className="w-full max-w-[200px] sm:max-w-[300px] md:max-w-md rounded-lg shadow-lg"
               />
             </div>
           </div>

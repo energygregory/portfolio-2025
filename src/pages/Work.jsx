@@ -346,7 +346,7 @@ const PostersContent = () => {
       { src: "/Images/2025/POSTERS/afterparty.png", aspectRatio: 1.778 }, // 1920/1080
       { src: "/Images/2025/POSTERS/ypee.jpg", aspectRatio: 1.0 },      // 3000/3000
       { src: "/Images/2025/POSTERS/JINJA main.png", aspectRatio: 1.778 }, // 1920/1080
-      { src: "/Images/2025/POSTERS/gb%20%26%20gr.png", aspectRatio: 1.0 },   // gb & gr.png (square)
+      { src: "/Images/2025/POSTERS/gb & gr.png", aspectRatio: 1.0 },   // gb & gr.png (square)
       { src: "/Images/2025/POSTERS/anticipate.png", aspectRatio: 1.25 }, // 2700/2160 = 1.25
       { src: "/Images/2025/POSTERS/final final.png", aspectRatio: 1.778 }, // 1920/1080
       { src: "/Images/2025/POSTERS/main flyer cod.png", aspectRatio: 1.778 }, // 1920/1080
