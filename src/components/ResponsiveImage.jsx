@@ -4,7 +4,7 @@ import React from 'react';
 // it will attempt to use generated variants like '/Images/2025/POSTERS/post00@400.avif',
 // '/Images/2025/POSTERS/post00@800.avif', '/Images/2025/POSTERS/post00@1200.avif',
 // and fall back to the original file. Uses <picture> with AVIF -> WEBP -> img.
-export default function ResponsiveImage({ src, alt = '', className = '', loading = 'lazy', sizes, ...imgProps }) {
+export default function ResponsiveImage({ src, alt = '', className = '', loading = 'lazy', sizes, fetchPriority, ...imgProps }) {
   if (!src) return null;
 
   const ext = src.split('.').pop();
@@ -19,11 +19,15 @@ export default function ResponsiveImage({ src, alt = '', className = '', loading
 
   const sizesAttr = sizes || '(max-width: 640px) 60vw, 30vw';
 
+  // Build extra props for fetchPriority (works in Chrome/Edge)
+  const extraProps = {};
+  if (fetchPriority) extraProps.fetchpriority = fetchPriority;
+
   return (
     <picture className="contents">
       <source type="image/avif" srcSet={avifSrcset} sizes={sizesAttr} />
       <source type="image/webp" srcSet={webpSrcset} sizes={sizesAttr} />
-      <img src={src} srcSet={jpgSrcset} sizes={sizesAttr} alt={alt} className={className} loading={loading} decoding="async" {...imgProps} />
+      <img src={src} srcSet={jpgSrcset} sizes={sizesAttr} alt={alt} className={className} loading={loading} decoding={loading === 'eager' ? 'sync' : 'async'} {...extraProps} {...imgProps} />
     </picture>
   );
 }

@@ -17,7 +17,9 @@ export default function About() {
       <div 
         className="w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:hidden"
       >
-        <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
+        {/* Glass backdrop — spans full width from top of page down through the nav border */}
+        <div className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md" style={{ height: 'calc(20px + 100%)', zIndex: -1 }} />
+        <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-none relative">
           <div
             className="font-mono uppercase text-sm tracking-widest pb-3 px-2 relative top-[1px] text-black dark:text-white border-b-2 border-black dark:border-white"
           >

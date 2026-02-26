@@ -168,13 +168,6 @@ export default function PriceList() {
             </div>
           ))}
         </div>
-
-        {/* Social links footer (optional) */}
-        <div className="mt-16 pt-8 border-t border-neutral-800 flex gap-6 text-xs text-neutral-500">
-          <a href="https://instagram.com/0021.studio" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-            © 0021.STUDIO
-          </a>
-        </div>
       </div>
 
       {/* Policy Modal */}

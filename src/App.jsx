@@ -1157,7 +1157,7 @@ function App() {
             paddingLeft: `${pillPadding}px`, 
             bottom: `${liveConfig.navY ?? 48}px`,
             // transform combined: center horizontal + conditional vertical slide + scale
-            transform: `translate(-50%, ${(navHidden || location.pathname === '/work/recents') ? '1.5rem' : '0'}) scale(${liveConfig.navScale ?? 1})`,
+            transform: `translate(-50%, ${(navHidden) ? '1.5rem' : '0'}) scale(${liveConfig.navScale ?? 1})`,
             transformOrigin: 'bottom center'
           }}
         className={`
@@ -1165,7 +1165,7 @@ function App() {
           z-50 flex justify-center items-center app-header
           fixed left-1/2 w-auto py-2 px-8 rounded-full border
           transition-all duration-300 ease-in-out
-          ${(navHidden || location.pathname === '/work/recents') ? 'opacity-0 pointer-events-none' : 'opacity-100'}
+          ${(navHidden) ? 'opacity-0 pointer-events-none' : 'opacity-100'}
           ${
             theme === "dark"
               ? "border-neutral-800 bg-black/80 backdrop-blur-sm"
@@ -1266,11 +1266,12 @@ function App() {
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden flex flex-col" style={{ minHeight: '100vh' }}>
         {(
-          viewMode === 'mobile' || 
-          location.pathname === '/'
+          (viewMode === 'mobile' || 
+          location.pathname === '/') &&
+          location.pathname !== '/pricelist'
         ) && (
           <Asset1Svg
-            theme={theme}
+            theme={location.pathname === '/work/recents' ? 'dark' : theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/') && location.pathname !== '/work/recents') ? 'z-0' : 'z-20'}`}
             style={{

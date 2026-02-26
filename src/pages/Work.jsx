@@ -355,25 +355,33 @@ const PostersContent = () => {
 
     const posterCount = posterData.length;
     const PRIORITY_COUNT = 10;
-    const CONCURRENCY = 8;
+    const CONCURRENCY = 12;
 
-    // Preload strategy: prioritize first-visible posters, then background-load the rest
-    // without compressing or altering images to preserve full quality.
+    // Preload strategy: preload AVIF variants (the format browsers actually use)
+    // to avoid wasted bandwidth on original files the <picture> element won't select.
     useEffect(() => {
       let cancelled = false;
       const head = typeof document !== 'undefined' ? document.head : null;
       const addedLinks = [];
 
-      // Add <link rel="preload"> for highest-priority images so browser gives them priority
+      // Helper to get AVIF URL for a given source
+      const toAvif = (src, width) => {
+        const base = src.replace(/\.[^.]+$/, '');
+        return width ? `${base}@${width}.avif` : `${base}.avif`;
+      };
+
+      // Preload first batch as AVIF at the size the browser will actually use
+      // Desktop tiles are 300px → 400w is perfect (or 800w for retina)
+      const preloadWidth = window.devicePixelRatio > 1 ? 800 : 400;
       for (let i = 0; i < Math.min(PRIORITY_COUNT, posterData.length); i++) {
         try {
-          const url = posterData[i].src;
+          const url = toAvif(posterData[i].src, preloadWidth);
           if (head) {
             const l = document.createElement('link');
             l.rel = 'preload';
             l.as = 'image';
+            l.type = 'image/avif';
             l.href = url;
-            l.crossOrigin = 'anonymous';
             head.appendChild(l);
             addedLinks.push(l);
           }
@@ -382,57 +390,44 @@ const PostersContent = () => {
         }
       }
 
-      // Helper to load a single image and decode it (keeps full quality)
-      const loadImage = (url) => new Promise((resolve, reject) => {
+      // Helper to load a single image as AVIF and decode it
+      const loadImage = (src) => new Promise((resolve) => {
         try {
           const img = new Image();
-          img.crossOrigin = 'anonymous';
           img.onload = () => {
-            // decode() gives better guarantee the image is ready for painting
             if (img.decode) {
-              img.decode().then(() => resolve(url)).catch(() => resolve(url));
+              img.decode().then(() => resolve()).catch(() => resolve());
             } else {
-              resolve(url);
+              resolve();
             }
           };
-          img.onerror = () => resolve(url); // resolve to avoid blocking other loads
-          img.src = url;
+          img.onerror = () => resolve();
+          img.src = toAvif(src, preloadWidth);
         } catch (err) {
-          resolve(url);
+          resolve();
         }
       });
 
-      // Background preload with limited concurrency
+      // Background preload remaining images with high concurrency
       const backgroundPreload = async () => {
-        const urls = posterData.slice(PRIORITY_COUNT).map(p => p.src);
+        const remaining = posterData.slice(PRIORITY_COUNT);
         let idx = 0;
         const workers = new Array(CONCURRENCY).fill(null).map(async () => {
-          while (!cancelled && idx < urls.length) {
+          while (!cancelled && idx < remaining.length) {
             const i = idx++;
-            const url = urls[i];
-            // Use requestIdleCallback when available to avoid janking
-            if (typeof requestIdleCallback !== 'undefined') {
-              await new Promise((r) => requestIdleCallback(r, { timeout: 200 }));
-            } else {
-              // small delay to yield
-              await new Promise(r => setTimeout(r, 20));
-            }
-            await loadImage(url);
+            await loadImage(remaining[i].src);
           }
         });
         await Promise.all(workers);
       };
 
-      // Kick off background preload but defer a tick so UI can respond
       if (typeof window !== 'undefined') {
-        // Defer to next animation frame to avoid blocking initial render
         const id = window.requestAnimationFrame(() => {
           backgroundPreload().catch(() => {});
         });
         return () => {
           cancelled = true;
           window.cancelAnimationFrame(id);
-          // remove added preload links
           if (head) addedLinks.forEach(l => l.remove());
         };
       }
@@ -872,8 +867,8 @@ const PostersContent = () => {
                  const { items, totalHeight } = columnLayouts[variantIdx];
 
                  // Visible Range:
-                 const visibleMinY = -effectiveOffsetY - 800;
-                 const visibleMaxY = -effectiveOffsetY + vpH + 800;
+                 const visibleMinY = -effectiveOffsetY - 400;
+                 const visibleMaxY = -effectiveOffsetY + vpH + 400;
                  
                  const minBlock = Math.floor(visibleMinY / totalHeight);
                  const maxBlock = Math.floor(visibleMaxY / totalHeight);
@@ -907,11 +902,12 @@ const PostersContent = () => {
                                         <ResponsiveImage
                                           src={posterData[item.index].src}
                                           className="w-full h-full block pointer-events-none select-none object-contain transition-all duration-200"
+                                          sizes="300px"
                                           style={{
                                             filter: isTablet ? 'none' : (hoveredPosterIndex === item.index ? 'grayscale(0%)' : 'grayscale(100%)')
                                           }}
                                           fetchPriority={item.index < PRIORITY_COUNT ? 'high' : undefined}
-                                          loading={item.index < PRIORITY_COUNT ? 'eager' : 'lazy'}
+                                          loading="eager"
                                         />
                                     </div>
                                  </div>
@@ -1097,7 +1093,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
       <div 
         className="relative w-full flex-shrink-0"
         style={{ 
-          height: selectedItem ? '0px' : `${(items.length * ITEM_HEIGHT) + 100 - mobileHeightAdjustment}px`,
+          height: selectedItem ? '0px' : `${(items.length * ITEM_HEIGHT) - mobileHeightAdjustment}px`,
           transition: 'height 500ms ease-in-out'
         }}
       >
@@ -1108,7 +1104,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
           return (
             <div 
               key={idx}
-              className={`absolute transition-all duration-700 ease-[0.165,0.84,0.44,1] group cursor-pointer flex items-center gap-4 hover:z-50 pointer-events-auto ${
+              className={`absolute transition-all duration-700 ease-[0.165,0.84,0.44,1] group cursor-pointer flex items-center hover:z-50 pointer-events-auto ${
                 isOther ? 'opacity-0 pointer-events-none ease-in duration-300' : 'opacity-100'
               } ${
                 (item === 'RECENTS' && isSelected) ? 'opacity-0 pointer-events-none' : ''
@@ -1131,13 +1127,13 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               onClick={() => setSelectedItem(selectedItem ? null : item)}
             >
               {/* Back Arrow - Only visible when selected */}
-              <div 
-                className={`transition-all duration-500 delay-300 ${isSelected ? 'opacity-100 w-8 md:w-12 -ml-8 md:-ml-12' : 'opacity-0 w-0 -ml-0 overflow-hidden'}`}
+              {isSelected && <div 
+                className="transition-all duration-500 delay-300 opacity-100 w-8 md:w-12 -ml-8 md:-ml-12"
               >
                  <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-black dark:text-white">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                  </svg>
-              </div>
+              </div>}
 
               <h2 
                 className={`${item === 'RECENTS' ? 'text-sm sm:text-2xl' : 'text-4xl sm:text-6xl'} font-light text-[#e5e5e5] dark:text-[#4d4d4d] transition-colors duration-300 z-20 whitespace-nowrap ${

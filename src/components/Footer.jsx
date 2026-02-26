@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AnimatedLogo from "./AnimatedLogo";
 import Dither from "./Dither";
 
 export default function Footer() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -226,7 +227,7 @@ export default function Footer() {
           {/* Resources & Legal links */}
           <div className="flex justify-center gap-4 mt-3">
             <button
-              onClick={() => setActiveModal("ratecard")}
+              onClick={() => navigate('/pricelist')}
               className={`text-[9px] ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-black"} transition-colors`}
             >
               RATE CARD
@@ -345,7 +346,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <button
-                  onClick={() => setActiveModal("ratecard")}
+                  onClick={() => navigate('/pricelist')}
                   className={`text-left ${
                     isDark
                       ? "text-gray-300 hover:text-white transition-colors"

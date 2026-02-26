@@ -1,15 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-// Original set
-const baseImages = [
-    '/Images/2025/PNGS/png1.webp',
-    '/Images/2025/PNGS/png2.webp',
-    '/Images/2025/PNGS/png5.webp',
+// Original set with labels
+const baseItems = [
+    { src: '/Images/2025/PNGS/png1.webp', label: 'William Ru — Kids Next Door "Numbuh 4" Hoodie', mobileLines: ['William Ru', 'Kids Next Door', '"Numbuh 4"', 'Hoodie'] },
+    { src: '/Images/2025/PNGS/png2.webp', label: 'William Ru — Nottingham Pinstripe Shirt', mobileLines: ['William Ru', 'Nottingham', 'Pinstripe Shirt'] },
+    { src: '/Images/2025/PNGS/png5.webp', label: 'William Ru — Stealth Camo Set', mobileLines: ['William Ru', 'Stealth Camo', 'Set'] },
 ];
 
 // Create a repeated array to simulate infinite scroll
 // 12 sets is usually enough buffer for 'infinite' feel if we reset scroll
-const images = Array(12).fill(baseImages).flat();
+const items = Array(12).fill(baseItems).flat();
 
 const BlurCarousel = () => {
     const containerRef = useRef(null);
@@ -67,8 +67,8 @@ const BlurCarousel = () => {
         // Full width/height container
         <div className="relative w-full h-full mx-auto flex justify-start pl-0 overflow-hidden">
             
-            {/* GLOBAL CONTROLS */}
-             <div className="fixed top-28 right-4 z-[9999] bg-white/90 text-black p-2 rounded shadow flex flex-col gap-2 scale-90 origin-top-right">
+            {/* GLOBAL CONTROLS - HIDDEN */}
+             {false && <div className="fixed top-28 right-4 z-[9999] bg-white/90 text-black p-2 rounded shadow flex flex-col gap-2 scale-90 origin-top-right">
                 <div>
                      <div className="text-[10px] uppercase font-bold">Global Scale</div>
                     <input type="range" min="0.5" max="1.5" step="0.05" value={globalScale} onChange={(e) => setGlobalScale(parseFloat(e.target.value))} />
@@ -79,7 +79,7 @@ const BlurCarousel = () => {
                     <input type="range" min="-200" max="200" value={globalX} onChange={(e) => setGlobalX(parseInt(e.target.value))} />
                      <div className="text-xs text-center">{globalX}px</div>
                 </div>
-            </div>
+            </div>}
 
             <div 
                 ref={containerRef}
@@ -89,10 +89,12 @@ const BlurCarousel = () => {
                     transformOrigin: 'left center' 
                 }}
             >
-                {images.map((img, idx) => (
+                {items.map((item, idx) => (
                     <CarouselItem 
                         key={idx} 
-                        src={img} 
+                        src={item.src}
+                        label={item.label}
+                        mobileLines={item.mobileLines}
                         containerRef={containerRef} 
                         scrollTop={scrollProgress}
                         manualSize={MOBILE_SIZE}
@@ -105,9 +107,10 @@ const BlurCarousel = () => {
     );
 };
 
-const CarouselItem = ({ src, containerRef, scrollTop, manualSize, verticalGap, xControlPoints }) => {
+const CarouselItem = ({ src, label, mobileLines, containerRef, scrollTop, manualSize, verticalGap, xControlPoints }) => {
     const itemRef = useRef(null);
     const [style, setStyle] = useState({ opacity: 0.2, filter: 'blur(8px)', transform: 'translateX(0) scale(0.8)' });
+    const [isCentered, setIsCentered] = useState(false);
 
     const handleClick = () => {
         if (!itemRef.current || !containerRef.current) return;
@@ -198,6 +201,9 @@ const CarouselItem = ({ src, containerRef, scrollTop, manualSize, verticalGap, x
              xShift = (1 - easedNorm) * maxShift; 
         }
         
+        // Track if this item is the centered one (within half an item slot)
+        setIsCentered(indexDist < 0.5);
+
         // Apply calculated styles
         setStyle({
             filter: `blur(${blur}px)`,
@@ -229,6 +235,44 @@ const CarouselItem = ({ src, containerRef, scrollTop, manualSize, verticalGap, x
                     className="h-full w-auto object-contain" 
                 />
             </div>
+
+            {/* Item label — visible only when centered */}
+            {label && (() => {
+              return (
+                <div
+                  className="absolute bottom-0 left-0 right-0 pointer-events-none transition-opacity duration-300 sm:text-center"
+                  style={{
+                    opacity: isCentered ? 1 : 0,
+                  }}
+                >
+                  {/* Mobile: multi-line right-aligned, pushed left */}
+                  <div className="flex flex-col items-end text-right sm:hidden"
+                    style={{ fontFamily: "'PT Mono', monospace", transform: 'translateX(-120px)', paddingRight: '16px' }}
+                  >
+                    {(mobileLines || []).map((line, i) => (
+                      <span
+                        key={i}
+                        className={`uppercase ${
+                          i === 0
+                            ? 'text-[11px] tracking-[0.15em] text-neutral-500 dark:text-neutral-400'
+                            : 'text-[9px] tracking-[0.12em] text-neutral-600 dark:text-neutral-500'
+                        }`}
+                        style={{ lineHeight: '1.4' }}
+                      >
+                        {line}
+                      </span>
+                    ))}
+                  </div>
+                  {/* Desktop: single line centered */}
+                  <span
+                    className="hidden sm:inline text-xs tracking-[0.15em] uppercase text-neutral-500 dark:text-neutral-400"
+                    style={{ fontFamily: "'PT Mono', monospace" }}
+                  >
+                    {label}
+                  </span>
+                </div>
+              );
+            })()}
         </div>
     );
 };
