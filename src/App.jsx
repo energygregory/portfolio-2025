@@ -1266,9 +1266,8 @@ function App() {
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
       <div className="relative flex-1 overflow-hidden flex flex-col" style={{ minHeight: '100vh' }}>
         {(
-          location.pathname === '/' || 
-          location.pathname === '/contact' ||
-          ((location.pathname.startsWith('/work/')) && viewMode === 'mobile')
+          viewMode === 'mobile' || 
+          location.pathname === '/'
         ) && (
           <Asset1Svg
             theme={theme}
@@ -1291,8 +1290,8 @@ function App() {
           />
         )}
 
-        {/* Mobile Asset Sliders - RESTORED FOR DEBUGGING */}
-        {location.pathname === '/' && viewMode === 'mobile' && (
+        {/* Mobile Asset Sliders - HIDDEN */}
+        {false && location.pathname === '/' && viewMode === 'mobile' && (
              <div className="fixed bottom-24 left-4 right-4 z-[200] flex flex-col gap-2 p-4 bg-white/5 dark:bg-black/5 backdrop-blur-sm rounded-xl border border-black/10 dark:border-white/10 shadow-2xl max-h-[50vh] overflow-y-auto">
                  <div className="text-xs font-bold mb-2 text-center uppercase tracking-widest">Mobile Controls</div>
                  

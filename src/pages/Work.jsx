@@ -712,6 +712,8 @@ const PostersContent = () => {
                     pointerEvents: 'auto',
                     left: '12.5%', // (100 - 75) / 2 = 12.5% to center horizontally with w=75vw
                     right: '12.5%',
+                    filter: isActive ? 'none' : 'grayscale(100%)',
+                    transition: 'filter 0.5s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1)',
                   }}
                   onClick={() => handlePosterClick(index)}
                   loading={Math.abs(index - currentIndex) < 2 ? "eager" : "lazy"}
@@ -930,6 +932,7 @@ const PackagingContent = () => {
     );
 };
 const TechpackContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Techpack Design content gallery will go here</div>;
+const RecentsContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Recents content coming soon</div>;
 const BrandContent = () => {
   const brandItems = [
     {
@@ -976,6 +979,7 @@ const getContentForItem = (item) => {
     case 'PACKAGING DESIGN': return <PackagingContent />;
     case 'TECHPACK DESIGN': return <TechpackContent />;
     case 'BRAND DESIGN': return <BrandContent />;
+    case 'RECENTS': return <RecentsContent />;
     default: return null;
   }
 };
@@ -1021,12 +1025,10 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
   // Height for the list view to maintain spacing
   // Desktop: 120px gap
   // Mobile: 105px gap
-  const ITEM_HEIGHT = isMobile ? 105 : 120; 
+  const ITEM_HEIGHT = isMobile ? 90 : 120; 
   const TOP_OFFSET = isMobile ? -20 : 40;   
 
-  // On mobile, we subtract one ITEM_HEIGHT from calculation effectively "hiding" the added height of the last item
-  // This keeps the footer where it was relative to the second-to-last item (Techpack)
-  const mobileHeightAdjustment = isMobile ? ITEM_HEIGHT : 0;
+  const mobileHeightAdjustment = 0;
 
   return (
     <div className="relative w-full flex-grow flex flex-col transition-all duration-700 ease-in-out">
@@ -1165,7 +1167,7 @@ export default function Work() {
     if (section) {
        const sectionUpper = section.toUpperCase();
        // Check if section matches any graphic items. If so, select it.
-       const validItems = ['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN'];
+       const validItems = ['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN', 'RECENTS'];
        // We might need to handle spaces in URL: visual-design -> VISUAL DESIGN
        const cleanSection = sectionUpper.replace(/-/g, ' ');
        
@@ -1261,7 +1263,7 @@ export default function Work() {
         {activeCategory === 'graphic' && (
           <section className="w-full max-w-4xl mt-4 mb-0 px-6 flex-grow flex flex-col">
             <GraphicDesignSection 
-              items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN']} 
+              items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN', 'RECENTS']} 
               onDetailViewChange={setIsGraphicDetailView}
               selectedItem={selectedGraphicItem}
               setSelectedItem={handleGraphicSelection}
@@ -1275,8 +1277,8 @@ export default function Work() {
              <Footer />
            </div>
         )}
-        {/* If detail view is active, we might want footer too, unless it's POSTERS? */}
-        {isGraphicDetailView && selectedGraphicItem !== 'POSTERS' && (
+        {/* If detail view is active, show footer unless it's POSTERS or RECENTS */}
+        {isGraphicDetailView && selectedGraphicItem !== 'POSTERS' && selectedGraphicItem !== 'RECENTS' && (
              <div className="w-full mt-auto mb-0 bg-transparent z-10 pointer-events-auto">
                 <Footer />
              </div>
