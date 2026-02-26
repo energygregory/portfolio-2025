@@ -132,24 +132,26 @@ const HARDCODED_ASSET_THICKNESS = 0.8;
 const DEVICE_CONFIGS = {
   // iPhone 14 Pro Mobile (Generic Mobile Fallback updated to these values)
   mobile: {
-    heroScale: 0.55,
-    heroY: 129,
-    animatedOutlineWidth: 4.4,
+    heroScale: 0.55,      // Logo Size
+    heroY: 129,           // Logo Y
     assetX: 11,
-    assetY: -116,
-    assetScale: 1,
-    assetH: 0.95,
-    assetV: 0.8,
+    assetY: -112,
+    assetH: 0.95,         // Asset Stretch X
+    assetV: 0.80,         // Asset Stretch Y
     navY: 54,
-    navScale: 1, // New: Scale for floating nav bar
+    navScale: 1.00,       // Nav Size
     widgetScale: 0.66,
     widgetY: 90,
+    marqueeY: 11,
+    marqueeScale: 0.96,   // Marquee Size
+    
+    // --- Below are existing values not in the screenshot, kept for functionality ---
+    assetScale: 1,
+    animatedOutlineWidth: 4.4,
     assetOutlineThickness: 0.8,
     assetRotation: 0,
-    marqueeY: 11,
-    marqueeScale: 0.6,
-    marqueeGap: 24, // mobile gap 6 (6 * 4 = 24px)
-    marqueeSpeed: 60, // 60s
+    marqueeGap: 24, 
+    marqueeSpeed: 60,
   },
   // iPhone 12 Pro (390x844) - LOCKED IN
   "390x844": {
