@@ -326,6 +326,9 @@ const PostersContent = () => {
     
     // State for the strict poster stack interaction
     const [currentIndex, setCurrentIndex] = useState(0);
+    // Poster position/scale sliders (mobile only)
+    const [posterY, setPosterY] = useState(0);
+    const [posterScale, setPosterScale] = useState(1);
 
     // Poster images with Dimensions for Masonry Layout
     // Width is fixed by column width (TILE_W), Height is calculated by aspect ratio (H/W)
@@ -656,11 +659,25 @@ const PostersContent = () => {
         };
 
         return (
+          <>
+          {/* Poster Controls - fixed at bottom, separate from poster container */}
+          <div className="fixed bottom-24 left-4 right-4 z-[201] flex flex-col gap-2 p-3 bg-black/10 backdrop-blur-sm rounded-xl border border-white/10 pointer-events-auto">
+            <div className="text-[10px] font-bold text-center uppercase tracking-widest">Poster Controls</div>
+            <div className="flex justify-between text-[10px] items-center">
+              <span>Y: {posterY}</span>
+              <input type="range" min="-300" max="300" step="1" value={posterY} onChange={(e) => setPosterY(parseInt(e.target.value))} className="w-32 accent-blue-500"/>
+            </div>
+            <div className="flex justify-between text-[10px] items-center">
+              <span>Scale: {posterScale.toFixed(2)}</span>
+              <input type="range" min="0.3" max="2" step="0.05" value={posterScale} onChange={(e) => setPosterScale(parseFloat(e.target.value))} className="w-32 accent-blue-500"/>
+            </div>
+          </div>
           <div 
             className="fixed inset-0 top-0 z-[50] w-full h-full flex items-center justify-center bg-transparent pointer-events-auto overflow-hidden"
             style={{ 
               perspective: '1200px',
-              touchAction: 'none'
+              touchAction: 'none',
+              transform: `translateY(${posterY}px) scale(${posterScale})`
             }}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
@@ -721,6 +738,7 @@ const PostersContent = () => {
               );
             })}
           </div>
+          </>
         );
       }
       
@@ -932,7 +950,27 @@ const PackagingContent = () => {
     );
 };
 const TechpackContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Techpack Design content gallery will go here</div>;
-const RecentsContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Recents content coming soon</div>;
+const RecentsContent = () => {
+  return (
+    <div 
+      className="fixed inset-x-0 top-0 overflow-hidden z-[1]" 
+      style={{ 
+        height: '100vh',
+        transform: 'translateY(-236px) scale(1.15)',
+        transformOrigin: 'top center',
+      }}
+    >
+      <video
+        src="/RECENTS/Untitledd.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="w-full h-full object-cover"
+      />
+    </div>
+  );
+};
 const BrandContent = () => {
   const brandItems = [
     {
@@ -986,6 +1024,7 @@ const getContentForItem = (item) => {
 
 const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSelectedItem }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
+  const navigate = useNavigate();
 
   // Responsive values
   const [isMobile, setIsMobile] = useState(false);
@@ -998,13 +1037,16 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Lock Body Scroll when POSTERS is selected (Fixed Page View)
+  // Lock Body Scroll when POSTERS or RECENTS is selected (Fixed Page View)
   useEffect(() => {
-    if (selectedItem === 'POSTERS' && !isMobile) {
+    if ((selectedItem === 'POSTERS' || selectedItem === 'RECENTS') && !isMobile) {
       document.body.style.overflow = 'hidden';
       document.body.style.height = '100vh'; 
       document.documentElement.style.overflow = 'hidden';
-      // Also ensure we are at the top? No, let user view stay.
+    } else if (selectedItem === 'RECENTS' && isMobile) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh'; 
+      document.documentElement.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
       document.body.style.height = '';
@@ -1049,12 +1091,12 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               key={idx}
               className={`absolute transition-all duration-700 ease-[0.165,0.84,0.44,1] group cursor-pointer flex items-center gap-4 hover:z-50 pointer-events-auto ${
                 isOther ? 'opacity-0 pointer-events-none ease-in duration-300' : 'opacity-100'
+              } ${
+                (item === 'RECENTS' && isSelected) ? 'opacity-0 pointer-events-none' : ''
               }`}
               style={{
-                // Move up moves to top left on desktop (-160px), but keeps relative position on mobile
-                // User requested vertical distance from navbar line on desktop
                 top: selectedItem 
-                  ? (isMobile ? '-75px' : '-160px')  // Mobile: moderate adjustment. Desktop: reduced negative offset to avoid hugging nav line.
+                  ? (item === 'RECENTS' ? '-9999px' : (isMobile ? '-75px' : '-160px'))
                   : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 
                 left: selectedItem ? '24px' : '50%',
@@ -1079,7 +1121,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               </div>
 
               <h2 
-                className={`text-4xl sm:text-6xl font-light text-[#e5e5e5] dark:text-[#4d4d4d] transition-colors duration-300 z-20 whitespace-nowrap ${
+                className={`${item === 'RECENTS' ? 'text-sm sm:text-2xl' : 'text-4xl sm:text-6xl'} font-light text-[#e5e5e5] dark:text-[#4d4d4d] transition-colors duration-300 z-20 whitespace-nowrap ${
                   (hoveredIdx === idx || isSelected) ? 'text-black dark:text-[#e5e5e5]' : ''
                 } ${
                   (!selectedItem && hoveredIdx !== null && hoveredIdx !== idx) ? 'blur-[1px] opacity-30 text-[#e5e5e5] dark:text-[#4d4d4d]' : ''
@@ -1129,6 +1171,39 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
           );
         })}
       </div>
+
+      {/* Custom RECENTS overlay header */}
+      {selectedItem === 'RECENTS' && (
+        <>
+          {/* Top bar: back arrow + right text */}
+          <div className="fixed top-12 left-0 right-0 z-[100] flex items-center justify-between px-6 pointer-events-auto">
+            {/* Left: Back arrow */}
+            <button 
+              onClick={() => setSelectedItem(null)}
+              className="flex-shrink-0 w-6 h-6 text-white hover:opacity-70 transition-opacity cursor-pointer"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+            </button>
+
+            {/* Right: Text */}
+            <div className="text-right text-white" style={{ fontFamily: '"PT Mono", monospace' }}>
+              <p className="text-[7px] tracking-widest leading-tight">DESIGNED BY ME</p>
+              <p className="text-[7px] tracking-widest leading-tight">FOR TERZO</p>
+            </div>
+          </div>
+
+          {/* Center: Logo vertically centered, same X as arrow */}
+          <button 
+            onClick={() => navigate('/')}
+            className="fixed left-6 z-[100] pointer-events-auto cursor-pointer hover:opacity-70 transition-opacity"
+            style={{ top: '50%', transform: 'translateY(-50%)' }}
+          >
+            <img src="/LOGOS/newlogo-white.svg" alt="Logo" className="h-8 w-auto" />
+          </button>
+        </>
+      )}
 
       {/* Content Area - Fades in below the header - Full width & Flexible height */}
       <div 

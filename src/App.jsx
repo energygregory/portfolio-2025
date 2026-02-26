@@ -1272,7 +1272,7 @@ function App() {
           <Asset1Svg
             theme={theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
-            className={`pointer-events-none absolute ${location.pathname.startsWith('/work/') ? 'z-0' : 'z-20'}`}
+            className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/') && location.pathname !== '/work/recents') ? 'z-0' : 'z-20'}`}
             style={{
               left: '50%',
               top: viewMode === 'desktop' ? '50%' : '48px',
