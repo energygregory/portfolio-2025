@@ -1068,7 +1068,7 @@ function App() {
       {/* Desktop: sticky bar at top, full width */}
       <header
         className={`
-          hidden sm:flex
+          ${location.pathname === '/recents' ? 'hidden' : 'hidden sm:flex'}
           z-50 justify-center items-center app-header
           sticky top-0 p-4 border-b w-full
           ${
@@ -1161,7 +1161,7 @@ function App() {
             transformOrigin: 'bottom center'
           }}
         className={`
-          sm:hidden
+          ${location.pathname === '/recents' ? 'hidden' : 'sm:hidden'}
           z-50 flex justify-center items-center app-header
           fixed left-1/2 w-auto py-2 px-8 rounded-full border
           transition-all duration-300 ease-in-out
@@ -1271,9 +1271,9 @@ function App() {
           location.pathname !== '/pricelist'
         ) && (
           <Asset1Svg
-            theme={location.pathname === '/work/recents' ? 'dark' : theme}
+            theme={location.pathname === '/recents' ? 'dark' : theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
-            className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/') && location.pathname !== '/work/recents') ? 'z-0' : 'z-20'}`}
+            className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/')) ? 'z-0' : 'z-20'}`}
             style={{
               left: '50%',
               top: viewMode === 'desktop' ? '50%' : '48px',
@@ -1608,7 +1608,7 @@ function App() {
       )}
         
         {/* Main content - above Asset1 */}
-        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${location.pathname.startsWith('/work') ? 'pointer-events-none' : ''}`}>
+        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${(location.pathname.startsWith('/work') || location.pathname === '/recents') ? 'pointer-events-none' : ''}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >
@@ -1629,6 +1629,7 @@ function App() {
 
               {/* Site routes - make accessible on production too (previously gated to localhost) */}
               <>
+                <Route path="/recents" element={<Work liveConfig={liveConfig} initialSection="recents" />} />
                 <Route path="/work" element={<Work liveConfig={liveConfig} />} />
                 <Route path="/work/:section" element={<Work liveConfig={liveConfig} />} />
                 {/* <Route path="/work/graphic" element={<WorkGraphic />} /> */}

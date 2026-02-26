@@ -1234,8 +1234,9 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
   );
 };
 
-export default function Work() {
-  const { section } = useParams();
+export default function Work({ initialSection } = {}) {
+  const { section: paramSection } = useParams();
+  const section = paramSection || initialSection;
   const navigate = useNavigate();
   
   const [activeCategory, setActiveCategory] = useState(() => {
