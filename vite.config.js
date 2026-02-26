@@ -3,9 +3,7 @@ import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   build: {
     // Enable asset inlining for small images (< 10kb become base64)
     assetsInlineLimit: 10240,
@@ -53,6 +51,7 @@ export default defineConfig({
       "2e8dccef22df81.lhr.life",
       "d7744db09a919c.lhr.life",
       "976e1fbf600dd4.lhr.life",
+      "oct-must-austin-tions.trycloudflare.com",
     ],
   },
 });

@@ -971,6 +971,25 @@ const RecentsContent = () => {
     </div>
   );
 };
+
+// RECENTS CONTAINER — Reserved for future use.
+// Same size and position as the RecentsContent video.
+// To activate: replace RecentsContent usage in getContentForItem with RecentsContainer,
+// or render RecentsContainer alongside/instead of the video.
+const RecentsContainer = () => {
+  return (
+    <div 
+      className="fixed inset-x-0 top-0 overflow-hidden z-[2]" 
+      style={{ 
+        height: '100vh',
+        transform: 'translateY(-236px) scale(1.15)',
+        transformOrigin: 'top center',
+      }}
+    >
+      {/* Future content goes here */}
+    </div>
+  );
+};
 const BrandContent = () => {
   const brandItems = [
     {
@@ -1175,7 +1194,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
       {/* Custom RECENTS overlay header */}
       {selectedItem === 'RECENTS' && (
         <>
-          {/* Top bar: back arrow + right text */}
+          {/* Top bar: back arrow + logo center + right text */}
           <div className="fixed top-12 left-0 right-0 z-[100] flex items-center justify-between px-6 pointer-events-auto">
             {/* Left: Back arrow */}
             <button 
@@ -1187,21 +1206,20 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               </svg>
             </button>
 
+            {/* Center: Logo clickable to home */}
+            <button 
+              onClick={() => navigate('/')}
+              className="absolute left-1/2 -translate-x-1/2 cursor-pointer hover:opacity-70 transition-opacity"
+            >
+              <img src="/LOGOS/newlogo-white.svg" alt="Logo" className="h-8 w-auto" />
+            </button>
+
             {/* Right: Text */}
             <div className="text-right text-white" style={{ fontFamily: '"PT Mono", monospace' }}>
               <p className="text-[7px] tracking-widest leading-tight">DESIGNED BY ME</p>
               <p className="text-[7px] tracking-widest leading-tight">FOR TERZO</p>
             </div>
           </div>
-
-          {/* Center: Logo vertically centered, same X as arrow */}
-          <button 
-            onClick={() => navigate('/')}
-            className="fixed left-6 z-[100] pointer-events-auto cursor-pointer hover:opacity-70 transition-opacity"
-            style={{ top: '50%', transform: 'translateY(-50%)' }}
-          >
-            <img src="/LOGOS/newlogo-white.svg" alt="Logo" className="h-8 w-auto" />
-          </button>
         </>
       )}
 
