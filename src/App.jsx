@@ -89,6 +89,7 @@ import {
   Route,
   Link,
   NavLink,
+  Navigate,
   useNavigate,
   useLocation,
 } from "react-router-dom";
@@ -1626,6 +1627,7 @@ function App() {
               
               {/* PUBLIC ROUTES (Accessible by link) */}
               <Route path="/pricelist" element={<PriceList />} />
+              <Route path="/policy" element={<Navigate to="/pricelist?policy" replace />} />
 
               {/* Site routes - make accessible on production too (previously gated to localhost) */}
               <>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const rateData = {
   "merch-design": [
@@ -33,7 +34,8 @@ export default function PriceList() {
   const [activeCategory, setActiveCategory] = useState("merch-design");
   const [currencyKey, setCurrencyKey] = useState("GHS");
   const [detectedCurrencyKey, setDetectedCurrencyKey] = useState("GHS");
-  const [showPolicyModal, setShowPolicyModal] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [showPolicyModal, setShowPolicyModal] = useState(searchParams.has('policy'));
   const [isDark, setIsDark] = useState(true);
 
   // Detect theme
