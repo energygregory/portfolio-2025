@@ -930,7 +930,43 @@ const PackagingContent = () => {
     );
 };
 const TechpackContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Techpack Design content gallery will go here</div>;
-const BrandContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Brand Design content gallery will go here</div>;
+const BrandContent = () => {
+  const brandItems = [
+    {
+      thumb: '/Images/2025/Brand design/brand guidelines-2_thumb.jpg',
+      pdf: '/Images/2025/Brand design/brand guidelines-2.pdf',
+      title: 'BRAND GUIDELINES',
+    },
+    {
+      thumb: '/Images/2025/Brand design/Educ8Africa New Proposed Identity_thumb.jpg',
+      pdf: '/Images/2025/Brand design/Educ8Africa New Proposed Identity.pdf',
+      title: 'EDUC8AFRICA IDENTITY',
+    },
+  ];
+
+  return (
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-start justify-items-center">
+      {brandItems.map((item, i) => (
+        <a
+          key={i}
+          href={item.pdf}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center gap-4 group cursor-pointer"
+        >
+          <div className="relative transition-transform duration-500 hover:scale-[1.02] hover:shadow-2xl rounded-lg overflow-hidden">
+            <img
+              src={item.thumb}
+              alt={item.title}
+              className="w-full max-w-[90vw] md:max-w-full h-auto"
+              loading="lazy"
+            />
+          </div>
+        </a>
+      ))}
+    </div>
+  );
+};
 
 const getContentForItem = (item) => {
   switch(item) {

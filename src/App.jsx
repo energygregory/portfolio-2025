@@ -138,12 +138,12 @@ const DEVICE_CONFIGS = {
     assetY: -112,
     assetH: 0.95,         // Asset Stretch X
     assetV: 0.80,         // Asset Stretch Y
-    navY: 54,
     navScale: 1.00,       // Nav Size
+    navY: 54,
     widgetScale: 0.66,
     widgetY: 90,
-    marqueeY: 11,
     marqueeScale: 0.96,   // Marquee Size
+    marqueeY: 11,
     
     // --- Below are existing values not in the screenshot, kept for functionality ---
     assetScale: 1,
@@ -346,27 +346,6 @@ const DEVICE_CONFIGS = {
     marqueeGap: 64, // desktop md:gap-16
     marqueeSpeed: 60,
   },
-  // Default fallback for mobile
-  mobile: {
-    heroScale: 0.72,
-    heroY: 129,
-    animatedOutlineWidth: 4.4,
-    assetX: 11,
-    assetY: -128,
-    assetScale: 1,
-    assetH: 0.95,
-    assetV: 0.8,
-    navY: 54,
-    navScale: 1, // Added for scaling control
-    widgetScale: 0.66,
-    widgetY: 90,
-    assetOutlineThickness: 0.8,
-    assetRotation: 0,
-    marqueeY: 11,
-    marqueeScale: 0.6,
-    marqueeGap: 24, // mobile gap 6 (6 * 4 = 24px)
-    marqueeSpeed: 60, // 60s
-  }
 };
 
 // Helper to get config based on screen dimensions and device type
