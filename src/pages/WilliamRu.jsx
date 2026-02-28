@@ -115,20 +115,6 @@ export default function WilliamRu() {
 				))}
 			</div>
 
-			{/* Mobile slider for camo section */}
-			{isCamoMobile && (
-				<div className="flex items-center gap-3 mb-4">
-					<span className="text-[10px] text-neutral-500 uppercase tracking-wider whitespace-nowrap" style={{ fontFamily: "'PT Mono', monospace" }}>Size</span>
-					<input
-						type="range"
-						min={50}
-						max={200}
-						value={camoScale}
-						onChange={(e) => setCamoScale(Number(e.target.value))}
-						className="w-full h-1 accent-black dark:accent-neutral-400 appearance-none bg-neutral-300 dark:bg-neutral-700 rounded-full"
-					/>
-				</div>
-			)}
 
 			<div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-2 gap-4">
 				{images.map((src, i) => (

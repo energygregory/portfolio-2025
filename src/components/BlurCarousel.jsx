@@ -27,6 +27,7 @@ const BlurCarousel = () => {
     // DEBUG: Global Controls
     const [globalScale, setGlobalScale] = useState(1);
     const [globalX, setGlobalX] = useState(0);
+    const [textXOffset, setTextXOffset] = useState(-90);
 
     const handleScroll = () => {
         if (containerRef.current) {
@@ -82,6 +83,7 @@ const BlurCarousel = () => {
                 </div>
             </div>}
 
+
             <div 
                 ref={containerRef}
                 className="flex flex-col items-start overflow-y-auto overflow-x-hidden h-full w-full no-scrollbar snap-y snap-mandatory py-[30vh]"
@@ -102,6 +104,7 @@ const BlurCarousel = () => {
                         manualSize={MOBILE_SIZE}
                         verticalGap={MOBILE_VERTICAL_GAP}
                         xControlPoints={MOBILE_X_POINTS}
+                        textXOffset={textXOffset}
                     />
                 ))}
             </div>
@@ -109,7 +112,7 @@ const BlurCarousel = () => {
     );
 };
 
-const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, manualSize, verticalGap, xControlPoints }) => {
+const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, manualSize, verticalGap, xControlPoints, textXOffset }) => {
     const itemRef = useRef(null);
     const navigate = useNavigate();
     const [style, setStyle] = useState({ opacity: 0.2, filter: 'blur(8px)', transform: 'translateX(0) scale(0.8)' });
@@ -279,7 +282,7 @@ const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, 
                   </div>
                   {/* Desktop: multi-line right-aligned, near image */}
                   <div className="hidden sm:flex flex-col items-end text-right"
-                    style={{ fontFamily: "'PT Mono', monospace", transform: 'translateX(-90px)', paddingRight: '16px' }}
+                    style={{ fontFamily: "'PT Mono', monospace", transform: `translateX(${textXOffset}px)`, paddingRight: '16px' }}
                   >
                     {(mobileLines || []).map((line, i) => (
                       <span
