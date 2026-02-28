@@ -55,11 +55,11 @@ const Recents = () => {
       ))}
 
       {/* Top bar: back arrow + logo center + right text */}
-      <div className="fixed top-12 left-0 right-0 z-[100] flex items-center justify-between px-6">
+      <div className="fixed top-12 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-12 md:top-16">
         {/* Left: Back arrow */}
         <button 
           onClick={() => navigate(-1)}
-          className="flex-shrink-0 w-6 h-6 text-white hover:opacity-70 transition-opacity cursor-pointer"
+          className="flex-shrink-0 w-6 h-6 md:w-10 md:h-10 text-white hover:opacity-70 transition-opacity cursor-pointer"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -71,13 +71,13 @@ const Recents = () => {
           onClick={() => navigate('/')}
           className="absolute left-1/2 -translate-x-1/2 cursor-pointer hover:opacity-70 transition-opacity"
         >
-          <img src="/LOGOS/newlogo-white.svg" alt="Logo" className="h-8 w-auto" />
+          <img src="/LOGOS/newlogo-white.svg" alt="Logo" className="h-8 md:h-12 w-auto" />
         </button>
 
         {/* Right: Text */}
         <div className="text-right text-white" style={{ fontFamily: '"PT Mono", monospace' }}>
-          <p className="text-[7px] tracking-widest leading-tight">DESIGNED BY ME</p>
-          <p className="text-[7px] tracking-widest leading-tight">{recentsVideos[currentIndex]?.label}</p>
+          <p className="text-[7px] md:text-[11px] tracking-widest leading-tight">DESIGNED BY ME</p>
+          <p className="text-[7px] md:text-[11px] tracking-widest leading-tight">{recentsVideos[currentIndex]?.label}</p>
         </div>
       </div>
 

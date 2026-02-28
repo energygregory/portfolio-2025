@@ -224,12 +224,15 @@ const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, 
             // Adjust container height to be tighter
             style={{...style, height: window.innerWidth < 640 ? (manualSize + verticalGap) + 'px' : '550px'}}
         >
-             {/* Image container */}
-            <div 
-                className="relative"
+             {/* Image — no container, free sizing */}
+            <img 
+                src={src} 
+                alt="" 
+                className="object-contain"
                 style={{
-                    width: window.innerWidth < 640 ? 'auto' : '500px',
-                    height: window.innerWidth < 640 ? manualSize + 'px' : '500px'
+                    height: window.innerWidth < 640 ? manualSize + 'px' : '500px',
+                    width: 'auto',
+                    cursor: isCentered ? 'pointer' : 'default',
                 }}
                 onClick={(e) => {
                     if (isCentered && slug) {
@@ -237,13 +240,7 @@ const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, 
                         navigate(`/williamru?item=${slug}`);
                     }
                 }}
-            >
-                <img 
-                    src={src} 
-                    alt="" 
-                    className="h-full w-auto object-contain" 
-                />
-            </div>
+            />
 
             {/* Item label — visible only when centered */}
             {label && (() => {
@@ -280,13 +277,24 @@ const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, 
                       </span>
                     ))}
                   </div>
-                  {/* Desktop: single line centered */}
-                  <span
-                    className="hidden sm:inline text-xs tracking-[0.15em] uppercase text-neutral-500 dark:text-neutral-400"
-                    style={{ fontFamily: "'PT Mono', monospace" }}
+                  {/* Desktop: multi-line right-aligned, near image */}
+                  <div className="hidden sm:flex flex-col items-end text-right"
+                    style={{ fontFamily: "'PT Mono', monospace", transform: 'translateX(-90px)', paddingRight: '16px' }}
                   >
-                    {label}
-                  </span>
+                    {(mobileLines || []).map((line, i) => (
+                      <span
+                        key={i}
+                        className={`uppercase ${
+                          i === 0
+                            ? 'text-base tracking-[0.15em] text-neutral-500 dark:text-neutral-400'
+                            : 'text-sm tracking-[0.12em] text-neutral-600 dark:text-neutral-500'
+                        }`}
+                        style={{ lineHeight: '1.5' }}
+                      >
+                        {line}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               );
             })()}

@@ -1690,8 +1690,8 @@ function App() {
         </div>
       </div> */}
 
-      {/* Hide global footer on ALL Work pages (managed locally there) */}
-      {!location.pathname.startsWith('/work') && (
+      {/* Hide global footer on Work and Recents pages */}
+      {!location.pathname.startsWith('/work') && location.pathname !== '/recents' && (
         <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
           <div className="w-full z-50 bg-inherit">
             <Footer />
