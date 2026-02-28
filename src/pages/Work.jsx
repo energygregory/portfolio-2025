@@ -707,8 +707,8 @@ const PostersContent = () => {
                     zIndex: zIndex,
                     opacity: opacity,
                     transform: `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})`,
-                    // Box shadow only on active, no borders/boxes
-                    boxShadow: isActive ? '0 20px 50px rgba(0,0,0,0.5)' : 'none',
+                    // No box shadow
+                    boxShadow: 'none',
                     pointerEvents: 'auto',
                     left: '12.5%', // (100 - 75) / 2 = 12.5% to center horizontally with w=75vw
                     right: '12.5%',
