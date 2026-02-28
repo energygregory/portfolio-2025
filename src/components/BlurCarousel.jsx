@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Original set with labels
 const baseItems = [
-    { src: '/Images/2025/PNGS/png1.webp', label: 'William Ru — Kids Next Door "Numbuh 4" Hoodie', mobileLines: ['William Ru', 'Kids Next Door', '"Numbuh 4"', 'Hoodie'] },
-    { src: '/Images/2025/PNGS/png2.webp', label: 'William Ru — Nottingham Pinstripe Shirt', mobileLines: ['William Ru', 'Nottingham', 'Pinstripe Shirt'] },
-    { src: '/Images/2025/PNGS/png5.webp', label: 'William Ru — Stealth Camo Set', mobileLines: ['William Ru', 'Stealth Camo', 'Set'] },
+    { src: '/Images/2025/PNGS/png1.webp', label: 'William Ru — Kids Next Door "Numbuh 4" Hoodie', mobileLines: ['William Ru', 'Kids Next Door', '"Numbuh 4"', 'Hoodie'], slug: 'kids-next-door-hoodie' },
+    { src: '/Images/2025/PNGS/png2.webp', label: 'William Ru — Nottingham Pinstripe Shirt', mobileLines: ['William Ru', 'Nottingham', 'Pinstripe Shirt'], slug: 'nottingham-pinstripe-shirt' },
+    { src: '/Images/2025/PNGS/png5.webp', label: 'William Ru — Stealth Camo Set', mobileLines: ['William Ru', 'Stealth Camo', 'Set'], slug: 'stealth-camo-set' },
 ];
 
 // Create a repeated array to simulate infinite scroll
@@ -95,6 +96,7 @@ const BlurCarousel = () => {
                         src={item.src}
                         label={item.label}
                         mobileLines={item.mobileLines}
+                        slug={item.slug}
                         containerRef={containerRef} 
                         scrollTop={scrollProgress}
                         manualSize={MOBILE_SIZE}
@@ -107,8 +109,9 @@ const BlurCarousel = () => {
     );
 };
 
-const CarouselItem = ({ src, label, mobileLines, containerRef, scrollTop, manualSize, verticalGap, xControlPoints }) => {
+const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, manualSize, verticalGap, xControlPoints }) => {
     const itemRef = useRef(null);
+    const navigate = useNavigate();
     const [style, setStyle] = useState({ opacity: 0.2, filter: 'blur(8px)', transform: 'translateX(0) scale(0.8)' });
     const [isCentered, setIsCentered] = useState(false);
 
@@ -228,6 +231,12 @@ const CarouselItem = ({ src, label, mobileLines, containerRef, scrollTop, manual
                     width: window.innerWidth < 640 ? 'auto' : '500px',
                     height: window.innerWidth < 640 ? manualSize + 'px' : '500px'
                 }}
+                onClick={(e) => {
+                    if (isCentered && slug) {
+                        e.stopPropagation();
+                        navigate(`/williamru?item=${slug}`);
+                    }
+                }}
             >
                 <img 
                     src={src} 
@@ -240,9 +249,17 @@ const CarouselItem = ({ src, label, mobileLines, containerRef, scrollTop, manual
             {label && (() => {
               return (
                 <div
-                  className="absolute bottom-0 left-0 right-0 pointer-events-none transition-opacity duration-300 sm:text-center"
+                  className="absolute bottom-0 left-0 right-0 transition-opacity duration-300 sm:text-center"
                   style={{
                     opacity: isCentered ? 1 : 0,
+                    pointerEvents: isCentered ? 'auto' : 'none',
+                    cursor: isCentered ? 'pointer' : 'default',
+                  }}
+                  onClick={(e) => {
+                    if (isCentered && slug) {
+                      e.stopPropagation();
+                      navigate(`/williamru?item=${slug}`);
+                    }
                   }}
                 >
                   {/* Mobile: multi-line right-aligned, pushed left */}

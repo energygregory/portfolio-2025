@@ -326,9 +326,9 @@ const PostersContent = () => {
     
     // State for the strict poster stack interaction
     const [currentIndex, setCurrentIndex] = useState(0);
-    // Poster position/scale sliders (mobile only)
-    const [posterY, setPosterY] = useState(0);
-    const [posterScale, setPosterScale] = useState(1);
+    // Poster position/scale (hardcoded values)
+    const posterY = -94;
+    const posterScale = 0.85;
 
     // Poster images with Dimensions for Masonry Layout
     // Width is fixed by column width (TILE_W), Height is calculated by aspect ratio (H/W)
@@ -655,18 +655,6 @@ const PostersContent = () => {
 
         return (
           <>
-          {/* Poster Controls - fixed at bottom, separate from poster container */}
-          <div className="fixed bottom-24 left-4 right-4 z-[201] flex flex-col gap-2 p-3 bg-black/10 backdrop-blur-sm rounded-xl border border-white/10 pointer-events-auto">
-            <div className="text-[10px] font-bold text-center uppercase tracking-widest">Poster Controls</div>
-            <div className="flex justify-between text-[10px] items-center">
-              <span>Y: {posterY}</span>
-              <input type="range" min="-300" max="300" step="1" value={posterY} onChange={(e) => setPosterY(parseInt(e.target.value))} className="w-32 accent-blue-500"/>
-            </div>
-            <div className="flex justify-between text-[10px] items-center">
-              <span>Scale: {posterScale.toFixed(2)}</span>
-              <input type="range" min="0.3" max="2" step="0.05" value={posterScale} onChange={(e) => setPosterScale(parseFloat(e.target.value))} className="w-32 accent-blue-500"/>
-            </div>
-          </div>
           <div 
             className="fixed inset-0 top-0 z-[50] w-full h-full flex items-center justify-center bg-transparent pointer-events-auto overflow-hidden"
             style={{ 
@@ -946,46 +934,6 @@ const PackagingContent = () => {
     );
 };
 const TechpackContent = () => <div className="p-4 text-center w-full flex-grow flex items-center justify-center">Techpack Design content gallery will go here</div>;
-const RecentsContent = () => {
-  return (
-    <div 
-      className="fixed inset-x-0 top-0 overflow-hidden z-[1]" 
-      style={{ 
-        height: '100vh',
-        transform: 'translateY(-236px) scale(1.15)',
-        transformOrigin: 'top center',
-      }}
-    >
-      <video
-        src="/RECENTS/Untitledd.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="w-full h-full object-cover"
-      />
-    </div>
-  );
-};
-
-// RECENTS CONTAINER — Reserved for future use.
-// Same size and position as the RecentsContent video.
-// To activate: replace RecentsContent usage in getContentForItem with RecentsContainer,
-// or render RecentsContainer alongside/instead of the video.
-const RecentsContainer = () => {
-  return (
-    <div 
-      className="fixed inset-x-0 top-0 overflow-hidden z-[2]" 
-      style={{ 
-        height: '100vh',
-        transform: 'translateY(-236px) scale(1.15)',
-        transformOrigin: 'top center',
-      }}
-    >
-      {/* Future content goes here */}
-    </div>
-  );
-};
 const BrandContent = () => {
   const brandItems = [
     {
@@ -1032,7 +980,6 @@ const getContentForItem = (item) => {
     case 'PACKAGING DESIGN': return <PackagingContent />;
     case 'TECHPACK DESIGN': return <TechpackContent />;
     case 'BRAND DESIGN': return <BrandContent />;
-    case 'RECENTS': return <RecentsContent />;
     default: return null;
   }
 };
@@ -1052,13 +999,9 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Lock Body Scroll when POSTERS or RECENTS is selected (Fixed Page View)
+  // Lock Body Scroll when POSTERS is selected (Fixed Page View)
   useEffect(() => {
-    if ((selectedItem === 'POSTERS' || selectedItem === 'RECENTS') && !isMobile) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.height = '100vh'; 
-      document.documentElement.style.overflow = 'hidden';
-    } else if (selectedItem === 'RECENTS' && isMobile) {
+    if (selectedItem === 'POSTERS' && !isMobile) {
       document.body.style.overflow = 'hidden';
       document.body.style.height = '100vh'; 
       document.documentElement.style.overflow = 'hidden';
@@ -1106,12 +1049,10 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               key={idx}
               className={`absolute transition-all duration-700 ease-[0.165,0.84,0.44,1] group cursor-pointer flex items-center hover:z-50 pointer-events-auto ${
                 isOther ? 'opacity-0 pointer-events-none ease-in duration-300' : 'opacity-100'
-              } ${
-                (item === 'RECENTS' && isSelected) ? 'opacity-0 pointer-events-none' : ''
               }`}
               style={{
                 top: selectedItem 
-                  ? (item === 'RECENTS' ? '-9999px' : (isMobile ? '-75px' : '-160px'))
+                  ? (isMobile ? '-75px' : '-160px')
                   : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 
                 left: selectedItem ? '24px' : '50%',
@@ -1124,7 +1065,13 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               }}
               onMouseEnter={() => !selectedItem && setHoveredIdx(idx)}
               onMouseLeave={() => !selectedItem && setHoveredIdx(null)}
-              onClick={() => setSelectedItem(selectedItem ? null : item)}
+              onClick={() => {
+                if (item === 'RECENTS') {
+                  navigate('/recents');
+                } else {
+                  setSelectedItem(selectedItem ? null : item);
+                }
+              }}
             >
               {/* Back Arrow - Only visible when selected */}
               {isSelected && <div 
@@ -1187,38 +1134,6 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
         })}
       </div>
 
-      {/* Custom RECENTS overlay header */}
-      {selectedItem === 'RECENTS' && (
-        <>
-          {/* Top bar: back arrow + logo center + right text */}
-          <div className="fixed top-12 left-0 right-0 z-[100] flex items-center justify-between px-6 pointer-events-auto">
-            {/* Left: Back arrow */}
-            <button 
-              onClick={() => setSelectedItem(null)}
-              className="flex-shrink-0 w-6 h-6 text-white hover:opacity-70 transition-opacity cursor-pointer"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </svg>
-            </button>
-
-            {/* Center: Logo clickable to home */}
-            <button 
-              onClick={() => navigate('/')}
-              className="absolute left-1/2 -translate-x-1/2 cursor-pointer hover:opacity-70 transition-opacity"
-            >
-              <img src="/LOGOS/newlogo-white.svg" alt="Logo" className="h-8 w-auto" />
-            </button>
-
-            {/* Right: Text */}
-            <div className="text-right text-white" style={{ fontFamily: '"PT Mono", monospace' }}>
-              <p className="text-[7px] tracking-widest leading-tight">DESIGNED BY ME</p>
-              <p className="text-[7px] tracking-widest leading-tight">FOR TERZO</p>
-            </div>
-          </div>
-        </>
-      )}
-
       {/* Content Area - Fades in below the header - Full width & Flexible height */}
       <div 
         className={`relative w-full flex-grow flex flex-col mt-4 sm:mt-12 transition-all duration-700 ease-out delay-200 ${
@@ -1257,7 +1172,7 @@ export default function Work({ initialSection } = {}) {
     if (section) {
        const sectionUpper = section.toUpperCase();
        // Check if section matches any graphic items. If so, select it.
-       const validItems = ['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN', 'RECENTS'];
+       const validItems = ['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN'];
        // We might need to handle spaces in URL: visual-design -> VISUAL DESIGN
        const cleanSection = sectionUpper.replace(/-/g, ' ');
        

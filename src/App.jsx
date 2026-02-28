@@ -117,6 +117,7 @@ const Around = lazy(() => import("./pages/Around.jsx"));
 const FlyHigh = lazy(() => import("./pages/FlyHigh.jsx"));
 const LegacyDrip = lazy(() => import("./pages/LegacyDrip.jsx"));
 const PriceList = lazy(() => import("./pages/PriceList.jsx"));
+const Recents = lazy(() => import("./pages/Recents.jsx"));
 const Admin = lazy(() => import("./pages/Admin.jsx"));
 
 import NavigationLoader from "./components/NavigationLoader";
@@ -485,11 +486,15 @@ function App() {
 
   // Hardcore Device Mode Detection (matches index.html script)
   const [viewMode, setViewMode] = useState(() => {
-    // Safety check for SSR, defaults to whatever the window has
-    if (typeof window !== 'undefined' && window.__DEVICE_MODE__) {
-      return window.__DEVICE_MODE__;
+    if (typeof window !== 'undefined') {
+      // Prefer the pre-computed flag from index.html
+      if (window.__DEVICE_MODE__) return window.__DEVICE_MODE__;
+      // Fallback: re-run detection inline
+      const isMobileHardware = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(navigator.userAgent || '');
+      const isSmallScreen = window.matchMedia("only screen and (max-width: 768px)").matches;
+      return (isMobileHardware || isSmallScreen) ? 'mobile' : 'desktop';
     }
-    return 'desktop'; // Default fallback
+    return 'desktop';
   });
 
   // Resize listener for view mode
@@ -1631,7 +1636,7 @@ function App() {
 
               {/* Site routes - make accessible on production too (previously gated to localhost) */}
               <>
-                <Route path="/recents" element={<Work liveConfig={liveConfig} initialSection="recents" />} />
+                <Route path="/recents" element={<Recents />} />
                 <Route path="/work" element={<Work liveConfig={liveConfig} />} />
                 <Route path="/work/:section" element={<Work liveConfig={liveConfig} />} />
                 {/* <Route path="/work/graphic" element={<WorkGraphic />} /> */}
