@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // Original set with labels
 const baseItems = [
     { src: '/Images/2025/PNGS/png1.webp', label: 'William Ru — Kids Next Door "Numbuh 4" Hoodie', mobileLines: ['William Ru', 'Kids Next Door', '"Numbuh 4"', 'Hoodie'], slug: 'kids-next-door-hoodie' },
-    { src: '/Images/2025/PNGS/png2.webp', label: 'William Ru — Nottingham Pinstripe Shirt', mobileLines: ['William Ru', 'Nottingham', 'Pinstripe Shirt'], slug: 'nottingham-pinstripe-shirt' },
+    { src: '/Images/2025/PNGS/png2.webp', label: 'William Ru — Notting Hill Pinstripe Shirt', mobileLines: ['William Ru', 'Notting Hill', 'Pinstripe Shirt'], slug: 'notting-hill-pinstripe-shirt' },
     { src: '/Images/2025/PNGS/png5.webp', label: 'William Ru — Stealth Camo Set', mobileLines: ['William Ru', 'Stealth Camo', 'Set'], slug: 'stealth-camo-set' },
 ];
 
