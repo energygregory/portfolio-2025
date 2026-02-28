@@ -84,6 +84,8 @@ const BlurCarousel = () => {
             </div>}
 
 
+
+
             <div 
                 ref={containerRef}
                 className="flex flex-col items-start overflow-y-auto overflow-x-hidden h-full w-full no-scrollbar snap-y snap-mandatory py-[30vh]"
@@ -283,6 +285,7 @@ const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, 
                   {/* Desktop: multi-line right-aligned, near image */}
                   <div className="hidden sm:flex flex-col items-end text-right"
                     style={{ fontFamily: "'PT Mono', monospace", transform: `translateX(${textXOffset}px)`, paddingRight: '16px' }}
+                  style={{ fontFamily: "'PT Mono', monospace", transform: 'translateX(-778px)', paddingRight: '16px' }}
                   >
                     {(mobileLines || []).map((line, i) => (
                       <span
