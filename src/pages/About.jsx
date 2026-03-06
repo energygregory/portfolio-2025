@@ -56,12 +56,18 @@ export default function About() {
             </div>
 
             {/* Photo */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex flex-col items-center lg:items-end gap-4">
               <img
                 src="/Images/2025/IMG_0801%203.jpg"
                 alt="Gregory"
                 className="w-full max-w-[200px] sm:max-w-[300px] md:max-w-md shadow-lg"
               />
+              <div className="flex gap-4 mt-4 items-center">
+                <img src="/LOGOS/apps/photoshop.png" alt="Photoshop" className="h-10 w-auto grayscale brightness-0 dark:brightness-75 dark:invert-0" />
+                <img src="/LOGOS/apps/blender-1.png" alt="Blender" className="h-10 w-auto grayscale brightness-0 dark:brightness-75 dark:invert-0" />
+                <img src="/LOGOS/apps/illustrtaor.png" alt="Illustrator" className="h-10 w-auto grayscale brightness-0 dark:brightness-75 dark:invert-0" />
+                <img src="/LOGOS/apps/figma-logo.png" alt="Figma" className="h-10 w-auto grayscale brightness-0 dark:brightness-75 dark:invert-0" />
+              </div>
             </div>
           </div>
         </div>

@@ -202,7 +202,7 @@ const LogosContent = () => {
                             type="range" 
                             min="0.5" 
                             max="3" 
-                            step="0.05" 
+                            step="0.02" 
                             value={logoScales[i] || 1}
                             onChange={(e) => handleScaleChange(i, e.target.value)}
                             className="w-16 md:w-24 h-1 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white shadow-sm pointer-events-auto opacity-70 hover:opacity-100"

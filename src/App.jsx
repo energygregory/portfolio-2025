@@ -118,6 +118,7 @@ const FlyHigh = lazy(() => import("./pages/FlyHigh.jsx"));
 const LegacyDrip = lazy(() => import("./pages/LegacyDrip.jsx"));
 const PriceList = lazy(() => import("./pages/PriceList.jsx"));
 const Recents = lazy(() => import("./pages/Recents.jsx"));
+const SixthMarch = lazy(() => import("./pages/6thmarch.jsx"));
 const Admin = lazy(() => import("./pages/Admin.jsx"));
 
 import NavigationLoader from "./components/NavigationLoader";
@@ -1074,7 +1075,7 @@ function App() {
       {/* Desktop: sticky bar at top, full width */}
       <header
         className={`
-          ${location.pathname === '/recents' ? 'hidden' : 'hidden sm:flex'}
+          ${(location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'hidden' : 'hidden sm:flex'}
           z-50 justify-center items-center app-header
           sticky top-0 p-4 border-b w-full
           ${
@@ -1167,7 +1168,7 @@ function App() {
             transformOrigin: 'bottom center'
           }}
         className={`
-          ${location.pathname === '/recents' ? 'hidden' : 'sm:hidden'}
+          ${(location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'hidden' : 'sm:hidden'}
           z-50 flex justify-center items-center app-header
           fixed left-1/2 w-auto py-2 px-8 rounded-full border
           transition-all duration-300 ease-in-out
@@ -1277,7 +1278,7 @@ function App() {
           location.pathname !== '/pricelist'
         ) && (
           <Asset1Svg
-            theme={location.pathname === '/recents' ? 'dark' : theme}
+            theme={(location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'dark' : theme}
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/')) ? 'z-0' : 'z-20'}`}
             style={{
@@ -1614,7 +1615,7 @@ function App() {
       )}
         
         {/* Main content - above Asset1 */}
-        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${(location.pathname.startsWith('/work') || location.pathname === '/recents') ? 'pointer-events-none' : ''}`}>
+        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${(location.pathname.startsWith('/work') || location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'pointer-events-none' : ''}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >
@@ -1647,6 +1648,7 @@ function App() {
                 <Route path="/legacydrip" element={<LegacyDrip />} />
                 <Route path="/terzo" element={<Terzo />} />
                 <Route path="/williamru" element={<WilliamRu />} />
+                <Route path="/6thmarch" element={<SixthMarch />} />
                 <Route path="/contact" element={<Contact />} />
 
                 {/* Keep Admin restricted to localhost/dev for safety */}
@@ -1690,8 +1692,8 @@ function App() {
         </div>
       </div> */}
 
-      {/* Hide global footer on Work and Recents pages */}
-      {!location.pathname.startsWith('/work') && location.pathname !== '/recents' && (
+      {/* Hide global footer on Work, Recents, and 6thmarch pages */}
+      {!location.pathname.startsWith('/work') && location.pathname !== '/recents' && location.pathname !== '/6thmarch' && (
         <Suspense fallback={<div className="py-8 text-center text-xs tracking-[0.3em] uppercase opacity-40">Loading footer…</div>}>
           <div className="w-full z-50 bg-inherit">
             <Footer />
