@@ -409,9 +409,15 @@ const getViewportDimensions = () => {
 // Inserted into the DOM tree
 const GlobalBackground = () => (
     <div 
-        className="fixed inset-0 -z-[2] w-full h-full pointer-events-none transition-colors duration-500"
+        className="fixed inset-0 -z-[2] pointer-events-none transition-colors duration-500"
         style={{
-            backgroundColor: 'var(--bg-base, #000000)'
+            backgroundColor: 'var(--bg-base, #000000)',
+            width: '100vw',
+            height: '100vh',
+            left: 0,
+            top: 0,
+            margin: 0,
+            padding: 0
             // Dark Mode Class handles variable switching normally, 
             // but we hardcode to black for now as per index.css removal? 
             // Actually, let's use the theme classes.
@@ -1063,7 +1069,7 @@ function App() {
               ? "text-white theme-dark"
               : "text-black theme-light"
           }`}
-          style={{ backgroundColor: 'transparent' }}
+          style={{ backgroundColor: 'transparent', width: '100vw', maxWidth: '100vw', margin: 0, padding: 0, left: 0, position: 'relative' }}
       >
       <NavigationLoader theme={theme} onInitialLoad={() => {
         // Remove the initial HTML loader when React's NavigationLoader takes over
@@ -1271,7 +1277,7 @@ function App() {
       )}
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
-      <div className="relative flex-1 overflow-hidden flex flex-col" style={{ minHeight: '100vh' }}>
+      <div className="relative flex-1 flex flex-col" style={{ height: '100%', width: '100%', maxWidth: '100%', overflow: 'hidden', position: 'relative' }}>
         {(
           (viewMode === 'mobile' || 
           location.pathname === '/') &&
@@ -1288,7 +1294,7 @@ function App() {
                 ? `translate(-50%, -50%) translate(${liveConfig.assetX ?? 0}px, ${liveConfig.assetY ?? 0}px) scale(${liveConfig.assetScale ?? 1}) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`
                 : `scale(${liveConfig.assetScale ?? 1}) translateX(calc(-50% + ${liveConfig.assetX ?? 0}px)) translateY(${liveConfig.assetY ?? 0}px) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
               transformOrigin: viewMode === 'desktop' ? 'center' : 'left top',
-              width: '140%',
+              width: viewMode === 'mobile' ? '100%' : '100%',
               maxWidth: 'none',
               height: 'auto',
               opacity: (location.pathname === '/' && assetHidden) ? 0 : 1, // Only hide on scroll for Home
@@ -1615,7 +1621,7 @@ function App() {
       )}
         
         {/* Main content - above Asset1 */}
-        <main className={`relative z-10 flex-grow p-0 ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${(location.pathname.startsWith('/work') || location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'pointer-events-none' : ''}`}>
+        <main className={`relative z-10 flex-grow p-0 w-full max-w-full overflow-x-hidden ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${(location.pathname.startsWith('/work') || location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'pointer-events-none' : ''}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >

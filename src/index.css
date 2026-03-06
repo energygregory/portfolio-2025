@@ -5,9 +5,29 @@
 
 @layer base {
   /* GLOBAL TEXT RESIZE (Except for specific classes) */
+  * {
+    box-sizing: border-box;
+  }
+  
   html {
     /* Scale down base font size to decrease text size sitewide */
     font-size: 13px; /* Reduced from browser default ~16px */
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: fixed;
+    top: 0;
+    left: 0 !important;
+    bottom: 0;
+    right: 0;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  
+  html::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
 
   /* Exclusions: Restore size for Footer and specific excluded classes */
@@ -41,9 +61,19 @@
 /* Links - Removed to prevent blue override */
 
 body {
-  margin: 0;
-  min-width: 320px;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
   min-height: 100vh;
+  overflow: hidden !important;
+  position: fixed;
+  top: 0;
+  left: 0 !important;
+  bottom: 0;
+  right: 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
   /* Remove default background to allow fixed background grid z-index logic to work */
   background-color: transparent; 
   color: #ffffff;
@@ -54,6 +84,26 @@ body {
   user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+  /* Explicitly reset any safe area padding that iOS might add */
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+#root {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  margin: 0 !important;
+  padding: 0 !important;
+  left: 0 !important;
 }
 
 /* Allow selection in inputs and textareas */
@@ -99,11 +149,7 @@ img.interactive {
 }
 
 /* Default to dark to prevent white flash, but let JS override */
-html,
-body {
-  background-color: #000000;
-  color: #ffffff;
-}
+/* Note: Additional html/body styles consolidated above */
 
 /* Mobile scroll optimization */
 @media (max-width: 640px) {

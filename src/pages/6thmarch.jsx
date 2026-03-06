@@ -33,7 +33,7 @@ export default function SixthMarch() {
   };
 
   return (
-    <div className="fixed inset-0 z-[1] pointer-events-auto">
+    <div className="pointer-events-auto" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 50 }}>
       {/* Blank bg behind video for fade target */}
       <div className="absolute inset-0 bg-white dark:bg-black" />
 
@@ -44,8 +44,8 @@ export default function SixthMarch() {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-        style={{ opacity: fadedOut ? 0 : 1 }}
+        className="absolute inset-0 object-cover transition-opacity duration-1000"
+        style={{ opacity: fadedOut ? 0 : 1, width: '100vw', height: '100vh' }}
       />
 
       {/* Top bar */}
