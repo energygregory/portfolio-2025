@@ -1342,7 +1342,7 @@ function App() {
           />
         )}
 
-        {/* Home-only Asset1 controls (desktop only) - localhost only */}}
+        {/* Home-only Asset1 controls (desktop only) - localhost only */}
         {location.pathname === '/' && viewMode === 'desktop' && (
           <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: 'none'}}>
             <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>
