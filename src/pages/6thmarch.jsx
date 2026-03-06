@@ -49,6 +49,11 @@ const outerSizeOverride = {
 export default function SixthMarch() {
   const navigate = useNavigate();
   const videoRef = useRef(null);
+  const [isGif] = useState(() => {
+    const shown = sessionStorage.getItem('marchIntro_shown');
+    sessionStorage.setItem('marchIntro_shown', '1');
+    return Boolean(shown);
+  });
   const [fadedOut, setFadedOut] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [isDark, setIsDark] = useState(false);
@@ -146,26 +151,35 @@ export default function SixthMarch() {
         width: '100vw', height: '100vh', zIndex: 50,
         WebkitUserSelect: 'none', userSelect: 'none',
         WebkitTouchCallout: 'none',
-        overflowY: 'hidden',
-        touchAction: 'none',
+        overflowY: 'auto',
+        touchAction: 'pan-y',
       }}
       onContextMenu={preventContextMenu}
     >
       {/* Blank bg */}
       <div className="absolute inset-0 bg-white dark:bg-black" />
 
-      {/* Video */}
-      <video
-        ref={videoRef}
-        src={videos[0].src}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        className="absolute inset-0 object-cover transition-opacity duration-1000"
-        style={{ opacity: fadedOut ? 0 : 1, width: '100%', height: '100%', minWidth: '100vw', minHeight: '100vh' }}
-      />
+      {/* Intro media: video on first visit, gif on refresh */}
+      {isGif ? (
+        <img
+          src="/RECENTS/Pi7_GIF_CMP.gif"
+          alt=""
+          className="absolute inset-0 object-cover transition-opacity duration-1000"
+          style={{ opacity: fadedOut ? 0 : 1, width: '100%', height: '100%', minWidth: '100vw', minHeight: '100vh' }}
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          src={videos[0].src}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 object-cover transition-opacity duration-1000"
+          style={{ opacity: fadedOut ? 0 : 1, width: '100%', height: '100%', minWidth: '100vw', minHeight: '100vh' }}
+        />
+      )}
 
       {/* Preload all gallery images so they appear immediately when gallery shows */}
       <div style={{ display: 'none' }} aria-hidden="true">
@@ -404,11 +418,11 @@ export default function SixthMarch() {
           transition: 'opacity 800ms ease',
         }}
       >
-        <p style={{ fontSize: 'clamp(4px, 0.55vw, 7px)', letterSpacing: '0.07em', color: isDark ? 'rgba(200,200,200,0.8)' : 'rgba(30,30,30,0.8)', lineHeight: 1.6 }}>
+        <p style={{ fontSize: 'clamp(3px, 0.45vw, 5.5px)', letterSpacing: '0.07em', color: isDark ? 'rgba(200,200,200,0.8)' : 'rgba(30,30,30,0.8)', lineHeight: 1.6 }}>
           ALL RIGHTS RESERVED.
         </p>
-        <p style={{ fontSize: 'clamp(3.5px, 0.5vw, 6.5px)', letterSpacing: '0.05em', color: isDark ? 'rgba(180,180,180,0.6)' : 'rgba(50,50,50,0.6)', lineHeight: 1.7, maxWidth: '32ch' }}>
-          ALL ITEMS ARE FOR PORTFOLIO PURPOSES ONLY AND NOT FOR SALE ON THIS WEBSITE. CLIENTS RETAIN FULL OWNERSHIP OF COMMISSIONED DESIGNS. UNAUTHORISED USE OR REPRODUCTION CONSTITUTES INFRINGEMENT.
+        <p style={{ fontSize: 'clamp(2.5px, 0.4vw, 5px)', letterSpacing: '0.05em', color: isDark ? 'rgba(180,180,180,0.6)' : 'rgba(50,50,50,0.6)', lineHeight: 1.7, maxWidth: '32ch' }}>
+          CLIENTS RETAIN FULL OWNERSHIP OF COMMISSIONED DESIGNS. UNAUTHORISED REPRODUCTION OR USE OF ANY CONTENT ON THIS SITE CONSTITUTES INFRINGEMENT.
         </p>
       </div>
 

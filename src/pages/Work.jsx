@@ -664,7 +664,6 @@ const PostersContent = () => {
      * Side posters fanning out, reduced opacity, scaled down, sitting underneath.
      */
     if (isMobile) {
-      if (isLocalhost) {
         const handlePosterClick = (index) => {
           setCurrentIndex(index);
         };
@@ -689,7 +688,7 @@ const PostersContent = () => {
             style={{ 
               perspective: '1200px',
               touchAction: 'none',
-              transform: `translateY(${posterY}px) scale(${posterScale})`
+              transform: `translateY(${posterY}px) scale(${posterScale * 0.7})`
             }}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
@@ -709,19 +708,10 @@ const PostersContent = () => {
               // Scale: Main 1.1 (or 1), others 0.8
               const scale = isActive ? 1.1 : 0.8;
               
-              // TranslateX: Fan out. 
-              // The user script used: offset * 45 (percent?)
-              // Let's use percentage relative to viewport width or just px.
-              // Logic: offset * 45% of translation.
-              // Since they are absolute centered, translateX moves them left/right.
               const translateX = offset * 45; // %
               
               // TranslateZ: Push back side posters
               const translateZ = absOffset * -150; // px
-              
-              const rotateY = 0; // The prompt didn't strictly specify rotation, typically strictly vertical meant flat? 
-              // User script snippet: transform: `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})` 
-              // It does NOT have rotateY.
 
               return (
                 <ResponsiveImage
@@ -736,13 +726,11 @@ const PostersContent = () => {
                     zIndex: zIndex,
                     opacity: opacity,
                     transform: `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})`,
-                    // No box shadow
                     boxShadow: 'none',
                     pointerEvents: 'auto',
-                    left: '12.5%', // (100 - 75) / 2 = 12.5% to center horizontally with w=75vw
+                    left: '12.5%',
                     right: '12.5%',
-                    filter: isActive ? 'none' : 'grayscale(100%)',
-                    transition: 'filter 0.5s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1)',
+                    transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1)',
                   }}
                   onClick={() => handlePosterClick(index)}
                   loading={Math.abs(index - currentIndex) < 2 ? "eager" : "lazy"}
@@ -753,72 +741,6 @@ const PostersContent = () => {
           </>
         );
       }
-      
-      // OLD Mobile: Duplicate the poster row (fallback for non-localhost/prod for now as requested?)
-      // User said: "On mobile only, implement this for the posters page... using only the posters allowed..."
-      // AND "bring back the sliders for localhost... on mobile localhost, implement this"
-      // So I will keep the existing prod implementation below for now, as requested.
-      return (
-        <div className="fixed inset-0 top-[100px] z-[50] w-full flex flex-col items-center bg-transparent pointer-events-auto"> 
-          <div className="w-full h-full flex items-center overflow-x-auto no-scrollbar pb-12 pt-12 pl-[15vw] pr-[50vw]">
-            <div className="flex flex-col items-center" style={{ height: '80vh' }}>
-                        {/* Split posters: portraits on top, landscapes on bottom */}
-                        {(() => {
-                          const portraits = posterData.filter(p => (Number(p.aspectRatio) || 1) < 1);
-                          const landscapes = posterData.filter(p => (Number(p.aspectRatio) || 1) >= 1);
-                          return (
-                            <>
-                            <div className="flex items-center mb-12 z-40" style={{ height: '60vh' }}>
-                              {portraits.map((item, i) => {
-                                const rotate = (i % 5 - 2) * 3;
-                                const origIndex = posterData.findIndex(p => p.src === item.src);
-                                return (
-                                  <ResponsiveImage
-                                    key={`dup-${i}`}
-                                    src={item.src}
-                                    alt={`Poster duplicate ${i + 1}`}
-                                    className="flex-shrink-0 w-[50vw] max-w-[260px] object-contain pointer-events-none transition-transform duration-300"
-                                    loading={origIndex >= 0 && origIndex < PRIORITY_COUNT ? 'eager' : 'lazy'}
-                                    style={{
-                                      marginLeft: i === 0 ? 0 : '-45vw',
-                                      transform: `rotate(${rotate}deg)`,
-                                      zIndex: 1000 - i,
-                                      display: 'block'
-                                    }}
-                                  />
-                                );
-                              })}
-                            </div>
-
-                            <div className="flex items-center z-30 mt-6" style={{ height: '60vh' }}>
-                              {landscapes.map((item, i) => {
-                                const rotate = (i % 5 - 2) * 3;
-                                const origIndex = posterData.findIndex(p => p.src === item.src);
-                                return (
-                                  <ResponsiveImage
-                                    key={`main-${i}`}
-                                    src={item.src}
-                                    alt={`Poster ${i + 1}`}
-                                    className="flex-shrink-0 w-[60vw] max-w-[300px] object-contain pointer-events-none transition-transform duration-300"
-                                    loading={origIndex >= 0 && origIndex < PRIORITY_COUNT ? 'eager' : 'lazy'}
-                                    style={{
-                                      marginLeft: i === 0 ? 0 : '-45vw',
-                                      transform: `rotate(${rotate}deg)`,
-                                      zIndex: i,
-                                      display: 'block'
-                                    }}
-                                  />
-                                );
-                              })}
-                            </div>
-                            </>
-                          );
-                        })()}
-            </div>
-          </div>
-        </div>
-      );
-    }
 
     // Expanded modal removed — hover-to-colour replaces click expansion
 
@@ -1424,7 +1346,7 @@ export default function Work({ initialSection } = {}) {
         </div>
       </div>
 
-      {/* Mini nav - Adjusted z-index to sit on top of carousel */}}
+      {/* Mini nav - Adjusted z-index to sit on top of carousel */}
       <div 
         className={`w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed left-1/2 -translate-x-1/2 transition-opacity duration-500 ease-in-out ${isGraphicDetailView ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
         style={{ top: `${effectiveNavY}px` }}

@@ -570,7 +570,7 @@ function App() {
   }, [theme]); */
 
   // icon/pill positions — hardcoded per user request
-  const iconOffset = 9;
+  const iconOffset = 5;
   const pillPadding = 12;
 
   // Screen dimensions state - updated on resize/viewport change
@@ -1220,7 +1220,7 @@ function App() {
         <nav className="flex items-center gap-4 text-xs px-2">
           {/* Ghana flag – first nav item */}
           <Link to="/6thmarch" className="opacity-75 hover:opacity-100 transition-opacity flex-shrink-0" aria-label="6th March">
-            <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 18, height: 12, display: 'block', borderRadius: 1 }} />
+            <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 14, height: 9, display: 'block', borderRadius: 1 }} />
           </Link>
           <NavLink
             to="/"
@@ -1315,7 +1315,7 @@ function App() {
               width: isTablet ? `calc(100% + ${assetHorizontalBleed}px)` : (viewMode === 'mobile' ? '140%' : '100%'),
               maxWidth: 'none',
               height: 'auto',
-              opacity: (location.pathname === '/' && assetHidden) ? 0 : 1,
+              opacity: (location.pathname === '/' && assetHidden) ? 0 : (isPhone ? 0.75 : 1),
               transition: 'opacity 300ms ease, transform 500ms ease-in-out',
               willChange: 'opacity, transform',
             }}
@@ -1681,7 +1681,7 @@ function App() {
                 <Route path="/terzo" element={<Terzo />} />
                 <Route path="/williamru" element={<WilliamRu />} />
                 <Route path="/6thmarch" element={<SixthMarch />} />
-                <Route path="/6thmarch2" element={<SixthMarch2 />} />
+                {isLocalhost && <Route path="/6thmarch2" element={<SixthMarch2 />} />}
                 <Route path="/contact" element={<Contact />} />
 
                 {/* Keep Admin restricted to localhost/dev for safety */}
@@ -1735,11 +1735,11 @@ function App() {
           transition: 'opacity 400ms ease',
         }}
       >
-        <p style={{ fontSize: 'clamp(4px, 0.5vw, 6.5px)', letterSpacing: '0.06em', opacity: 0.35, color: theme === 'dark' ? '#fff' : '#000', lineHeight: 1.6 }}>
-          All rights reserved.
+        <p style={{ fontSize: 'clamp(4px, 0.4vw, 5px)', letterSpacing: '0.06em', opacity: 0.35, color: theme === 'dark' ? '#fff' : '#000', lineHeight: 1.6 }}>
+          ALL RIGHTS RESERVED.
         </p>
-        <p style={{ fontSize: 'clamp(3.5px, 0.45vw, 6px)', letterSpacing: '0.04em', opacity: 0.25, color: theme === 'dark' ? '#fff' : '#000', lineHeight: 1.6, maxWidth: '30ch' }}>
-          Clients retain full ownership of commissioned designs. Unauthorised reproduction or use of any content on this site constitutes infringement.
+        <p style={{ fontSize: 'clamp(3.5px, 0.35vw, 4.5px)', letterSpacing: '0.04em', opacity: 0.25, color: theme === 'dark' ? '#fff' : '#000', lineHeight: 1.6, maxWidth: '30ch' }}>
+          CLIENTS RETAIN FULL OWNERSHIP OF COMMISSIONED DESIGNS. UNAUTHORISED REPRODUCTION OR USE OF ANY CONTENT ON THIS SITE CONSTITUTES INFRINGEMENT.
         </p>
       </div>}
 
