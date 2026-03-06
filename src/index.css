@@ -7,21 +7,28 @@
   /* GLOBAL TEXT RESIZE (Except for specific classes) */
   * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
+    background-color: transparent;
   }
   
   html {
     /* Scale down base font size to decrease text size sitewide */
     font-size: 13px; /* Reduced from browser default ~16px */
-    overflow-x: hidden !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    position: fixed;
-    top: 0;
-    left: 0 !important;
-    bottom: 0;
-    right: 0;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
   }
@@ -64,14 +71,14 @@ body {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
-  max-width: 100% !important;
+  height: 100% !important;
   min-height: 100vh;
   overflow: hidden !important;
-  position: fixed;
-  top: 0;
+  position: fixed !important;
+  top: 0 !important;
   left: 0 !important;
-  bottom: 0;
-  right: 0;
+  right: 0 !important;
+  bottom: 0 !important;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
   /* Remove default background to allow fixed background grid z-index logic to work */

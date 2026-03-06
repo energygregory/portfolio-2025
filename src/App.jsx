@@ -1288,11 +1288,11 @@ function App() {
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/')) ? 'z-0' : 'z-20'}`}
             style={{
-              left: '50%',
+              left: viewMode === 'desktop' ? '50%' : '0px',
               top: viewMode === 'desktop' ? '50%' : '48px',
               transform: viewMode === 'desktop' 
                 ? `translate(-50%, -50%) translate(${liveConfig.assetX ?? 0}px, ${liveConfig.assetY ?? 0}px) scale(${liveConfig.assetScale ?? 1}) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`
-                : `scale(${liveConfig.assetScale ?? 1}) translateX(calc(-50% + ${liveConfig.assetX ?? 0}px)) translateY(${liveConfig.assetY ?? 0}px) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
+                : `scale(${liveConfig.assetScale ?? 1}) translateX(${liveConfig.assetX ?? 0}px) translateY(${liveConfig.assetY ?? 0}px) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
               transformOrigin: viewMode === 'desktop' ? 'center' : 'left top',
               width: viewMode === 'mobile' ? '100%' : '100%',
               maxWidth: 'none',
