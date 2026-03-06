@@ -5,6 +5,15 @@ import BlurCarousel from "../components/BlurCarousel";
 import Footer from "../components/Footer";
 import ResponsiveImage from "../components/ResponsiveImage.jsx";
 
+// Localhost detection for dev-only controls
+const IS_LOCALHOST = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname === '' ||
+  window.location.hostname.startsWith('192.168.') ||
+  window.location.hostname.startsWith('10.')
+);
+
 // Graphic Design Content Components (Placeholders for now)
 const LogosContent = () => {
     const logos = [
@@ -192,7 +201,7 @@ const LogosContent = () => {
                         className={`
                             absolute bottom-1 left-0 right-0 z-20 flex flex-col items-center justify-center
                             md:opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-none space-y-1
-                            hidden md:flex mb-1 md:mb-2 
+                            ${IS_LOCALHOST ? 'hidden md:flex' : 'hidden'} mb-1 md:mb-2 
                         `}
                    >
                         <span className="text-[8px] md:text-[10px] font-mono bg-black/50 text-white px-1 rounded backdrop-blur-sm">
@@ -1022,7 +1031,15 @@ const IPAD_LANDSCAPE_PRESET = {
   textScale: 1.02,
 };
 
-const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSelectedItem, textX = 0 }) => {
+const LOCKED_GRAPHIC_ITEMS = new Set(['VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN']);
+
+const LockIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ opacity: 0.4, flexShrink: 0, marginLeft: '10px', verticalAlign: 'middle' }}>
+    <path d="M12 2a5 5 0 0 0-5 5v3H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-2V7a5 5 0 0 0-5-5zm0 2a3 3 0 0 1 3 3v3H9V7a3 3 0 0 1 3-3zm0 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+  </svg>
+);
+
+const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSelectedItem, textX = 0, topLabelY = 0 }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const navigate = useNavigate();
 
@@ -1094,7 +1111,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               }`}
               style={{
                 top: selectedItem 
-                  ? (isMobile ? '-75px' : (isTablet ? '8px' : '-160px'))
+                  ? (isMobile ? `${-75 + topLabelY}px` : (isTablet ? `${8 + topLabelY}px` : `${-160 + topLabelY}px`))
                   : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 
                 left: selectedItem ? '24px' : '50%',
@@ -1108,6 +1125,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               onMouseEnter={() => !selectedItem && setHoveredIdx(idx)}
               onMouseLeave={() => !selectedItem && setHoveredIdx(null)}
               onClick={() => {
+                if (LOCKED_GRAPHIC_ITEMS.has(item)) return;
                 if (item === 'RECENTS') {
                   navigate('/recents');
                 } else {
@@ -1125,16 +1143,17 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               </div>}
 
               <h2 
-                className={`${item === 'RECENTS' ? 'text-sm sm:text-2xl' : 'text-4xl sm:text-6xl'} font-light text-[#e5e5e5] dark:text-[#4d4d4d] transition-colors duration-300 z-20 whitespace-nowrap ${
+                className={`${item === 'RECENTS' ? 'text-sm sm:text-2xl' : 'text-4xl sm:text-6xl'} font-light text-[#e5e5e5] dark:text-[#4d4d4d] transition-colors duration-300 z-20 whitespace-nowrap flex items-center ${
                   (hoveredIdx === idx || isSelected) ? 'text-black dark:text-[#e5e5e5]' : ''
                 } ${
                   (!selectedItem && hoveredIdx !== null && hoveredIdx !== idx) ? 'blur-[1px] opacity-30 text-[#e5e5e5] dark:text-[#4d4d4d]' : ''
-                }`}
+                } ${LOCKED_GRAPHIC_ITEMS.has(item) ? 'cursor-default' : ''}`}
                 style={{ 
                  fontFamily: '"PT Mono", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
                 }}
               >
                 {item}
+                {LOCKED_GRAPHIC_ITEMS.has(item) && <LockIcon />}
               </h2>
 
               {/* TAP AND HOLD TEXT (Mobile only - visible when LOGOS is selected) */}
@@ -1214,6 +1233,7 @@ export default function Work({ initialSection } = {}) {
   const [textX, setTextX] = useState(0);
   const [textY, setTextY] = useState(0);
   const [textScale, setTextScale] = useState(1);
+  const [graphicLabelY, setGraphicLabelY] = useState(0);
   const [isIpadLike, setIsIpadLike] = useState(false);
   const [isPortraitMode, setIsPortraitMode] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -1244,7 +1264,7 @@ export default function Work({ initialSection } = {}) {
        // We might need to handle spaces in URL: visual-design -> VISUAL DESIGN
        const cleanSection = sectionUpper.replace(/-/g, ' ');
        
-       if (validItems.includes(cleanSection)) {
+       if (validItems.includes(cleanSection) && !LOCKED_GRAPHIC_ITEMS.has(cleanSection)) {
           setSelectedGraphicItem(cleanSection);
           setActiveCategory('graphic');
        } else if (section === 'merch') {
@@ -1314,6 +1334,7 @@ export default function Work({ initialSection } = {}) {
       {/* Dev Controls for iPad tweaking */}
       <div 
         className="fixed bottom-4 right-4 z-[9999] bg-white/90 dark:bg-black/90 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col gap-2 pointer-events-auto"
+        style={{ display: IS_LOCALHOST ? 'flex' : 'none' }}
       >
         <span className="text-[10px] font-bold uppercase tracking-widest text-center">iPad Tuning</span>
         {isIpadPresetLocked && (
@@ -1391,9 +1412,19 @@ export default function Work({ initialSection } = {}) {
             </div>
           </>
         )}
+        <div className="flex flex-col gap-1">
+          <label className="text-[9px] uppercase tracking-widest flex justify-between">
+            <span>Graphic Label Y:</span> <span>{graphicLabelY}px</span>
+          </label>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setGraphicLabelY(g => g - 10)} className="text-[9px] px-1 bg-black/10 dark:bg-white/10 rounded">-10</button>
+            <input type="range" min="-300" max="300" step="1" value={graphicLabelY} onInput={(e) => setGraphicLabelY(Number(e.currentTarget.value))} onChange={(e) => setGraphicLabelY(Number(e.currentTarget.value))} className="flex-1 w-20 touch-auto pointer-events-auto" />
+            <button onClick={() => setGraphicLabelY(g => g + 10)} className="text-[9px] px-1 bg-black/10 dark:bg-white/10 rounded">+10</button>
+          </div>
+        </div>
       </div>
 
-      {/* Mini nav - Adjusted z-index to sit on top of carousel */}
+      {/* Mini nav - Adjusted z-index to sit on top of carousel */}}
       <div 
         className={`w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed left-1/2 -translate-x-1/2 transition-opacity duration-500 ease-in-out ${isGraphicDetailView ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
         style={{ top: `${effectiveNavY}px` }}
@@ -1444,6 +1475,7 @@ export default function Work({ initialSection } = {}) {
           <section className="w-full max-w-4xl mt-4 mb-0 px-6 flex-grow flex flex-col">
             <GraphicDesignSection 
               textX={0}
+              topLabelY={graphicLabelY}
               items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN', 'RECENTS']} 
               onDetailViewChange={setIsGraphicDetailView}
               selectedItem={selectedGraphicItem}

@@ -83,6 +83,7 @@ export default function Footer() {
       content: (
         <>
           <p>This website is operated by Greg. All rights reserved.</p>
+          <p>All items are for portfolio purposes only and not for sale on this website. Clients retain full ownership of commissioned designs. Unauthorised reproduction or use of any content constitutes infringement.</p>
           <p>
             For legal inquiries, please contact us directly through the contact
             form.

@@ -119,6 +119,7 @@ const LegacyDrip = lazy(() => import("./pages/LegacyDrip.jsx"));
 const PriceList = lazy(() => import("./pages/PriceList.jsx"));
 const Recents = lazy(() => import("./pages/Recents.jsx"));
 const SixthMarch = lazy(() => import("./pages/6thmarch.jsx"));
+const SixthMarch2 = lazy(() => import("./pages/6thmarch2.jsx"));
 const Admin = lazy(() => import("./pages/Admin.jsx"));
 
 import NavigationLoader from "./components/NavigationLoader";
@@ -988,6 +989,7 @@ function App() {
 
   // Nav pill hide at page bottom, reveal when user scrolls up
   const [navHidden, setNavHidden] = useState(false);
+  const [atPageBottom, setAtPageBottom] = useState(false);
   const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
   useEffect(() => {
     let raf = null;
@@ -996,6 +998,7 @@ function App() {
       raf = requestAnimationFrame(() => {
         const y = window.scrollY;
         const atBottom = window.innerHeight + y >= document.documentElement.scrollHeight - 20;
+        setAtPageBottom(atBottom);
         if (atBottom) {
           setNavHidden(true);
         } else if (y < lastScrollY.current) {
@@ -1118,6 +1121,16 @@ function App() {
             </svg>
           )}
         </button>
+
+        {/* Ghana flag – links to 6thmarch page */}
+        <Link
+          to="/6thmarch"
+          className="absolute top-1/2 -translate-y-1/2 opacity-75 hover:opacity-100 transition-opacity"
+          style={{ right: `${iconOffset + 36}px` }}
+          aria-label="6th March"
+        >
+          <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 20, height: 13, display: 'block', borderRadius: 1 }} />
+        </Link>
         
         {/* Nav links */}
         <nav className="flex items-center gap-6 text-sm px-2">
@@ -1202,9 +1215,13 @@ function App() {
             </svg>
           )}
         </button>
-        
+
         {/* Nav links for mobile */}
         <nav className="flex items-center gap-4 text-xs px-2">
+          {/* Ghana flag – first nav item */}
+          <Link to="/6thmarch" className="opacity-75 hover:opacity-100 transition-opacity flex-shrink-0" aria-label="6th March">
+            <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 18, height: 12, display: 'block', borderRadius: 1 }} />
+          </Link>
           <NavLink
             to="/"
             className={({ isActive }) =>
@@ -1306,7 +1323,7 @@ function App() {
         )}
 
         {/* Mobile Asset Sliders - HIDDEN */}
-        {false && location.pathname === '/' && viewMode === 'mobile' && (
+        {isLocalhost && location.pathname === '/' && viewMode === 'mobile' && (
              <div className="fixed bottom-24 left-4 right-4 z-[200] flex flex-col gap-2 p-4 bg-white/5 dark:bg-black/5 backdrop-blur-sm rounded-xl border border-black/10 dark:border-white/10 shadow-2xl max-h-[50vh] overflow-y-auto">
                  <div className="text-xs font-bold mb-2 text-center uppercase tracking-widest">Mobile Controls</div>
                  
@@ -1408,8 +1425,8 @@ function App() {
             </div>
         )}
 
-        {/* Home-only Asset1 controls (desktop + iPad) - localhost only */}
-        {location.pathname === '/' && (viewMode === 'desktop' || isTablet) && (
+        {/* Home-only Asset1 controls (desktop only) - localhost only */}
+        {location.pathname === '/' && viewMode === 'desktop' && (
           <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: isLocalhost ? 'block' : 'none'}}>
             <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>
             {/* Browser window size detection */}
@@ -1424,9 +1441,11 @@ function App() {
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>X pos</label>
+              <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX ?? 0) - 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-10</button>
               <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX ?? 0) - 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-1</button>
               <input type="range" min="-500" max="500" step="1" value={Math.max(-500,Math.min(500,liveConfig.assetX ?? 0))} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{flex:1}} />
               <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX ?? 0) + 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+1</button>
+              <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX ?? 0) + 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+10</button>
               <input type="number" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{width:'60px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
@@ -1662,6 +1681,7 @@ function App() {
                 <Route path="/terzo" element={<Terzo />} />
                 <Route path="/williamru" element={<WilliamRu />} />
                 <Route path="/6thmarch" element={<SixthMarch />} />
+                <Route path="/6thmarch2" element={<SixthMarch2 />} />
                 <Route path="/contact" element={<Contact />} />
 
                 {/* Keep Admin restricted to localhost/dev for safety */}
@@ -1704,6 +1724,24 @@ function App() {
           </div>
         </div>
       </div> */}
+
+      {/* Global bottom-right legal notice – all pages except 6thmarch (has its own) */}
+      {location.pathname !== '/6thmarch' && <div
+        style={{
+          position: 'fixed', bottom: 8, right: 10, zIndex: 9999,
+          textAlign: 'right', pointerEvents: 'none',
+          fontFamily: '"PT Mono", monospace',
+          opacity: atPageBottom ? 0 : 1,
+          transition: 'opacity 400ms ease',
+        }}
+      >
+        <p style={{ fontSize: 'clamp(4px, 0.5vw, 6.5px)', letterSpacing: '0.06em', opacity: 0.35, color: theme === 'dark' ? '#fff' : '#000', lineHeight: 1.6 }}>
+          All rights reserved.
+        </p>
+        <p style={{ fontSize: 'clamp(3.5px, 0.45vw, 6px)', letterSpacing: '0.04em', opacity: 0.25, color: theme === 'dark' ? '#fff' : '#000', lineHeight: 1.6, maxWidth: '30ch' }}>
+          Clients retain full ownership of commissioned designs. Unauthorised reproduction or use of any content on this site constitutes infringement.
+        </p>
+      </div>}
 
       {/* Hide global footer on Work, Recents, and 6thmarch pages */}
       {!location.pathname.startsWith('/work') && location.pathname !== '/recents' && location.pathname !== '/6thmarch' && (

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const videos = [
-  { src: '/RECENTS/Untitledd copy.mp4', label: 'FOR TERZO' },
+  { src: '/RECENTS/Untitledd%20copy.mp4', label: 'FOR TERZO' },
 ];
 
 // Inner circle (original – do not change order or contents)
@@ -26,10 +26,13 @@ const outerImageFiles = [
   'black.png',
   'black2.png',
   'blue1 copy.png',
+  'castro d.png',
   'ebony.png',
   'gyan back.png',
   'gyan front.png',
   'hac.png',
+  'kojo.png',
+  'last two.png',
   'legend tee.png',
   'rawlings.png',
   'white.png',
@@ -39,14 +42,18 @@ const outerImageFiles = [
 const outerSizeOverride = {
   'black2.png': 0.72,
   'blue1 copy.png': 0.75,
+  'ebony.png': 1.45,
+  'rawlings.png': 1.4,
 };
 
 export default function SixthMarch() {
   const navigate = useNavigate();
+  const videoRef = useRef(null);
   const [fadedOut, setFadedOut] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [hoveredOuterIndex, setHoveredOuterIndex] = useState(null);
   const [pressedImage, setPressedImage] = useState(null);
@@ -63,9 +70,12 @@ export default function SixthMarch() {
   useEffect(() => {
     const mql = window.matchMedia('(pointer: coarse)');
     setIsMobileOrTablet(mql.matches);
-    const onChange = (e) => setIsMobileOrTablet(e.matches);
+    const checkTablet = () => setIsTablet(window.innerWidth >= 768);
+    checkTablet();
+    window.addEventListener('resize', checkTablet);
+    const onChange = (e) => { setIsMobileOrTablet(e.matches); };
     mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
+    return () => { mql.removeEventListener('change', onChange); window.removeEventListener('resize', checkTablet); };
   }, []);
 
   // Screenshot blocking: blur content when page is hidden
@@ -82,8 +92,16 @@ export default function SixthMarch() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  // Programmatically start video – required for autoplay on some mobile browsers
   useEffect(() => {
-    const timer = setTimeout(() => setFadedOut(true), 6000);
+    const vid = videoRef.current;
+    if (vid) {
+      vid.play().catch(() => {});
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setFadedOut(true), 3900);
     return () => clearTimeout(timer);
   }, []);
 
@@ -138,14 +156,23 @@ export default function SixthMarch() {
 
       {/* Video */}
       <video
+        ref={videoRef}
         src={videos[0].src}
         autoPlay
         loop
         muted
         playsInline
+        preload="auto"
         className="absolute inset-0 object-cover transition-opacity duration-1000"
-        style={{ opacity: fadedOut ? 0 : 1, width: '100vw', height: '100vh' }}
+        style={{ opacity: fadedOut ? 0 : 1, width: '100%', height: '100%', minWidth: '100vw', minHeight: '100vh' }}
       />
+
+      {/* Preload all gallery images so they appear immediately when gallery shows */}
+      <div style={{ display: 'none' }} aria-hidden="true">
+        {[...marchImages, ...outerImages].map(src => (
+          <img key={src} src={src} alt="" />
+        ))}
+      </div>
 
       {/* Gallery wrapper – both circles + hint */}
       <div
@@ -161,7 +188,9 @@ export default function SixthMarch() {
         {marchImages.map((src, idx) => {
           const angle = (idx / marchImages.length) * 360;
           const isHovered = !isMobileOrTablet && hoveredIndex === idx;
-          const isDimmed = !isMobileOrTablet && hoveredIndex !== null && hoveredIndex !== idx;
+          const anyHovered = !isMobileOrTablet && (hoveredIndex !== null || hoveredOuterIndex !== null);
+          const isDimmed = anyHovered && !isHovered;
+          const innerLabel = marchImageFiles[idx] === '5.png' || marchImageFiles[idx] === '6.png' ? 'DESIGN FOR SALE' : 'CLIENT WORK';
           return (
             <div
               key={src}
@@ -169,8 +198,8 @@ export default function SixthMarch() {
               style={{
                 left: '50%',
                 top: '50%',
-                width: 'clamp(58px, 9vw, 150px)',
-                transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(min(38vw, 34vh)) rotate(${-angle}deg)`,
+                width: 'clamp(44px, 6.5vw, 112px)',
+                transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(min(${isMobileOrTablet ? '36vw, 32vh' : '35vw, 31vh'})) rotate(${-angle}deg)`,
                 transformOrigin: 'center center',
                 opacity: showGallery ? 1 : 0,
                 transition: `opacity 700ms ease ${idx * 80}ms`,
@@ -202,6 +231,11 @@ export default function SixthMarch() {
                   onContextMenu={preventContextMenu}
                   onDragStart={preventContextMenu}
                 />
+                {isHovered && (
+                  <p style={{ textAlign: 'center', fontSize: '4.5px', letterSpacing: '0.12em', marginTop: '4px', color: isDark ? 'rgba(210,210,210,0.9)' : 'rgba(30,30,30,0.9)', fontFamily: '"PT Mono", monospace', whiteSpace: 'nowrap' }}>
+                    {innerLabel}
+                  </p>
+                )}
                 <div className="absolute inset-0" onContextMenu={preventContextMenu} />
               </div>
             </div>
@@ -227,8 +261,8 @@ export default function SixthMarch() {
             top: '50%',
             width: 0,
             height: 0,
-            animation: isMobileOrTablet ? 'marchOuterRotate 60s linear infinite' : undefined,
-            transform: isMobileOrTablet ? undefined : 'translate(-50%, -50%)',
+            animation: 'marchOuterRotate 60s linear infinite',
+            transform: undefined,
             pointerEvents: 'none',
             opacity: showGallery ? 1 : 0,
             transition: 'opacity 900ms ease 200ms',
@@ -237,9 +271,13 @@ export default function SixthMarch() {
           {outerImages.map((src, idx) => {
             const angle = (idx / outerImages.length) * 360;
             const isHovered = !isMobileOrTablet && hoveredOuterIndex === idx;
-            const isDimmed = !isMobileOrTablet && hoveredOuterIndex !== null && hoveredOuterIndex !== idx;
+            const anyHovered = !isMobileOrTablet && (hoveredIndex !== null || hoveredOuterIndex !== null);
+            const isDimmed = anyHovered && !isHovered;
             const fileName = outerImageFiles[idx];
             const scaleFactor = outerSizeOverride[fileName] ?? 1;
+            // desktop: 60% of mobile/tablet size
+            const desktopMult = isMobileOrTablet ? 1 : 0.6;
+            const ef = scaleFactor * desktopMult;
             return (
               <div
                 key={`outer-${src}`}
@@ -247,7 +285,7 @@ export default function SixthMarch() {
                 style={{
                   left: 0,
                   top: 0,
-                  width: `clamp(${Math.round(54 * scaleFactor)}px, ${(8.5 * scaleFactor).toFixed(2)}vw, ${Math.round(140 * scaleFactor)}px)`,
+                  width: `clamp(${Math.round(54 * ef)}px, ${(8.5 * ef).toFixed(2)}vw, ${Math.round(140 * ef)}px)`,
                   transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(min(60vw, 54vh)) rotate(${-angle}deg)`,
                   transformOrigin: 'center center',
                   zIndex: isHovered ? 50 : 1,
@@ -262,7 +300,7 @@ export default function SixthMarch() {
                 onContextMenu={preventContextMenu}
               >
                 {/* Counter-rotate so images stay upright as the orbit spins */}
-                <div style={{ animation: isMobileOrTablet ? 'marchCounterRotate 60s linear infinite' : undefined }}>
+                <div style={{ animation: 'marchCounterRotate 60s linear infinite' }}>
                   <div
                     style={{
                       transform: isHovered ? 'scale(2.5)' : 'scale(1)',
@@ -297,16 +335,16 @@ export default function SixthMarch() {
             top: '50%',
             transform: 'translate(-50%, -50%)',
             zIndex: 30,
-            opacity: showGallery ? 1 : 0,
-            transition: 'opacity 1200ms ease 800ms',
+            opacity: showGallery ? ((!isMobileOrTablet && (hoveredIndex !== null || hoveredOuterIndex !== null)) ? 0 : 1) : 0,
+            transition: 'opacity 300ms ease',
             textAlign: 'center',
             fontFamily: '"PT Mono", monospace',
           }}
         >
-          <p className="text-white/50 tracking-widest uppercase" style={{ fontSize: 'clamp(7px, 1.1vw, 11px)', lineHeight: '1.8' }}>
+          <p className="tracking-widest uppercase" style={{ fontSize: 'clamp(7px, 1.1vw, 11px)', lineHeight: '1.8', color: isDark ? 'rgba(150,150,150,0.7)' : 'rgba(80,80,80,0.6)' }}>
             {isMobileOrTablet ? 'TAP AND HOLD' : 'HOVER'}
           </p>
-          <p className="text-white/50 tracking-widest uppercase" style={{ fontSize: 'clamp(7px, 1.1vw, 11px)', lineHeight: '1.8' }}>
+          <p className="tracking-widest uppercase" style={{ fontSize: 'clamp(7px, 1.1vw, 11px)', lineHeight: '1.8', color: isDark ? 'rgba(150,150,150,0.7)' : 'rgba(80,80,80,0.6)' }}>
             TO PREVIEW
           </p>
         </div>
@@ -315,20 +353,33 @@ export default function SixthMarch() {
       {/* Mobile/tablet tap-and-hold preview popup */}
       {pressedImage && (
         <div
-          className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
+          className="fixed inset-0 z-[200] pointer-events-none flex flex-col items-center justify-center gap-4"
           style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
         >
           <img
             src={pressedImage}
             alt="Preview"
-            className="max-w-[82vw] max-h-[82vh] object-contain"
+            style={{
+              maxWidth: isMobileOrTablet && isTablet ? '44vw' : '82vw',
+              maxHeight: isMobileOrTablet && isTablet ? '38vh' : '68vh',
+              objectFit: 'contain',
+            }}
             draggable={false}
             onContextMenu={preventContextMenu}
           />
+          {(() => {
+            const pf = decodeURIComponent(pressedImage.split('/').pop());
+            const lbl = pf === '5.png' || pf === '6.png' ? 'DESIGN FOR SALE' : marchImageFiles.includes(pf) ? 'CLIENT WORK' : null;
+            return lbl ? (
+              <p style={{ color: 'rgba(190,190,190,0.9)', fontSize: 'clamp(9px, 1.5vw, 14px)', letterSpacing: '0.15em', fontFamily: '"PT Mono", monospace' }}>
+                {lbl}
+              </p>
+            ) : null;
+          })()}
         </div>
       )}
 
-      {/* Top gradient – ensures top-bar UI is readable over the circles */}
+      {/* Top gradient – only after video fades, on top of circles */}
       <div
         style={{
           position: 'fixed', top: 0, left: 0, right: 0,
@@ -338,15 +389,35 @@ export default function SixthMarch() {
             : 'linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, transparent 100%)',
           zIndex: 80,
           pointerEvents: 'none',
+          opacity: fadedOut ? 1 : 0,
+          transition: 'opacity 800ms ease',
         }}
       />
+
+      {/* Bottom-right legal notice */}
+      <div
+        style={{
+          position: 'fixed', bottom: 10, right: 12, zIndex: 90,
+          textAlign: 'right', pointerEvents: 'none',
+          fontFamily: '"PT Mono", monospace',
+          opacity: fadedOut ? 0.45 : 0,
+          transition: 'opacity 800ms ease',
+        }}
+      >
+        <p style={{ fontSize: 'clamp(4px, 0.55vw, 7px)', letterSpacing: '0.07em', color: isDark ? 'rgba(200,200,200,0.8)' : 'rgba(30,30,30,0.8)', lineHeight: 1.6 }}>
+          ALL RIGHTS RESERVED.
+        </p>
+        <p style={{ fontSize: 'clamp(3.5px, 0.5vw, 6.5px)', letterSpacing: '0.05em', color: isDark ? 'rgba(180,180,180,0.6)' : 'rgba(50,50,50,0.6)', lineHeight: 1.7, maxWidth: '32ch' }}>
+          ALL ITEMS ARE FOR PORTFOLIO PURPOSES ONLY AND NOT FOR SALE ON THIS WEBSITE. CLIENTS RETAIN FULL OWNERSHIP OF COMMISSIONED DESIGNS. UNAUTHORISED USE OR REPRODUCTION CONSTITUTES INFRINGEMENT.
+        </p>
+      </div>
 
       {/* Top bar */}
       <div className="fixed top-8 left-0 right-0 z-[100] flex items-center justify-between px-4 md:px-10 md:top-12">
         {/* Left: Light/Dark mode toggle */}
         <button
           onClick={toggleTheme}
-          className={`flex-shrink-0 w-4 h-4 md:w-6 md:h-6 hover:opacity-70 transition-opacity cursor-pointer ${isDark ? 'text-white' : 'text-black'}`}
+          className={`flex-shrink-0 w-5 h-5 md:w-6 md:h-6 hover:opacity-70 transition-opacity cursor-pointer ${isDark ? 'text-white' : 'text-black'}`}
         >
           {isDark ? (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -364,20 +435,21 @@ export default function SixthMarch() {
           onClick={() => navigate('/')}
           className="absolute left-1/2 -translate-x-1/2 cursor-pointer hover:opacity-70 transition-opacity"
         >
-          <img src={isDark ? '/LOGOS/newlogo-white.svg' : '/LOGOS/newlogo.svg'} alt="Logo" className="h-5 md:h-8 w-auto" />
+          <img src={isDark ? '/LOGOS/newlogo-white.svg' : '/LOGOS/newlogo.svg'} alt="Logo" className="h-8 md:h-10 w-auto" />
         </button>
 
         {/* Right: Text — changes after video fades */}
         <div className={`text-right ${isDark ? 'text-white' : 'text-black'}`} style={{ fontFamily: '"PT Mono", monospace' }}>
           {fadedOut ? (
             <>
-              <p className="text-[5px] md:text-[8px] tracking-widest leading-tight">DESIGNED BY ME</p>
-              <p className="text-[5px] md:text-[8px] tracking-widest leading-tight">GHANA INSPIRED</p>
+              <p className="text-[7px] md:text-[11px] tracking-widest leading-tight">DESIGNED BY ME</p>
+              <p className="text-[7px] md:text-[11px] tracking-widest leading-tight">GHANA INSPIRED</p>
+              <p className="text-[5px] md:text-[8px] tracking-widest leading-tight opacity-50">2022–2026</p>
             </>
           ) : (
             <>
-              <p className="text-[5px] md:text-[8px] tracking-widest leading-tight">DESIGNED BY ME</p>
-              <p className="text-[5px] md:text-[8px] tracking-widest leading-tight">{videos[0].label}</p>
+              <p className="text-[7px] md:text-[11px] tracking-widest leading-tight">DESIGNED BY ME</p>
+              <p className="text-[7px] md:text-[11px] tracking-widest leading-tight">{videos[0].label}</p>
             </>
           )}
         </div>
