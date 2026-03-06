@@ -1149,7 +1149,7 @@ function App() {
           style={{ right: `${iconOffset + 36}px` }}
           aria-label="6th March"
         >
-          <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 20, height: 13, display: 'block', borderRadius: 1 }} />
+          <img src="/Images/6thMarch/Flag_of_Ghana.svg.webp" alt="Ghana" style={{ width: 20, height: 13, display: 'block', borderRadius: 1 }} />
         </Link>
         
         {/* Nav links */}
@@ -1237,10 +1237,10 @@ function App() {
         </button>
 
         {/* Nav links for mobile */}
-        <nav className="flex items-center gap-4 text-xs px-2">
+        <nav className="flex items-center gap-4 text-xs px-2" style={{ paddingRight: '28px' }}>
           {/* Ghana flag – first nav item */}
           <Link to="/6thmarch" className="opacity-75 hover:opacity-100 transition-opacity flex-shrink-0" aria-label="6th March">
-            <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 11, height: 7, display: 'block', borderRadius: 1 }} />
+            <img src="/Images/6thMarch/Flag_of_Ghana.svg.webp" alt="Ghana" style={{ width: 11, height: 7, display: 'block', borderRadius: 1 }} />
           </Link>
           <NavLink
             to="/"
@@ -1335,117 +1335,14 @@ function App() {
               width: isTablet ? `calc(100% + ${assetHorizontalBleed}px)` : (viewMode === 'mobile' ? '140%' : '100%'),
               maxWidth: 'none',
               height: 'auto',
-              opacity: (location.pathname === '/' && assetHidden) ? 0 : (isPhone ? 0.75 : 1),
+              opacity: (location.pathname === '/' && assetHidden) ? 0 : (isPhone && location.pathname === '/6thmarch' ? 0.3 : (isPhone ? 0.75 : 1)),
               transition: 'opacity 300ms ease, transform 500ms ease-in-out',
               willChange: 'opacity, transform',
             }}
           />
         )}
 
-        {/* Mobile Asset Sliders - HIDDEN */}
-        {isLocalhost && location.pathname === '/' && viewMode === 'mobile' && (
-             <div className="fixed bottom-24 left-4 right-4 z-[200] flex flex-col gap-2 p-4 bg-white/5 dark:bg-black/5 backdrop-blur-sm rounded-xl border border-black/10 dark:border-white/10 shadow-2xl max-h-[50vh] overflow-y-auto">
-                 <div className="text-xs font-bold mb-2 text-center uppercase tracking-widest">Mobile Controls</div>
-                 
-                 {/* Asset 1 Controls */}
-                 <div className="space-y-1 pb-2 border-b border-gray-500/20">
-                    <div className="flex flex-col gap-1">
-                        <div className="flex justify-between text-[10px] items-center">
-                            <span>Asset X: {liveConfig.assetX || 0}</span>
-                            <div className="flex items-center gap-1">
-                                <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX || 0) - 1)} className="px-1 bg-black/10 rounded">-</button>
-                                <input type="range" min="-500" max="500" step="1" value={liveConfig.assetX || 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} className="w-24"/>
-                                <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX || 0) + 1)} className="px-1 bg-black/10 rounded">+</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-1">
-                        <div className="flex justify-between text-[10px] items-center">
-                            <span>Asset Y: {liveConfig.assetY || 0}</span>
-                            <div className="flex items-center gap-1">
-                                <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY || 0) - 1)} className="px-1 bg-black/10 rounded">-</button>
-                                <input type="range" min="-2000" max="500" step="1" value={liveConfig.assetY || 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} className="w-24"/>
-                                <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY || 0) + 1)} className="px-1 bg-black/10 rounded">+</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <div className="flex justify-between text-[10px] items-center">
-                            <span>Asset Stretch X: {(liveConfig.assetH || 1).toFixed(2)}</span>
-                            <div className="flex items-center gap-1">
-                                <button onClick={() => handleConfigChange('assetH', Number(((liveConfig.assetH || 1) - 0.1).toFixed(2)))} className="px-1 bg-black/10 rounded">-</button>
-                                <input type="range" min="-5" max="20" step="0.1" value={liveConfig.assetH || 1} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} className="w-24"/>
-                                <button onClick={() => handleConfigChange('assetH', Number(((liveConfig.assetH || 1) + 0.1).toFixed(2)))} className="px-1 bg-black/10 rounded">+</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <div className="flex justify-between text-[10px] items-center">
-                            <span>Asset Stretch Y: {(liveConfig.assetV || 1).toFixed(2)}</span>
-                            <div className="flex items-center gap-1">
-                                <button onClick={() => handleConfigChange('assetV', Number(((liveConfig.assetV || 1) - 0.1).toFixed(2)))} className="px-1 bg-black/10 rounded">-</button>
-                                <input type="range" min="-5" max="20" step="0.1" value={liveConfig.assetV || 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} className="w-24"/>
-                                <button onClick={() => handleConfigChange('assetV', Number(((liveConfig.assetV || 1) + 0.1).toFixed(2)))} className="px-1 bg-black/10 rounded">+</button>
-                            </div>
-                        </div>
-                    </div>
-                 </div>
-
-                 {/* Widget Controls */}
-                 <div className="space-y-1 pb-2 border-b border-gray-500/20">
-                    <div className="flex justify-between text-[10px] items-center">
-                        <span>Widget Scale: {(liveConfig.widgetScale || 1).toFixed(2)}</span>
-                        <input type="range" min="0.1" max="1.5" step="0.01" value={liveConfig.widgetScale || 0.66} onChange={(e) => handleConfigChange('widgetScale', parseFloat(e.target.value))} className="w-24"/>
-                    </div>
-                    <div className="flex justify-between text-[10px] items-center">
-                        <span>Widget Y: {liveConfig.widgetY || 0}</span>
-                        <input type="range" min="0" max="300" step="1" value={liveConfig.widgetY || 90} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} className="w-24"/>
-                    </div>
-                 </div>
-
-                {/* Marquee (Scrolling PNGs) Controls */}
-                 <div className="space-y-1 pb-2 border-b border-gray-500/20 pt-1">
-                    <div className="flex justify-between text-[10px] items-center">
-                        <span>Marquee Size: {(liveConfig.marqueeScale || 1).toFixed(2)}</span>
-                        <input type="range" min="0.1" max="1.5" step="0.01" value={liveConfig.marqueeScale || 0.6} onChange={(e) => handleConfigChange('marqueeScale', parseFloat(e.target.value))} className="w-24"/>
-                    </div>
-                    {/* Marquee Y Position isn't requested but helpful - adding anyway */}
-                    <div className="flex justify-between text-[10px] items-center">
-                        <span>Marquee Y: {liveConfig.marqueeY}</span>
-                        <input type="range" min="0" max="200" step="1" value={liveConfig.marqueeY || 11} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} className="w-24"/>
-                    </div>
-                 </div>
-
-                 {/* Floating Nav Bar Controls */}
-                 <div className="space-y-1 pb-2 border-b border-gray-500/20 pt-1">
-                    <div className="flex justify-between text-[10px] items-center">
-                        <span>Nav Size: {(liveConfig.navScale || 1).toFixed(2)}</span>
-                        <input type="range" min="0.5" max="1.5" step="0.01" value={liveConfig.navScale || 1} onChange={(e) => handleConfigChange('navScale', parseFloat(e.target.value))} className="w-24"/>
-                    </div>
-                     <div className="flex justify-between text-[10px] items-center">
-                        <span>Nav Y: {liveConfig.navY}</span>
-                        <input type="range" min="0" max="200" step="1" value={liveConfig.navY || 54} onChange={(e) => handleConfigChange('navY', parseInt(e.target.value))} className="w-24"/>
-                    </div>
-                 </div>
-
-                 {/* Animated LOGO Controls */}
-                 <div className="space-y-1 pt-1">
-                    <div className="flex justify-between text-[10px] items-center">
-                        <span>Logo Size: {(liveConfig.heroScale || 1).toFixed(2)}</span>
-                        <input type="range" min="0.1" max="1.5" step="0.01" value={liveConfig.heroScale || 0.72} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} className="w-24"/>
-                    </div>
-                    <div className="flex justify-between text-[10px] items-center">
-                        <span>Logo Y: {liveConfig.heroY}</span>
-                        <input type="range" min="0" max="300" step="1" value={liveConfig.heroY || 129} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} className="w-24"/>
-                    </div>
-                 </div>
-            </div>
-        )}
-
-        {/* Home-only Asset1 controls (desktop only) - localhost only */}
+        {/* Home-only Asset1 controls (desktop only) - localhost only */}}
         {location.pathname === '/' && viewMode === 'desktop' && (
           <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: isLocalhost ? 'block' : 'none'}}>
             <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>

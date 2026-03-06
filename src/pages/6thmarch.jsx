@@ -50,9 +50,15 @@ export default function SixthMarch() {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const [isGif] = useState(() => {
-    const shown = sessionStorage.getItem('marchIntro_shown');
-    sessionStorage.setItem('marchIntro_shown', '1');
-    return Boolean(shown);
+    // First ever visit → video. Each subsequent visit alternates.
+    const lastShown = localStorage.getItem('marchIntro_lastShown');
+    if (!lastShown) {
+      localStorage.setItem('marchIntro_lastShown', 'video');
+      return false; // show video
+    }
+    const showGif = lastShown === 'video';
+    localStorage.setItem('marchIntro_lastShown', showGif ? 'gif' : 'video');
+    return showGif;
   });
   const [fadedOut, setFadedOut] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
@@ -104,6 +110,27 @@ export default function SixthMarch() {
       vid.play().catch(() => {});
     }
   }, []);
+
+  // Preload intro media early so it starts instantly on mobile
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const head = document.head;
+    if (isGif) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = '/RECENTS/Pi7_GIF_CMP.gif';
+      head.appendChild(link);
+      return () => link.remove();
+    } else {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'video';
+      link.href = '/RECENTS/Untitledd%20copy.mp4';
+      head.appendChild(link);
+      return () => link.remove();
+    }
+  }, [isGif]);
 
   useEffect(() => {
     const timer = setTimeout(() => setFadedOut(true), 3900);
