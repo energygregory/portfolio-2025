@@ -262,6 +262,25 @@ const DEVICE_CONFIGS = {
     widgetY: 0,
     assetOutlineThickness: 0.8,
   },
+  // iPad (810x1052) - Hardcoded from portrait tuning
+  "810x1052": {
+    assetScale: 0.86,
+    assetX: 0,
+    assetY: -154,
+    assetOutlineThickness: 0.5,
+    assetH: 1.62,
+    assetV: 0.86,
+    assetRotation: 0,
+    heroScale: 1.17,
+    heroY: 181,
+    widgetY: 152,
+    marqueeY: 207,
+    marqueeItemScale: 0.36,
+    widgetScale: 0.7,
+    navY: 79,
+    marqueeScale: 0.3,
+    marqueeSpeed: 60,
+  },
   // iPad Air/Pro 11" Portrait (820x1052)
   "820x1052": {
     heroScale: 1.05,
@@ -371,7 +390,8 @@ const getDeviceConfig = (dims, deviceMode) => {
     // Check orientation for tablets
     const width = typeof window !== 'undefined' ? (window.visualViewport?.width || window.innerWidth) : 0;
     
-    // iPad 10th Gen Portrait (width 820)
+    // iPad 10th Gen Portrait (width 810 or 820)
+    if (width === 810) return DEVICE_CONFIGS["810x1052"];
     if (width === 820) return DEVICE_CONFIGS["820x1052"];
 
     // Tablet Landscape (iPad Pro Landscape, etc)
@@ -1220,7 +1240,7 @@ function App() {
         <nav className="flex items-center gap-4 text-xs px-2">
           {/* Ghana flag – first nav item */}
           <Link to="/6thmarch" className="opacity-75 hover:opacity-100 transition-opacity flex-shrink-0" aria-label="6th March">
-            <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 14, height: 9, display: 'block', borderRadius: 1 }} />
+            <img src="/Images/ghana-flag.svg" alt="Ghana" style={{ width: 11, height: 7, display: 'block', borderRadius: 1 }} />
           </Link>
           <NavLink
             to="/"
@@ -1436,8 +1456,12 @@ function App() {
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>Scale</label>
-              <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} />
-              <input type="number" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('assetScale', parseFloat(((liveConfig.assetScale ?? 1) - 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.1</button>
+              <button onClick={() => handleConfigChange('assetScale', parseFloat(((liveConfig.assetScale ?? 1) - 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.01</button>
+              <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('assetScale', parseFloat(((liveConfig.assetScale ?? 1) + 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.01</button>
+              <button onClick={() => handleConfigChange('assetScale', parseFloat(((liveConfig.assetScale ?? 1) + 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.1</button>
+              <input type="number" step="0.01" value={liveConfig.assetScale ?? 1} onChange={(e) => handleConfigChange('assetScale', parseFloat(e.target.value))} style={{width:'50px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>X pos</label>
@@ -1459,18 +1483,30 @@ function App() {
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>Thickness</label>
-              <input type="range" min="0" max="20" step="0.1" value={liveConfig.assetOutlineThickness ?? 0.8} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} />
-              <input type="number" step="0.1" value={liveConfig.assetOutlineThickness ?? 0.8} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('assetOutlineThickness', parseFloat(((liveConfig.assetOutlineThickness ?? 0.8) - 0.5).toFixed(1)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.5</button>
+              <button onClick={() => handleConfigChange('assetOutlineThickness', parseFloat(((liveConfig.assetOutlineThickness ?? 0.8) - 0.1).toFixed(1)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.1</button>
+              <input type="range" min="0" max="20" step="0.1" value={liveConfig.assetOutlineThickness ?? 0.8} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('assetOutlineThickness', parseFloat(((liveConfig.assetOutlineThickness ?? 0.8) + 0.1).toFixed(1)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.1</button>
+              <button onClick={() => handleConfigChange('assetOutlineThickness', parseFloat(((liveConfig.assetOutlineThickness ?? 0.8) + 0.5).toFixed(1)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.5</button>
+              <input type="number" step="0.1" value={liveConfig.assetOutlineThickness ?? 0.8} onChange={(e) => handleConfigChange('assetOutlineThickness', parseFloat(e.target.value))} style={{width:'50px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>X stretch</label>
-              <input type="range" min="-10" max="30" step="0.01" value={liveConfig.assetH ?? 1} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} />
-              <input type="number" step="0.01" value={liveConfig.assetH ?? 1} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('assetH', parseFloat(((liveConfig.assetH ?? 1) - 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.1</button>
+              <button onClick={() => handleConfigChange('assetH', parseFloat(((liveConfig.assetH ?? 1) - 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.01</button>
+              <input type="range" min="-10" max="30" step="0.01" value={liveConfig.assetH ?? 1} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('assetH', parseFloat(((liveConfig.assetH ?? 1) + 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.01</button>
+              <button onClick={() => handleConfigChange('assetH', parseFloat(((liveConfig.assetH ?? 1) + 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.1</button>
+              <input type="number" step="0.01" value={liveConfig.assetH ?? 1} onChange={(e) => handleConfigChange('assetH', parseFloat(e.target.value))} style={{width:'50px'}} />
             </div>
             <div className="flex items-center gap-2">
               <label style={{width:80,fontSize:12}}>Y stretch</label>
-              <input type="range" min="-10" max="30" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} />
-              <input type="number" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('assetV', parseFloat(((liveConfig.assetV ?? 1) - 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.1</button>
+              <button onClick={() => handleConfigChange('assetV', parseFloat(((liveConfig.assetV ?? 1) - 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.01</button>
+              <input type="range" min="-10" max="30" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('assetV', parseFloat(((liveConfig.assetV ?? 1) + 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.01</button>
+              <button onClick={() => handleConfigChange('assetV', parseFloat(((liveConfig.assetV ?? 1) + 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.1</button>
+              <input type="number" step="0.01" value={liveConfig.assetV ?? 1} onChange={(e) => handleConfigChange('assetV', parseFloat(e.target.value))} style={{width:'50px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginTop:6}}>
               <label style={{width:80,fontSize:12}}>Rotation</label>
@@ -1482,36 +1518,56 @@ function App() {
             {/* Animated logo scale quick control */}
             <div className="flex items-center gap-2" style={{marginTop:8}}>
               <label style={{width:80,fontSize:12}}>Logo Scale</label>
-              <input type="range" min="0.2" max="2" step="0.01" value={liveConfig.heroScale ?? 1} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} />
-              <input type="number" step="0.01" value={liveConfig.heroScale ?? 1} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('heroScale', parseFloat(((liveConfig.heroScale ?? 1) - 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.1</button>
+              <button onClick={() => handleConfigChange('heroScale', parseFloat(((liveConfig.heroScale ?? 1) - 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.01</button>
+              <input type="range" min="0.2" max="2" step="0.01" value={liveConfig.heroScale ?? 1} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('heroScale', parseFloat(((liveConfig.heroScale ?? 1) + 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.01</button>
+              <button onClick={() => handleConfigChange('heroScale', parseFloat(((liveConfig.heroScale ?? 1) + 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.1</button>
+              <input type="number" step="0.01" value={liveConfig.heroScale ?? 1} onChange={(e) => handleConfigChange('heroScale', parseFloat(e.target.value))} style={{width:'50px'}} />
             </div>
 
             {/* Logo Y position control */}
             <div className="flex items-center gap-2" style={{marginTop:6}}>
               <label style={{width:80,fontSize:12}}>Logo Y</label>
-              <input type="range" min="-500" max="500" step="1" value={liveConfig.heroY ?? 0} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} />
-              <input type="number" step="1" value={liveConfig.heroY ?? 0} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('heroY', (liveConfig.heroY ?? 0) - 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-10</button>
+              <button onClick={() => handleConfigChange('heroY', (liveConfig.heroY ?? 0) - 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-1</button>
+              <input type="range" min="-500" max="500" step="1" value={liveConfig.heroY ?? 0} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('heroY', (liveConfig.heroY ?? 0) + 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+1</button>
+              <button onClick={() => handleConfigChange('heroY', (liveConfig.heroY ?? 0) + 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+10</button>
+              <input type="number" step="1" value={liveConfig.heroY ?? 0} onChange={(e) => handleConfigChange('heroY', parseInt(e.target.value))} style={{width:'50px'}} />
             </div>
 
             {/* Now Playing Y position - quick control in small panel */}
             <div className="flex items-center gap-2" style={{marginTop:8}}>
               <label style={{width:80,fontSize:12}}>Widget Y</label>
-              <input type="range" min="-200" max="200" step="1" value={liveConfig.widgetY ?? 0} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} />
-              <input type="number" step="1" value={liveConfig.widgetY ?? 0} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('widgetY', (liveConfig.widgetY ?? 0) - 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-10</button>
+              <button onClick={() => handleConfigChange('widgetY', (liveConfig.widgetY ?? 0) - 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-1</button>
+              <input type="range" min="-200" max="300" step="1" value={liveConfig.widgetY ?? 0} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('widgetY', (liveConfig.widgetY ?? 0) + 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+1</button>
+              <button onClick={() => handleConfigChange('widgetY', (liveConfig.widgetY ?? 0) + 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+10</button>
+              <input type="number" step="1" value={liveConfig.widgetY ?? 0} onChange={(e) => handleConfigChange('widgetY', parseInt(e.target.value))} style={{width:'50px'}} />
             </div>
 
             {/* Marquee Y quick control */}
             <div className="flex items-center gap-2" style={{marginTop:6}}>
               <label style={{width:80,fontSize:12}}>Marquee Y</label>
-              <input type="range" min="0" max="300" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} />
-              <input type="number" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('marqueeY', (liveConfig.marqueeY ?? 96) - 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-10</button>
+              <button onClick={() => handleConfigChange('marqueeY', (liveConfig.marqueeY ?? 96) - 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-1</button>
+              <input type="range" min="0" max="400" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('marqueeY', (liveConfig.marqueeY ?? 96) + 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+1</button>
+              <button onClick={() => handleConfigChange('marqueeY', (liveConfig.marqueeY ?? 96) + 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+10</button>
+              <input type="number" step="1" value={liveConfig.marqueeY ?? 96} onChange={(e) => handleConfigChange('marqueeY', parseInt(e.target.value))} style={{width:'50px'}} />
             </div>
 
             {/* Marquee Item Size (scales items without changing gap) */}
             <div className="flex items-center gap-2" style={{marginTop:6}}>
               <label style={{width:80,fontSize:12}}>Marquee Item Size</label>
-              <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeItemScale', parseFloat(e.target.value))} />
-              <input type="number" step="0.01" value={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeItemScale', parseFloat(e.target.value))} style={{width:'60px'}} />
+              <button onClick={() => handleConfigChange('marqueeItemScale', parseFloat(((liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1) - 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.1</button>
+              <button onClick={() => handleConfigChange('marqueeItemScale', parseFloat(((liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1) - 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-.01</button>
+              <input type="range" min="0.1" max="3" step="0.01" value={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeItemScale', parseFloat(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('marqueeItemScale', parseFloat(((liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1) + 0.01).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.01</button>
+              <button onClick={() => handleConfigChange('marqueeItemScale', parseFloat(((liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1) + 0.1).toFixed(2)))} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+.1</button>
+              <input type="number" step="0.01" value={liveConfig.marqueeItemScale ?? liveConfig.marqueeScale ?? 1} onChange={(e) => handleConfigChange('marqueeItemScale', parseFloat(e.target.value))} style={{width:'50px'}} />
             </div>
           </div>
         )}

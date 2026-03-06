@@ -363,8 +363,9 @@ const PostersContent = () => {
     ];
 
     const posterCount = posterData.length;
-    const PRIORITY_COUNT = 10;
-    const CONCURRENCY = 12;
+    const isMobileLoad = typeof window !== 'undefined' && window.innerWidth < 768;
+    const PRIORITY_COUNT = isMobileLoad ? 3 : 10;
+    const CONCURRENCY = isMobileLoad ? 2 : 12;
 
     // Preload strategy: preload AVIF variants (the format browsers actually use)
     // to avoid wasted bandwidth on original files the <picture> element won't select.
@@ -380,8 +381,9 @@ const PostersContent = () => {
       };
 
       // Preload first batch as AVIF at the size the browser will actually use
-      // Desktop tiles are 300px → 400w is perfect (or 800w for retina)
-      const preloadWidth = window.devicePixelRatio > 1 ? 800 : 400;
+      // On mobile use 400w to avoid heavy downloads on small screens
+      const isMobilePreload = typeof window !== 'undefined' && window.innerWidth < 768;
+      const preloadWidth = isMobilePreload ? 400 : (window.devicePixelRatio > 1 ? 800 : 400);
       for (let i = 0; i < Math.min(PRIORITY_COUNT, posterData.length); i++) {
         try {
           const url = toAvif(posterData[i].src, preloadWidth);
@@ -698,7 +700,7 @@ const PostersContent = () => {
               const absOffset = Math.abs(offset);
               
               // Only render posters within a visible range to save resources/DOM clutter
-              if (absOffset > 5) return null;
+              if (absOffset > (isMobile ? 2 : 5)) return null;
 
               const isActive = offset === 0;
               // z-index: Main is on top (100). Further away = lower z-index.
@@ -733,7 +735,7 @@ const PostersContent = () => {
                     transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1)',
                   }}
                   onClick={() => handlePosterClick(index)}
-                  loading={Math.abs(index - currentIndex) < 2 ? "eager" : "lazy"}
+                  loading={index === currentIndex ? "eager" : "lazy"}
                 />
               );
             })}
