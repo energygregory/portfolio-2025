@@ -1288,16 +1288,16 @@ function App() {
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/')) ? 'z-0' : 'z-20'}`}
             style={{
-              left: viewMode === 'desktop' ? '50%' : '0px',
+              left: viewMode === 'desktop' ? '50%' : '-4px',
               top: viewMode === 'desktop' ? '50%' : '48px',
               transform: viewMode === 'desktop' 
                 ? `translate(-50%, -50%) translate(${liveConfig.assetX ?? 0}px, ${liveConfig.assetY ?? 0}px) scale(${liveConfig.assetScale ?? 1}) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`
                 : `scale(${liveConfig.assetScale ?? 1}) translateX(${liveConfig.assetX ?? 0}px) translateY(${liveConfig.assetY ?? 0}px) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
               transformOrigin: viewMode === 'desktop' ? 'center' : 'left top',
-              width: viewMode === 'mobile' ? '100%' : '100%',
+              width: viewMode === 'mobile' ? 'calc(100% + 8px)' : '100%',
               maxWidth: 'none',
               height: 'auto',
-              opacity: (location.pathname === '/' && assetHidden) ? 0 : 1, // Only hide on scroll for Home
+              opacity: (location.pathname === '/' && assetHidden) ? 0 : 1,
               transition: 'opacity 300ms ease, transform 500ms ease-in-out',
               willChange: 'opacity, transform',
             }}
