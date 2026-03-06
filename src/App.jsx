@@ -135,25 +135,22 @@ const HARDCODED_ASSET_THICKNESS = 0.8;
 const DEVICE_CONFIGS = {
   // iPhone 14 Pro Mobile (Generic Mobile Fallback updated to these values)
   mobile: {
-    heroScale: 0.55,      // Logo Size
-    heroY: 129,           // Logo Y
-    assetX: 11,
-    assetY: -112,
-    assetH: 0.95,         // Asset Stretch X
-    assetV: 0.80,         // Asset Stretch Y
-    navScale: 1.00,       // Nav Size
+    heroScale: 0.72,
+    heroY: 129,
+    animatedOutlineWidth: 4.4,
+    assetX: 0,
+    assetY: -181,
+    assetScale: 1,
+    assetH: 1,
+    assetV: 0.88,
     navY: 54,
     widgetScale: 0.66,
     widgetY: 90,
-    marqueeScale: 0.96,   // Marquee Size
-    marqueeY: 11,
-    
-    // --- Below are existing values not in the screenshot, kept for functionality ---
-    assetScale: 1,
-    animatedOutlineWidth: 4.4,
     assetOutlineThickness: 0.8,
     assetRotation: 0,
-    marqueeGap: 24, 
+    marqueeY: 11,
+    marqueeScale: 0.6,
+    marqueeGap: 24,
     marqueeSpeed: 60,
   },
   // iPhone 12 Pro (390x844) - LOCKED IN
@@ -412,8 +409,8 @@ const GlobalBackground = () => (
         className="fixed inset-0 -z-[2] pointer-events-none transition-colors duration-500"
         style={{
             backgroundColor: 'var(--bg-base, #000000)',
-            width: '100vw',
-            height: '100vh',
+      width: '100%',
+      height: '100%',
             left: 0,
             top: 0,
             margin: 0,
@@ -1058,6 +1055,8 @@ function App() {
     }
   }, [theme]);
 
+  const assetHorizontalBleed = viewMode === 'mobile' ? (isTablet ? 56 : 8) : 0;
+
   return (
     <>
       <GlobalBackground />
@@ -1069,7 +1068,7 @@ function App() {
               ? "text-white theme-dark"
               : "text-black theme-light"
           }`}
-          style={{ backgroundColor: 'transparent', width: '100vw', maxWidth: '100vw', margin: 0, padding: 0, left: 0, position: 'relative' }}
+          style={{ backgroundColor: 'transparent', width: '100%', maxWidth: '100%', margin: 0, padding: 0, left: 0, position: 'relative' }}
       >
       <NavigationLoader theme={theme} onInitialLoad={() => {
         // Remove the initial HTML loader when React's NavigationLoader takes over
@@ -1277,7 +1276,7 @@ function App() {
       )}
 
       {/* Asset1.svg decorative element - positioned between navbar and footer */}
-      <div className="relative flex-1 flex flex-col" style={{ height: '100%', width: '100%', maxWidth: '100%', overflow: 'hidden', position: 'relative' }}>
+      <div className="relative flex-1 flex flex-col" style={{ height: '100%', width: '100%', maxWidth: '100%', position: 'relative' }}>
         {(
           (viewMode === 'mobile' || 
           location.pathname === '/') &&
@@ -1288,13 +1287,15 @@ function App() {
             outlineThickness={liveConfig.assetOutlineThickness ?? 0.8}
             className={`pointer-events-none absolute ${(location.pathname.startsWith('/work/')) ? 'z-0' : 'z-20'}`}
             style={{
-              left: viewMode === 'desktop' ? '50%' : '-4px',
+              left: viewMode === 'desktop' ? '50%' : (isTablet ? `-${assetHorizontalBleed / 2}px` : '50%'),
               top: viewMode === 'desktop' ? '50%' : '48px',
-              transform: viewMode === 'desktop' 
+              transform: viewMode === 'desktop'
                 ? `translate(-50%, -50%) translate(${liveConfig.assetX ?? 0}px, ${liveConfig.assetY ?? 0}px) scale(${liveConfig.assetScale ?? 1}) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`
-                : `scale(${liveConfig.assetScale ?? 1}) translateX(${liveConfig.assetX ?? 0}px) translateY(${liveConfig.assetY ?? 0}px) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
-              transformOrigin: viewMode === 'desktop' ? 'center' : 'left top',
-              width: viewMode === 'mobile' ? 'calc(100% + 8px)' : '100%',
+                : isTablet
+                  ? `scale(${liveConfig.assetScale ?? 1}) translateX(${liveConfig.assetX ?? 0}px) translateY(${liveConfig.assetY ?? 0}px) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`
+                  : `translateX(calc(-50% + ${liveConfig.assetX ?? 0}px)) translateY(${liveConfig.assetY ?? 0}px) scaleX(${liveConfig.assetH ?? 1}) scaleY(${liveConfig.assetV ?? 1}) scale(${liveConfig.assetScale ?? 1}) rotate(${liveConfig.assetRotation ?? 0}deg)`,
+              transformOrigin: viewMode === 'desktop' ? 'center' : (isTablet ? 'left top' : undefined),
+              width: isTablet ? `calc(100% + ${assetHorizontalBleed}px)` : (viewMode === 'mobile' ? '140%' : '100%'),
               maxWidth: 'none',
               height: 'auto',
               opacity: (location.pathname === '/' && assetHidden) ? 0 : 1,
@@ -1327,7 +1328,7 @@ function App() {
                             <span>Asset Y: {liveConfig.assetY || 0}</span>
                             <div className="flex items-center gap-1">
                                 <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY || 0) - 1)} className="px-1 bg-black/10 rounded">-</button>
-                                <input type="range" min="-5000" max="2000" step="1" value={liveConfig.assetY || 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} className="w-24"/>
+                                <input type="range" min="-2000" max="500" step="1" value={liveConfig.assetY || 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} className="w-24"/>
                                 <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY || 0) + 1)} className="px-1 bg-black/10 rounded">+</button>
                             </div>
                         </div>
@@ -1423,13 +1424,19 @@ function App() {
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>X pos</label>
-              <input type="range" min="-8000" max="8000" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} />
+              <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX ?? 0) - 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-1</button>
+              <input type="range" min="-500" max="500" step="1" value={Math.max(-500,Math.min(500,liveConfig.assetX ?? 0))} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('assetX', (liveConfig.assetX ?? 0) + 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+1</button>
               <input type="number" step="1" value={liveConfig.assetX ?? 0} onChange={(e) => handleConfigChange('assetX', parseInt(e.target.value))} style={{width:'60px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>Y pos</label>
-              <input type="range" min="-8000" max="8000" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} />
-              <input type="number" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{width:'80px'}} />
+              <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY ?? 0) - 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-10</button>
+              <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY ?? 0) - 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>-1</button>
+              <input type="range" min="-2000" max="1000" step="1" value={Math.max(-2000,Math.min(1000,liveConfig.assetY ?? 0))} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{flex:1}} />
+              <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY ?? 0) + 1)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+1</button>
+              <button onClick={() => handleConfigChange('assetY', (liveConfig.assetY ?? 0) + 10)} style={{padding:'2px 5px',fontSize:10,cursor:'pointer',borderRadius:3,background:'rgba(128,128,128,0.2)'}}>+10</button>
+              <input type="number" step="1" value={liveConfig.assetY ?? 0} onChange={(e) => handleConfigChange('assetY', parseInt(e.target.value))} style={{width:'60px'}} />
             </div>
             <div className="flex items-center gap-2" style={{marginBottom:6}}>
               <label style={{width:80,fontSize:12}}>Thickness</label>
@@ -1621,7 +1628,7 @@ function App() {
       )}
         
         {/* Main content - above Asset1 */}
-        <main className={`relative z-10 flex-grow p-0 w-full max-w-full overflow-x-hidden ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${(location.pathname.startsWith('/work') || location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'pointer-events-none' : ''}`}>
+        <main className={`relative z-10 flex-grow p-0 w-full max-w-full overflow-x-hidden ${slideTransition ? 'page-transition' : ''} ${viewMode === 'mobile' ? 'mobile-view-wrapper' : 'desktop-view-wrapper'} ${(location.pathname === '/recents' || location.pathname === '/6thmarch') ? 'pointer-events-none' : ''}`}>
           <Suspense
             fallback={<div className="min-h-screen" />}
           >

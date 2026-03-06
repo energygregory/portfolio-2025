@@ -619,6 +619,26 @@ const PostersContent = () => {
         stateRef.current.isDragging = false;
     };
 
+    const handleDesktopTouchStart = (e) => {
+        if(isMobile) return;
+        stateRef.current.isDragging = true;
+        stateRef.current.lastPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    };
+
+    const handleDesktopTouchMove = (e) => {
+        if (!stateRef.current.isDragging) return;
+        const dx = e.touches[0].clientX - stateRef.current.lastPos.x;
+        const dy = e.touches[0].clientY - stateRef.current.lastPos.y;
+        
+        stateRef.current.offset.x += dx * 1.5;
+        stateRef.current.offset.y += dy * 1.5;
+        stateRef.current.lastPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    };
+
+    const handleDesktopTouchEnd = () => {
+        stateRef.current.isDragging = false;
+    };
+
     const handleWheel = (e) => {
         // Optional: Map scroll wheel to pan
         const dx = -e.deltaX;
@@ -803,9 +823,9 @@ const PostersContent = () => {
 
       <div 
         ref={containerRef}
-        className="fixed inset-0 w-full h-full overflow-hidden cursor-grab active:cursor-grabbing select-none bg-transparent pointer-events-auto"
+        className="fixed inset-0 w-full h-full overflow-hidden cursor-grab active:cursor-grabbing select-none bg-transparent pointer-events-auto touch-none"
         style={{ 
-            zIndex: 0, // 0 to sit behind z-10 content but above -z global background
+            zIndex: 25, // above main z-10 so iPad touch events reach the grid
              // Dynamic Mask Image based on controls
                maskImage: `linear-gradient(to bottom, transparent 0%, transparent ${GRADIENT_START}%, black ${GRADIENT_END}%, black 100%)`,
                WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, transparent ${GRADIENT_START}%, black ${GRADIENT_END}%, black 100%)`
@@ -813,6 +833,10 @@ const PostersContent = () => {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onTouchStart={handleDesktopTouchStart}
+        onTouchMove={handleDesktopTouchMove}
+        onTouchEnd={handleDesktopTouchEnd}
+        onTouchCancel={handleDesktopTouchEnd}
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       >
@@ -984,16 +1008,34 @@ const getContentForItem = (item) => {
   }
 };
 
-const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSelectedItem }) => {
+const IPAD_PORTRAIT_PRESET = {
+  navY: 93,
+  textX: 506,
+  textY: -54,
+  textScale: 0.83,
+};
+
+const IPAD_LANDSCAPE_PRESET = {
+  navY: 63,
+  textX: 326,
+  textY: -121,
+  textScale: 1.02,
+};
+
+const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSelectedItem, textX = 0 }) => {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const navigate = useNavigate();
 
   // Responsive values
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
     // Check if mobile
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+      setIsTablet(window.innerWidth >= 640 && window.innerWidth < 1200);
+    };
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -1052,13 +1094,13 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               }`}
               style={{
                 top: selectedItem 
-                  ? (isMobile ? '-75px' : '-160px')
+                  ? (isMobile ? '-75px' : (isTablet ? '8px' : '-160px'))
                   : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 
                 left: selectedItem ? '24px' : '50%',
                 transform: selectedItem 
-                  ? (isMobile ? 'translate(0, 0) scale(0.7)' : 'translate(0, 0) scale(0.85)') // scaled down on mobile
-                  : 'translate(-50%, 0) scale(1)',
+                  ? (isMobile ? `translate(${textX}px, 0) scale(0.7)` : `translate(${textX}px, 0) scale(0.85)`) // scaled down on mobile
+                  : `translate(calc(-50% + ${textX}px), 0) scale(1)`,
                 
                 transformOrigin: 'left center',
                 zIndex: isSelected ? 50 : 10
@@ -1125,7 +1167,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
                             fontFamily: "'PT Mono', monospace",
                           }}
                         >
-                          SCROLL ANY DIRECTION TO EXPLORE, HOVER TO COLOUR
+                          SCROLL ANY DIRECTION TO EXPLORE
                         </h3>
                 </div>
               )}
@@ -1166,6 +1208,32 @@ export default function Work({ initialSection } = {}) {
 
   // Track if we are in a detail view (Graphic Design) to hide the mini-nav
   const [isGraphicDetailView, setIsGraphicDetailView] = useState(false);
+  
+  // Dev control states for iPad tuning
+  const [navY, setNavY] = useState(20);
+  const [textX, setTextX] = useState(0);
+  const [textY, setTextY] = useState(0);
+  const [textScale, setTextScale] = useState(1);
+  const [isIpadLike, setIsIpadLike] = useState(false);
+  const [isPortraitMode, setIsPortraitMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(orientation: portrait)').matches;
+  });
+
+  const isIpadPortrait = isIpadLike && isPortraitMode;
+  const isIpadLandscape = isIpadLike && !isPortraitMode;
+  const activeIpadPreset = isIpadPortrait
+    ? IPAD_PORTRAIT_PRESET
+    : isIpadLandscape
+      ? IPAD_LANDSCAPE_PRESET
+      : null;
+  const isIpadPresetLocked = Boolean(activeIpadPreset);
+  const presetLabel = isIpadPortrait ? 'Portrait preset locked' : isIpadLandscape ? 'Landscape preset locked' : '';
+
+  const effectiveNavY = activeIpadPreset ? activeIpadPreset.navY : navY;
+  const effectiveTextX = activeIpadPreset ? activeIpadPreset.textX : textX;
+  const effectiveTextY = activeIpadPreset ? activeIpadPreset.textY : textY;
+  const effectiveTextScale = activeIpadPreset ? activeIpadPreset.textScale : textScale;
 
   // Sync state with URL params on mount/update
   useEffect(() => {
@@ -1203,6 +1271,23 @@ export default function Work({ initialSection } = {}) {
     sessionStorage.setItem('work_active_category', activeCategory);
   }, [activeCategory]);
 
+  useEffect(() => {
+    const detectIpadLike = () => {
+      const ua = navigator.userAgent || '';
+      const appleTablet = /iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const coarseTablet = window.matchMedia('(pointer: coarse)').matches
+        && Math.min(window.innerWidth, window.innerHeight) >= 600
+        && Math.max(window.innerWidth, window.innerHeight) <= 1400;
+
+      setIsIpadLike(appleTablet || coarseTablet);
+      setIsPortraitMode(window.matchMedia('(orientation: portrait)').matches);
+    };
+
+    detectIpadLike();
+    window.addEventListener('resize', detectIpadLike);
+    return () => window.removeEventListener('resize', detectIpadLike);
+  }, []);
+
   const handleGraphicSelection = (item) => {
     if (item) {
       // Navigate to /work/item-name
@@ -1226,9 +1311,92 @@ export default function Work({ initialSection } = {}) {
     // Graphic Design allows scrolling
     <main className={`transition-colors duration-500 min-h-screen font-['PT_Mono'] selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col items-center pt-24 sm:pt-32 ${activeCategory === 'merch' ? 'h-screen overflow-hidden' : 'w-full'}`}>
       
+      {/* Dev Controls for iPad tweaking */}
+      <div 
+        className="fixed bottom-4 right-4 z-[9999] bg-white/90 dark:bg-black/90 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col gap-2 pointer-events-auto"
+      >
+        <span className="text-[10px] font-bold uppercase tracking-widest text-center">iPad Tuning</span>
+        {isIpadPresetLocked && (
+          <span className="text-[9px] uppercase tracking-widest text-center text-neutral-600 dark:text-neutral-400">
+            {presetLabel}
+          </span>
+        )}
+        <div className="flex flex-col gap-1">
+          <label className="text-[9px] uppercase tracking-widest flex justify-between">
+            <span>Mini Nav Y:</span> <span>{effectiveNavY}px</span>
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="300"
+            step="1"
+            value={effectiveNavY}
+            onInput={(e) => setNavY(Number(e.currentTarget.value))}
+            onChange={(e) => setNavY(Number(e.currentTarget.value))}
+            className="w-32 touch-auto pointer-events-auto"
+            disabled={isIpadPresetLocked}
+          />
+        </div>
+        {isIpadLike && (
+          <>
+            <div className="flex flex-col gap-1">
+              <label className="text-[9px] uppercase tracking-widest flex justify-between">
+                <span>William Ru Text X:</span> <span>{effectiveTextX}px</span>
+              </label>
+              <input
+                type="range"
+                min="-1200"
+                max="1200"
+                step="1"
+                value={effectiveTextX}
+                onInput={(e) => setTextX(Number(e.currentTarget.value))}
+                onChange={(e) => setTextX(Number(e.currentTarget.value))}
+                className="w-32 touch-auto pointer-events-auto"
+                disabled={isIpadPresetLocked}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[9px] uppercase tracking-widest flex justify-between">
+                <span>William Ru Text Y:</span> <span>{effectiveTextY}px</span>
+              </label>
+              <input
+                type="range"
+                min="-300"
+                max="300"
+                step="1"
+                value={effectiveTextY}
+                onInput={(e) => setTextY(Number(e.currentTarget.value))}
+                onChange={(e) => setTextY(Number(e.currentTarget.value))}
+                className="w-32 touch-auto pointer-events-auto"
+                disabled={isIpadPresetLocked}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[9px] uppercase tracking-widest flex justify-between">
+                <span>William Ru Text Scale:</span> <span>{effectiveTextScale.toFixed(2)}x</span>
+              </label>
+              <input
+                type="range"
+                min="0.6"
+                max="2"
+                step="0.01"
+                value={effectiveTextScale}
+                onInput={(e) => setTextScale(Number(e.currentTarget.value))}
+                onChange={(e) => setTextScale(Number(e.currentTarget.value))}
+                className="w-32 touch-auto pointer-events-auto"
+                disabled={isIpadPresetLocked}
+              />
+            </div>
+          </>
+        )}
+      </div>
+
       {/* Mini nav - Adjusted z-index to sit on top of carousel */}
       <div 
-        className={`w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed top-[20px] left-1/2 -translate-x-1/2 sm:sticky sm:top-32 sm:left-auto sm:translate-x-0 transition-opacity duration-500 ease-in-out ${isGraphicDetailView ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
+        className={`w-full max-w-xl mb-2 flex flex-col items-center z-[60] fixed left-1/2 -translate-x-1/2 transition-opacity duration-500 ease-in-out ${isGraphicDetailView ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}
+        style={{ top: `${effectiveNavY}px` }}
       >
         <nav className="flex gap-12 mb-0 border-b border-black/50 dark:border-white/50 pb-0 backdrop-blur-sm relative">
           <button
@@ -1252,14 +1420,21 @@ export default function Work({ initialSection } = {}) {
             Graphic Design
           </button>
         </nav>
-        <span className="uppercase tracking-[0] text-[10px] text-neutral-500 mt-1">Selected Works</span>
+        <span className="uppercase tracking-[0] text-[10px] text-neutral-500 mt-1">
+          Selected Works
+        </span>
       </div>
 
       {activeCategory === 'merch' && (
         // Full screen fixed background for the carousel
         // z-0 puts it behind the mini nav (z-[60])
         <section className="fixed inset-0 w-full h-full z-0 flex items-start justify-start pointer-events-auto">
-            <BlurCarousel />
+            <BlurCarousel
+              textXOffset={isIpadLike ? -778 + effectiveTextX : -778}
+              textYOffset={isIpadLike ? effectiveTextY : 0}
+              textScale={isIpadLike ? effectiveTextScale : 1}
+              isIpad={isIpadLike}
+            />
         </section>
       )}
 
@@ -1268,6 +1443,7 @@ export default function Work({ initialSection } = {}) {
         {activeCategory === 'graphic' && (
           <section className="w-full max-w-4xl mt-4 mb-0 px-6 flex-grow flex flex-col">
             <GraphicDesignSection 
+              textX={0}
               items={['LOGOS', 'POSTERS', 'VISUAL DESIGN', 'PACKAGING DESIGN', 'TECHPACK DESIGN', 'BRAND DESIGN', 'RECENTS']} 
               onDetailViewChange={setIsGraphicDetailView}
               selectedItem={selectedGraphicItem}

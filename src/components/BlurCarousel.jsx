@@ -12,7 +12,7 @@ const baseItems = [
 // 12 sets is usually enough buffer for 'infinite' feel if we reset scroll
 const items = Array(12).fill(baseItems).flat();
 
-const BlurCarousel = () => {
+const BlurCarousel = ({ textXOffset = -778, textYOffset = 0, textScale = 1, isIpad = false }) => {
     const containerRef = useRef(null);
     const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -27,7 +27,6 @@ const BlurCarousel = () => {
     // DEBUG: Global Controls
     const [globalScale, setGlobalScale] = useState(1);
     const [globalX, setGlobalX] = useState(0);
-    const [textXOffset, setTextXOffset] = useState(-90);
 
     const handleScroll = () => {
         if (containerRef.current) {
@@ -107,6 +106,9 @@ const BlurCarousel = () => {
                         verticalGap={MOBILE_VERTICAL_GAP}
                         xControlPoints={MOBILE_X_POINTS}
                         textXOffset={textXOffset}
+                        textYOffset={textYOffset}
+                        textScale={textScale}
+                        isIpad={isIpad}
                     />
                 ))}
             </div>
@@ -114,7 +116,7 @@ const BlurCarousel = () => {
     );
 };
 
-const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, manualSize, verticalGap, xControlPoints, textXOffset }) => {
+            const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, manualSize, verticalGap, xControlPoints, textXOffset, textYOffset, textScale, isIpad }) => {
     const itemRef = useRef(null);
     const navigate = useNavigate();
     const [style, setStyle] = useState({ opacity: 0.2, filter: 'blur(8px)', transform: 'translateX(0) scale(0.8)' });
@@ -284,18 +286,26 @@ const CarouselItem = ({ src, label, mobileLines, slug, containerRef, scrollTop, 
                   </div>
                   {/* Desktop: multi-line right-aligned, near image */}
                   <div className="hidden sm:flex flex-col items-end text-right"
-                    style={{ fontFamily: "'PT Mono', monospace", transform: `translateX(${textXOffset}px)`, paddingRight: '16px' }}
-                  style={{ fontFamily: "'PT Mono', monospace", transform: 'translateX(-778px)', paddingRight: '16px' }}
+                    style={{
+                      fontFamily: "'PT Mono', monospace",
+                      transform: `translateX(${textXOffset}px) translateY(${isIpad ? textYOffset : 0}px) scale(${isIpad ? textScale : 1})`,
+                      transformOrigin: 'right center',
+                      paddingRight: '16px'
+                    }}
                   >
                     {(mobileLines || []).map((line, i) => (
                       <span
                         key={i}
                         className={`uppercase ${
                           i === 0
-                            ? 'text-base tracking-[0.15em] text-neutral-500 dark:text-neutral-400'
-                            : 'text-sm tracking-[0.12em] text-neutral-600 dark:text-neutral-500'
+                            ? (isIpad
+                                ? 'text-[19px] tracking-[0.24em] font-bold text-neutral-500 dark:text-neutral-300'
+                                : 'text-base tracking-[0.15em] text-neutral-500 dark:text-neutral-400')
+                            : (isIpad
+                                ? 'text-[12px] tracking-[0.15em] font-medium text-neutral-600 dark:text-neutral-500'
+                                : 'text-sm tracking-[0.12em] text-neutral-600 dark:text-neutral-500')
                         }`}
-                        style={{ lineHeight: '1.5' }}
+                        style={{ lineHeight: isIpad ? (i === 0 ? '1.2' : '1.35') : '1.5', opacity: i === 0 ? 1 : (isIpad ? 0.82 : 1) }}
                       >
                         {line}
                       </span>

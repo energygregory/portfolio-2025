@@ -43,7 +43,7 @@ export default function Asset1Svg({ theme = "dark", style = {}, className = "", 
   ].join('\n');
 
   // Ensure the SVG scales responsively inside its container
-  const responsiveCss = '\n.asset1-svg-container svg { width: 100% !important; height: auto !important; display:block !important;}\n';
+  const responsiveCss = '\n.asset1-svg-container svg { width: 100% !important; min-width: 100% !important; height: auto !important; display:block !important; overflow: visible !important;}\n';
 
   const overrideCss = theme === "dark" ? darkCss + responsiveCss : lightCss + responsiveCss;
 
