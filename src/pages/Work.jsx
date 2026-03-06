@@ -1258,7 +1258,7 @@ export default function Work({ initialSection } = {}) {
       {/* Dev Controls for iPad tweaking */}
       <div 
         className="fixed bottom-4 right-4 z-[9999] bg-white/90 dark:bg-black/90 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col gap-2 pointer-events-auto"
-        style={{ display: IS_LOCALHOST ? 'flex' : 'none' }}
+        style={{ display: 'none' }}
       >
         <span className="text-[10px] font-bold uppercase tracking-widest text-center">iPad Tuning</span>
         {isIpadPresetLocked && (

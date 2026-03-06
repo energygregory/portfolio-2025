@@ -1237,7 +1237,7 @@ function App() {
         </button>
 
         {/* Nav links for mobile */}
-        <nav className="flex items-center gap-4 text-xs px-2" style={{ paddingRight: '28px' }}>
+        <nav className="flex items-center gap-4 text-xs px-2" style={{ paddingRight: '18px' }}>
           {/* Ghana flag – first nav item */}
           <Link to="/6thmarch" className="opacity-75 hover:opacity-100 transition-opacity flex-shrink-0" aria-label="6th March">
             <img src="/Images/6thMarch/Flag_of_Ghana.svg.webp" alt="Ghana" style={{ width: 11, height: 7, display: 'block', borderRadius: 1 }} />
@@ -1344,7 +1344,7 @@ function App() {
 
         {/* Home-only Asset1 controls (desktop only) - localhost only */}}
         {location.pathname === '/' && viewMode === 'desktop' && (
-          <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: isLocalhost ? 'block' : 'none'}}>
+          <div style={{position: 'fixed', right: 18, bottom: 120, zIndex: 1200, background: theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)', color: theme === 'dark' ? 'white' : 'black', padding: '10px', borderRadius: '8px', fontFamily: 'sans-serif', width: '300px', display: 'none'}}>
             <div style={{fontWeight: '700', marginBottom: 6, fontSize: 12}}>Asset Controls (Home)</div>
             {/* Browser window size detection */}
             <div style={{fontSize:11, marginBottom:8}}>
