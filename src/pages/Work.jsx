@@ -1035,7 +1035,7 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
               }`}
               style={{
                 top: selectedItem 
-                  ? (isMobile ? `${-75 + topLabelY}px` : (isTablet ? `${8 + topLabelY}px` : `${-160 + topLabelY}px`))
+                  ? (isMobile ? `${-45 + topLabelY}px` : (isTablet ? `${38 + topLabelY}px` : `${-110 + topLabelY}px`))
                   : `${idx * ITEM_HEIGHT + TOP_OFFSET}px`,
                 
                 left: selectedItem ? '24px' : '50%',
@@ -1059,7 +1059,11 @@ const GraphicDesignSection = ({ items, onDetailViewChange, selectedItem, setSele
             >
               {/* Back Arrow - Only visible when selected */}
               {isSelected && <div 
-                className="transition-all duration-500 delay-300 opacity-100 w-8 md:w-12 -ml-8 md:-ml-12"
+                className="transition-all duration-500 delay-300 opacity-100 w-8 md:w-12 -ml-8 md:-ml-12 z-50 pointer-events-auto cursor-default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedItem(null);
+                }}
               >
                  <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-black dark:text-white">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -1153,7 +1157,7 @@ export default function Work({ initialSection } = {}) {
   const [isGraphicDetailView, setIsGraphicDetailView] = useState(false);
   
   // Dev control states for iPad tuning
-  const [navY, setNavY] = useState(20);
+  const [navY, setNavY] = useState(85);
   const [textX, setTextX] = useState(0);
   const [textY, setTextY] = useState(0);
   const [textScale, setTextScale] = useState(1);
