@@ -4,6 +4,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 const sections = {
 	"kids-next-door-hoodie": {
 		title: 'KND "NUMBUH 4" HOODIE',
+		subtitle: 'Inspired by Numbuh 4 of the "Codename: Kids Next Door" animated tv show',
 		images: [
 			"/Images/William Ru/png1.png",
 		],
@@ -12,7 +13,6 @@ const sections = {
 		title: "NOTTING HILL PINSTRIPE SHIRT",
 		images: [
 			"/Images/William Ru/png2.png",
-			"/Images/William Ru/DSC07061.jpeg",
 			"/Images/William Ru/DSC07129.jpeg",
 		],
 	},
@@ -118,23 +118,39 @@ export default function WilliamRu() {
 
 			<div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-2 gap-4">
 				{images.map((src, i) => (
-					<a
-						key={src}
-						href={src}
-						target="_blank"
-						rel="noreferrer noopener"
-						className="block overflow-hidden"
-						aria-label={`Open photo ${i + 1}`}
-					>
-						<img
-							src={src}
-							alt={`William Ru photo ${i + 1}`}
-							loading="lazy"
-							decoding="async"
-							className="w-full h-auto sm:h-[500px] sm:object-cover transition-transform duration-300 hover:scale-105"
-							style={isCamoMobile ? { width: `${camoScale}%`, maxWidth: 'none' } : undefined}
-						/>
-					</a>
+					<React.Fragment key={src}>
+						<a
+							href={src}
+							target="_blank"
+							rel="noreferrer noopener"
+							className="block overflow-hidden"
+							aria-label={`Open photo ${i + 1}`}
+						>
+							<img
+								src={src}
+								alt={`William Ru photo ${i + 1}`}
+								loading="lazy"
+								decoding="async"
+								className="w-full h-auto sm:h-[500px] sm:object-cover transition-transform duration-300 hover:scale-105"
+								style={isCamoMobile ? { width: `${camoScale}%`, maxWidth: 'none' } : undefined}
+							/>
+						</a>
+						{/* Desktop: Subtitle in the second column for KND Hoodie */}
+						{!isMobile && activeItem === 'kids-next-door-hoodie' && i === 0 && (
+							<div className="flex flex-col items-start justify-start pl-8 gap-6">
+								<p className="text-sm text-neutral-500 font-mono italic max-w-xs leading-relaxed">
+									{sections[activeItem].subtitle}
+								</p>
+								<div className="w-1/2 max-w-[120px] opacity-80">
+									<img
+										src="/Images/William Ru/knd.png"
+										alt="KND Reference"
+										className="w-full h-auto"
+									/>
+								</div>
+							</div>
+						)}
+					</React.Fragment>
 				))}
 			</div>
 		</div>

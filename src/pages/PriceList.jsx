@@ -211,6 +211,12 @@ export default function PriceList() {
                 4. OWNERSHIP: Final designs become client property upon full
                 payment. I retain the right to display the work in my portfolio.
               </p>
+              <p>
+                5. All charges quoted "per design" strictly means per 1 single design concept, limited to 5 colourways.
+              </p>
+              <div className="mt-8 pt-4 border-t border-neutral-700 font-bold uppercase italic">
+                PAYING THE INITIAL DEPOSIT MEANS YOU AGREE TO THESE TERMS.
+              </div>
             </div>
           </div>
         </div>
